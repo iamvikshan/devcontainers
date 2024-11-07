@@ -1,13 +1,11 @@
-# Bun + Node.js DevContainer
+# Bun DevContainer
 
-A minimal development container configuration with Bun, Node.js, and Git.
+A minimal development container configuration with Bun and Git.
 
 ## Contents
 
 - Bun (latest)
-- Node.js (latest)
 - Git
-- Eslint
 
 ## Usage
 
@@ -16,15 +14,15 @@ A minimal development container configuration with Bun, Node.js, and Git.
 Copy the `.devcontainer` directory to your project:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun-node/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
-curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun-node/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
+curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
+curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
 ```
 
 ### Container Registry
 
 ```json
 {
-  "image": "ghcr.io/vixshan/devcontainers/bun-node:latest"
+  "image": "ghcr.io/vixshan/devcontainers/bun:latest"
 }
 ```
 
@@ -33,7 +31,7 @@ curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun
 ```json
 {
   "name": "Custom Environment",
-  "extends": "ghcr.io/vixshan/devcontainers/bun-node",
+  "extends": "ghcr.io/vixshan/devcontainers/bun",
   "features": {
     // Add additional features
   }
@@ -61,6 +59,5 @@ curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun
 
 - **1.0.0** - Initial release
   - Bun (latest)
-  - Node.js (latest)
   - Git
-  - Essential VS Code extensions
+  - Essential VS Code extensions 
