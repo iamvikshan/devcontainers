@@ -31,16 +31,23 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_PAT }}
 
-      - name: Build and push Bun+Node image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./base/bun-node/.devcontainer
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/bun-node:latest
-            ${{ env.REGISTRY }}/${{ github.repository }}/bun-node:${{ github.sha }}
-          labels: |
-            org.opencontainers.image.source=${{ github.event.repository.html_url }}
-            org.opencontainers.image.description=Bun+Node.js development container
+      - name: Build and push DevContainers
+        uses: actions/checkout@v4
+
+      - name: Build and push DevContainer images
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          REPOSITORY: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          for dir in base/*/; do
+            devcontainer_name=$(basename "$dir")
+            docker buildx build \
+              --file "$dir/.devcontainer/Dockerfile" \
+              --push=${{ github.event_name != 'pull_request' }} \
+              --tag "${REGISTRY}/${REPOSITORY}/${devcontainer_name}:latest" \
+              --tag "${REGISTRY}/${REPOSITORY}/${devcontainer_name}:${SHA}" \
+              "$dir/.devcontainer"
+          done

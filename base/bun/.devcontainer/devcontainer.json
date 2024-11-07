@@ -1,5 +1,5 @@
 {
-	"name": "Bun + Node.js",
+	"name": "Ubuntu + Bun",
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
@@ -10,12 +10,14 @@
 		// 	"username": "root",
 		// 	"upgradePackages": "true"
 		// },
+
         // if you install common-utils, you can remove the following line
 		"ghcr.io/devcontainers/features/git:latest": {
 			"ppa": "false"
 		}
     },
 
+	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -32,6 +34,9 @@
 		}
 	},
 
+	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "bun install",
+
+	// Set `remoteUser` to `root` to connect as root.
 	"remoteUser": "root"
 }

@@ -1,28 +1,39 @@
-# Use Ubuntu as the base image
-FROM ubuntu:latest
+ARG VARIANT=22-bookworm
+FROM node:${VARIANT}
 
-# Environment variables
-ENV PATH="/root/.bun/bin:${PATH}"
+ARG USERNAME=root
+ARG NPM_GLOBAL=/usr/local/share/npm-global
 
-# Install essential packages only
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    curl \
-    ca-certificates \
-    git && \
-    rm -rf /var/lib/apt/lists/*
+# Add NPM global to PATH.
+ENV PATH=${NPM_GLOBAL}/bin:/usr/local/bun/bin:${PATH}
 
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install -g npm@latest
+RUN \
+    # Configure global npm install location, use group to adapt to UID/GID changes
+    if ! cat /etc/group | grep -e "^npm:" > /dev/null 2>&1; then groupadd -r npm; fi \
+    && usermod -a -G npm ${USERNAME} \
+    && umask 0002 \
+    && mkdir -p ${NPM_GLOBAL} \
+    && touch /usr/local/etc/npmrc \
+    && chown ${USERNAME}:npm ${NPM_GLOBAL} /usr/local/etc/npmrc \
+    && chmod g+s ${NPM_GLOBAL} \
+    && npm config -g set prefix ${NPM_GLOBAL} \
+    && su ${USERNAME} -c "npm config -g set prefix ${NPM_GLOBAL}" \
+    # Install eslint
+    && su ${USERNAME} -c "umask 0002 && npm install -g eslint" \
+    && npm cache clean --force > /dev/null 2>&1 \
+    # Install Bun
+    && mkdir -p /usr/local/bun \
+    && curl -fsSL https://bun.sh/install | bash -s -- --install-dir /usr/local/bun \
+    && ln -s /usr/local/bun/bin/bun /usr/local/bin/bun \
+    && ln -s /usr/local/bun/bin/bunx /usr/local/bin/bunx
 
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash && \
-    ln -s /root/.bun/bin/bun /usr/local/bin/bun
+# [Optional] Uncomment this section to install additional OS packages.
+# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+#     && apt-get -y install --no-install-recommends <your-package-list-here>
 
-# Verify installations
-RUN node --version && \
-    npm --version && \
-    bun --version && \
-    git --version
+# [Optional] Uncomment if you want to install an additional version of node using nvm
+# ARG EXTRA_NODE_VERSION=10
+# RUN su node -c "source /usr/local/share/nvm/nvm.sh && nvm install ${EXTRA_NODE_VERSION}"
+
+# [Optional] Uncomment if you want to install more global node modules
+# RUN su node -c "npm install -g <your-package-list-here>"
