@@ -7,6 +7,7 @@ This repository contains reusable DevContainer configurations for different deve
 ### Base Configurations
 
 - **[bun-node](./base/bun-node)**: A minimal development environment with Bun, Node.js, and Git.
+- **[bun](./base/bun)**: A minimal development environment with Bun and Git.
 
 ## Usage
 
@@ -17,6 +18,12 @@ Add this to your `.devcontainer/devcontainer.json`:
 ```json
 {
   "image": "ghcr.io/vixshan/devcontainers/bun-node:latest"
+}
+```
+
+```json
+{
+  "image": "ghcr.io/vixshan/devcontainers/bun:latest"
 }
 ```
 
@@ -37,6 +44,16 @@ Add this to your `.devcontainer/devcontainer.json`:
 }
 ```
 
+```json
+{
+  "name": "My Custom Environment",
+  "build": {
+    "dockerfile": "./Dockerfile"
+  },
+  "extends": "ghcr.io/vixshan/devcontainers/bun"
+}
+```
+
 ## Development
 
 ### Building Images Locally
@@ -44,6 +61,11 @@ Add this to your `.devcontainer/devcontainer.json`:
 ```bash
 # From the base/bun-node directory
 docker build -t devcontainers/bun-node .
+```
+
+```bash
+# From the base/bun directory
+docker build -t devcontainers/bun .
 ```
 
 ### Publishing Updates
@@ -58,7 +80,3 @@ docker build -t devcontainers/bun-node .
 1. Fork the repository
 2. Create a feature branch
 3. Submit a pull request
-
-## License
-
-MIT

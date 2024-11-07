@@ -33,9 +33,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_PAT }}
 
-      - name: Build and push DevContainers
-        uses: actions/checkout@v4
-
       - name: Build and push DevContainer images
         env:
           REGISTRY: ${{ env.REGISTRY }}
@@ -44,10 +41,21 @@ jobs:
         run: |
           for dir in base/*/; do
             devcontainer_name=$(basename "$dir")
-            docker buildx build \
-              --file "$dir/.devcontainer/Dockerfile" \
-              --push=${{ github.event_name != 'pull_request' }} \
-              --tag "${REGISTRY}/${REPOSITORY}/${devcontainer_name}:latest" \
-              --tag "${REGISTRY}/${REPOSITORY}/${devcontainer_name}:${SHA}" \
-              "$dir/.devcontainer"
+            if [ -f "$dir/.devcontainer/Dockerfile" ]; then
+              docker buildx build \
+                --file "$dir/.devcontainer/Dockerfile" \
+                --push=${{ github.event_name != 'pull_request' }} \
+                --tag "${REGISTRY}/${REPOSITORY}/${devcontainer_name}:latest" \
+                --tag "${REGISTRY}/${REPOSITORY}/${devcontainer_name}:${SHA}" \
+                "$dir/.devcontainer"
+            else
+              echo "No Dockerfile found in $dir/.devcontainer"
+            fi
           done
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          branch: main
