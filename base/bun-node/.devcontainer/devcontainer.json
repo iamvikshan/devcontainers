@@ -1,0 +1,33 @@
+{
+	"name": "Bun + Node.js",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {
+			"version": "latest",
+			"ppa": "false"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "latest"
+		}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"astro-build.astro-vscode",
+				"GitHub.copilot",
+				"unifiedjs.vscode-mdx",
+				"bradlc.vscode-tailwindcss",
+				"esbenp.prettier-vscode",
+				"eamodio.gitlens",
+				"oven.bun-vscode"
+			]
+		}
+	},
+
+	"postCreateCommand": "bun install",
+	"remoteUser": "root"
+}

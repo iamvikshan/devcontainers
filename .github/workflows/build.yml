@@ -1,0 +1,46 @@
+name: Build and Publish DevContainers
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'base/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'base/**'
+  release:
+    types: [ published ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Bun+Node image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./base/bun-node/.devcontainer
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/bun-node:latest
+            ${{ env.REGISTRY }}/${{ github.repository }}/bun-node:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.description=Bun+Node.js development container
