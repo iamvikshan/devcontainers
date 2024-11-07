@@ -1,4 +1,4 @@
-ARG VARIANT=22-bookworm
+ARG VARIANT=latest
 FROM node:${VARIANT}
 
 ARG USERNAME=root
@@ -23,9 +23,9 @@ RUN \
     && npm cache clean --force > /dev/null 2>&1 \
     # Install Bun
     && mkdir -p /usr/local/bun \
-    && curl -fsSL https://bun.sh/install | bash -s -- --install-dir /usr/local/bun \
-    && ln -s /usr/local/bun/bin/bun /usr/local/bin/bun \
-    && ln -s /usr/local/bun/bin/bunx /usr/local/bin/bunx
+    && curl -fsSL https://bun.sh/install | bash \
+    && ln -s /root/.bun/bin/bun /usr/local/bin/bun \
+    && ln -s /root/.bun/bin/bunx /usr/local/bin/bunx
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
