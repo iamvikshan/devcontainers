@@ -1,36 +1,43 @@
 ARG VARIANT=latest
-FROM oven/bun:${VARIANT}
+FROM ubuntu:${VARIANT}
 
 ARG USERNAME=vik
 
 # Install Git and sudo non-interactively
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y git sudo curl
-
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
-    apt-get install -y nodejs
-
-# Install ESLint globally
-RUN npm install -g eslint
+RUN apt-get update && apt-get install -y git sudo
 
 # Create the user if it doesn't exist (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \
-        useradd -m ${USERNAME}; \
+    useradd -m ${USERNAME}; \
     fi
 
 # Add the user to the sudo group (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ]; then \
-        usermod -aG sudo ${USERNAME}; \
+    usermod -aG sudo ${USERNAME}; \
     fi
 
 # Configure sudoers to allow passwordless sudo (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ]; then \
-        echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
+    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
     fi
 
 # Ensure necessary directories have the correct permissions
 RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var/lib/apt/lists
+
+# Install Bun
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    && curl -fsSL https://bun.sh/install | bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# Move .bun directory and create symbolic links for non-root user
+RUN if [ "${USERNAME}" != "root" ]; then \
+    mv /root/.bun /home/${USERNAME}/.bun \
+    && ln -s /home/${USERNAME}/.bun/bin/bun /usr/local/bin/bun \
+    && ln -s /home/${USERNAME}/.bun/bin/bunx /usr/local/bin/bunx; \
+    fi
 
 # Copy the setup script and make it executable
 COPY setup.sh /usr/local/bin/setup.sh
@@ -38,14 +45,14 @@ RUN chmod +x /usr/local/bin/setup.sh
 
 # Ensure the home directory and .bashrc file exist for the specified user
 RUN if [ "${USERNAME}" != "root" ]; then \
-        mkdir -p /home/${USERNAME} && touch /home/${USERNAME}/.bashrc; \
+    mkdir -p /home/${USERNAME} && touch /home/${USERNAME}/.bashrc; \
     fi
 
 # Append sourcing the setup script to .bashrc
 RUN if [ "${USERNAME}" != "root" ]; then \
-        echo "source /usr/local/bin/setup.sh" >> /home/${USERNAME}/.bashrc; \
+    echo "source /usr/local/bin/setup.sh" >> /home/${USERNAME}/.bashrc; \
     else \
-        echo "source /usr/local/bin/setup.sh" >> /root/.bashrc; \
+    echo "source /usr/local/bin/setup.sh" >> /root/.bashrc; \
     fi
 
 # Switch to the specified user

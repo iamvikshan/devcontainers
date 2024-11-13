@@ -60,3 +60,17 @@ jobs:
               echo "No Dockerfile found in $dir/.devcontainer"
             fi
           done
+
+          for dir in base/ubuntu/*/; do
+            devcontainer_name=$(basename "$dir")
+            if [ -f "$dir/Dockerfile" ]; then
+              docker buildx build \
+                --file "$dir/Dockerfile" \
+                --push \
+                --tag "${REGISTRY}/${REPOSITORY}/ubuntu-${devcontainer_name}:${SEMVER}" \
+                --tag "${REGISTRY}/${REPOSITORY}/ubuntu-${devcontainer_name}:latest" \
+                "$dir"
+            else
+              echo "No Dockerfile found in $dir"
+            fi
+          done
