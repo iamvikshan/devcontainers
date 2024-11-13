@@ -5,7 +5,7 @@ ARG USERNAME=root
 
 # Install Git and sudo non-interactively
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y git sudo curl
+RUN apt-get update && apt-get install -y git sudo openssh-client curl
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
