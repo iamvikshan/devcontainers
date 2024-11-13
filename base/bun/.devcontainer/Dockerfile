@@ -1,11 +1,11 @@
 ARG VARIANT=latest
 FROM oven/bun:${VARIANT}
 
-ARG USERNAME=vik
+ARG USERNAME=root
 
 # Install Git and sudo non-interactively
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y git sudo
+RUN apt-get update && apt-get install -y git sudo curl
 
 # Create the user if it doesn't exist (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \

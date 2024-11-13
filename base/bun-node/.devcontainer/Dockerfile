@@ -1,7 +1,7 @@
 ARG VARIANT=latest
 FROM oven/bun:${VARIANT}
 
-ARG USERNAME=vik
+ARG USERNAME=root
 
 # Install Git and sudo non-interactively
 ENV DEBIAN_FRONTEND=noninteractive

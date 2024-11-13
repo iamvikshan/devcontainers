@@ -1,7 +1,7 @@
 ARG VARIANT=latest
 FROM ubuntu:${VARIANT}
 
-ARG USERNAME=vik
+ARG USERNAME=root
 ARG NPM_GLOBAL=/usr/local/share/npm-global
 
 # Add NPM global to PATH.
