@@ -3,9 +3,17 @@ FROM oven/bun:${VARIANT}
 
 ARG USERNAME=root
 
-# Install Git and sudo non-interactively
+# Install Git, sudo, OpenSSH client, and curl non-interactively
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y git sudo openssh-client curl
+RUN apt-get update && apt-get install -y \
+    git \
+    sudo \
+    openssh-client \
+    curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configure SSH server to allow TCP forwarding
+RUN echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config
 
 # Create the user if it doesn't exist (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \

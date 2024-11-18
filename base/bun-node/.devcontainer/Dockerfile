@@ -3,9 +3,18 @@ FROM oven/bun:${VARIANT}
 
 ARG USERNAME=root
 
-# Install Git and sudo non-interactively
+# Install Git, sudo, OpenSSH client, and curl non-interactively
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y git sudo openssh-client curl
+RUN apt-get update && apt-get install -y \
+    git \
+    sudo \
+    openssh-client \
+    curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configure SSH server to allow TCP forwarding
+RUN echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config
+
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
