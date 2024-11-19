@@ -1,0 +1,40 @@
+# .gitlab/ci/github-sync.yml
+github-sync:
+  stage: sync
+  image: alpine/git:latest
+  variables:
+    GIT_STRATEGY: clone
+    GH_TOKEN: $GH_TOKEN
+  script:
+    # Configure git
+    - git config --global user.name "vixshan"
+    - git config --global user.email "vixshan@gmail.com"
+    
+    # Add GitHub remote
+    - git remote add github https://$GH_TOKEN@github.com/vixshan/amina.git
+    
+    # Fetch from GitHub to ensure we have latest state
+    - git fetch github
+    
+    # For each branch, try to sync
+    - |
+      for branch in $(git branch -r | grep -v '\->'); do
+        branch_name=$(echo $branch | sed 's|origin/||')
+        
+        echo "Syncing branch: $branch_name"
+        
+        # Try normal push first
+        if git push github HEAD:$branch_name; then
+          echo "Successfully pushed $branch_name"
+        else
+          # If normal push fails, try to merge instead of force push
+          git checkout -b sync-$branch_name $branch
+          git pull github $branch_name --no-edit || true
+          git push github sync-$branch_name:$branch_name
+          git checkout -
+          git branch -D sync-$branch_name
+        fi
+      done
+  only:
+    - pushes
+    - web

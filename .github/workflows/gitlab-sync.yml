@@ -1,0 +1,62 @@
+# .github/workflows/gitlab-sync.yml
+name: Sync to GitLab
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types: [opened, closed]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "vixshan"
+          git config user.email "vixshan@gmail.com"
+
+      - name: Add GitLab remote
+        run: |
+          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/vikshan/amina.git
+
+      - name: Sync with GitLab
+        run: |
+          # Fetch from GitLab first to ensure we have latest changes
+          git fetch gitlab
+
+          # For each branch in origin
+          git for-each-ref --format='%(refname:short)' refs/remotes/origin/ | while read branch; do
+            # Extract branch name without origin/ prefix
+            branch_name=$(echo $branch | sed 's|origin/||')
+            
+            # Skip if it's HEAD
+            if [ "$branch_name" = "HEAD" ]; then
+              continue
+            }
+
+            echo "Syncing branch: $branch_name"
+            
+            # Try normal push first
+            if git push gitlab $branch:$branch_name; then
+              echo "Successfully pushed $branch_name"
+            else
+              # If normal push fails, try to merge instead of force push
+              git checkout -b sync-$branch_name $branch
+              git pull gitlab $branch_name --no-edit || true
+              git push gitlab sync-$branch_name:$branch_name
+              git checkout -
+              git branch -D sync-$branch_name
+            fi
+          done
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
