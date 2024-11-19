@@ -19,7 +19,7 @@
       "files": ["*.yml", "*.yaml", "*.json"],
       "options": {
         "singleQuote": false,
-        "printWidth": 120
+        "printWidth": 130
       }
     },
     {

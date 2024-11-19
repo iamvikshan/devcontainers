@@ -82,7 +82,7 @@ release:
       git commit --amend --no-edit
       git push -f "https://oauth2:${GITLAB_TOKEN}@gitlab.com/${CI_PROJECT_PATH}.git" HEAD:$CI_COMMIT_REF_NAME
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /^Release/'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /^Release/ && $CI_COMMIT_MESSAGE !~ /^GitHub Sync/'
       when: always
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: always
