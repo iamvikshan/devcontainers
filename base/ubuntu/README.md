@@ -16,12 +16,12 @@ well, maybe the size, and wider compatibility with other tools as this is a stan
 ### 1. GitHub Container Registry
 
 <<<<<<< HEAD
+
 1. `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 121.24 MiB
-2. `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 189.20 MiB
-=======
-1. `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
-2. `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
->>>>>>> origin/main
+2. # `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 189.20 MiB
+3. `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
+4. `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
+   > > > > > > > origin/main
 
 ### 2. GitLab Container Registry
 

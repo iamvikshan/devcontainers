@@ -13,11 +13,13 @@ sync-github:
     - git config --global user.name "vixshan"
     - git config --global user.email "vixshan@gmail.com"
   script:
-    # Add commit message prefix to indicate sync source
     - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
     - |
-      for branch in $(git branch -r | grep 'origin/' | sed 's/origin//'); do
-        git checkout -B "$branch" "origin/$branch"
-        git commit --allow-empty -m "GitLab Sync: $CI_COMMIT_MESSAGE"
-        git push -f github "$branch:$branch"
+      git fetch origin --no-tags
+      for branch in $(git branch -r | grep 'origin/' | grep -v 'origin/HEAD' | sed 's#origin/##'); do
+        if git show-ref --verify --quiet refs/remotes/origin/"$branch"; then
+          git checkout -B "$branch" "origin/$branch"
+          git commit --allow-empty -m "GitLab Sync: $CI_COMMIT_MESSAGE"
+          git push -f github "$branch:$branch"
+        fi
       done
