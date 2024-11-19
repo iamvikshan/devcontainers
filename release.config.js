@@ -7,14 +7,14 @@ module.exports = {
     [
       '@semantic-release/commit-analyzer',
       {
-        // Allow minor/patch releases to create first release
         preset: 'angular',
         releaseRules: [
           { type: 'fix', release: 'patch' },
           { type: 'perf', release: 'patch' },
           { type: 'feat', release: 'minor' },
-          // Special case for first release
-          { type: 'fix', release: 'minor', beforeRelease: true },
+          // Ensure first release works with any commit type
+          { scope: 'no-release', release: false },
+          { scope: 'release', release: 'patch' },
         ],
         parserOpts: {
           noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
