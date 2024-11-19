@@ -1,5 +1,7 @@
 const config = {
   branches: ['main'],
+  githubToken: process.env.GH_TOKEN || process.env.GITHUB_TOKEN,
+  gitlabToken: process.env.GITLAB_TOKEN,
   plugins: [
     [
       'semantic-release-gitmoji',

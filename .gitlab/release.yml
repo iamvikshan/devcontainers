@@ -14,14 +14,11 @@ release:
   <<: *release_template
   stage: release
   script:
-    # Use existing semantic-release configuration with better error handling
     - |
-      SEMVER=$(npx semantic-release --dry-run --no-ci 2>&1 | sed -n 's/.*The next release version is \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p' || echo "")
-
+      SEMVER=$(npx semantic-release --no-ci | grep "The next release version is" | sed -n 's/.*The next release version is \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p')
+      
       if [ -z "$SEMVER" ]; then
-        # Run semantic-release again with debug to see what's happening
-        npx semantic-release --dry-run --no-ci --debug
-        echo "No new version to release based on commit messages"
+        echo "No new version to release"
         exit 0
       fi
 
