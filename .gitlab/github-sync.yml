@@ -40,5 +40,3 @@ sync-github:
   variables:
     GIT_STRATEGY: clone
     GIT_DEPTH: "0"
-  schedule:
-    - cron: "0 */6 * * *"
