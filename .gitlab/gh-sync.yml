@@ -2,7 +2,7 @@ sync-github:
   image: alpine:latest
   stage: sync-github
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^GitHub Sync/
       when: always
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
@@ -13,47 +13,11 @@ sync-github:
     - git config --global user.name "vixshan"
     - git config --global user.email "vixshan@gmail.com"
   script:
-    # Add GitHub remote
+    # Add commit message prefix to indicate sync source
     - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
-    
-    # Debug logging
-    - echo "Fetching remotes..."
-    - git fetch github --prune --no-tags
-    - git fetch origin --prune --no-tags
-    
-    # Get and display branch lists
     - |
-      echo "Listing branches:"
-      echo "GitLab branches:"
-      git branch -r | grep 'origin/'
-      echo "GitHub branches:"
-      git branch -r | grep 'github/'
-      
-      # Get branch lists
-      gitlab_branches=$(git branch -r | grep 'origin/' | sed 's/origin\///')
-      github_branches=$(git branch -r | grep 'github/' | sed 's/github\///')
-      
-      # Protected branches that shouldn't be deleted
-      protected_branches="main"
-      
-      # Delete non-protected branches in GitHub that don't exist in GitLab
-      for branch in $github_branches; do
-        if ! echo "$gitlab_branches" | grep -q "^$branch$"; then
-          if ! echo "$protected_branches" | grep -q "\b$branch\b"; then
-            echo "Deleting non-protected branch $branch from GitHub"
-            git push github --delete "$branch" || echo "Warning: Failed to delete $branch"
-          else
-            echo "Skipping deletion of protected branch: $branch"
-          fi
-        fi
-      done
-      
-      # Update/create branches in GitHub
-      for branch in $gitlab_branches; do
-        echo "Syncing branch: $branch"
+      for branch in $(git branch -r | grep 'origin/' | sed 's/origin//'); do
         git checkout -B "$branch" "origin/$branch"
+        git commit --allow-empty -m "GitLab Sync: $CI_COMMIT_MESSAGE"
         git push -f github "$branch:$branch"
       done
-  variables:
-    GIT_STRATEGY: clone
-    GIT_DEPTH: "0"
