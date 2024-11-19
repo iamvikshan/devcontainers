@@ -59,8 +59,8 @@ release:
       done
 
       # Wait for registry updates
-       - echo "Waiting for registry updates..."
-       - sleep 5
+      echo "Waiting for registry updates..."
+      sleep 5
 
       # Update image sizes
       npm run s && npm run f
