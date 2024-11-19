@@ -1,5 +1,3 @@
-/** @format */
-
 // release.config.js
 module.exports = {
   branches: ['main'],
@@ -12,7 +10,6 @@ module.exports = {
           { type: 'fix', release: 'patch' },
           { type: 'perf', release: 'patch' },
           { type: 'feat', release: 'minor' },
-          // Ensure first release works with any commit type
           { scope: 'no-release', release: false },
           { scope: 'release', release: 'patch' },
         ],
@@ -29,12 +26,17 @@ module.exports = {
         changelogTitle: '# Changelog',
       },
     ],
-    [
-      '@semantic-release/github',
-      {
-        assets: ['CHANGELOG.md'],
-      },
-    ],
+    // Conditionally include GitHub or GitLab plugin based on CI environment
+    ...(process.env.GITLAB_CI
+      ? ['@semantic-release/gitlab']
+      : [
+          [
+            '@semantic-release/github',
+            {
+              assets: ['CHANGELOG.md'],
+            },
+          ],
+        ]),
     [
       '@semantic-release/git',
       {
