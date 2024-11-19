@@ -1,3 +1,13 @@
+# v1.0.2 (2024-11-19)
+
+
+
+## [1.0.2](https://gitlab.com/vikshan/devcontainers/compare/v1.0.1...v1.0.2) (2024-11-19)
+
+### Bug Fixes
+
+* Refactor GitLab release configuration for improved versioning and error handling ([cd2fa81](https://gitlab.com/vikshan/devcontainers/commit/cd2fa8173ce07f3c5e199f99a26cb1bf3a5ab737))
+
 # v1.0.1 (2024-11-19)
 
 ## [1.0.1](https://gitlab.com/vikshan/devcontainers/compare/v1.0.0...v1.0.1) (2024-11-19)
