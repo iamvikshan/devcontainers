@@ -1,10 +1,8 @@
-name: Sync to GitLab
-
+name: GitLab Sync
 on:
   push:
     branches:
-      - "**"
-  workflow_dispatch:
+      - '*'
   schedule:
     - cron: "0 */6 * * *"
 
@@ -22,8 +20,9 @@ jobs:
           git config user.email "vixshan@gmail.com"
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/vikshan/devcontainers.git
 
-          for branch in $(git branch -r | grep 'origin/' | sed 's/origin//'); do
-            git checkout -B "$branch" "origin/$branch"
+          # List and sync each branch
+          git branch -r | grep 'origin/' | sed 's#origin/##' | while read branch; do
+            git checkout -B "${branch}" "origin/${branch}"
             git commit --allow-empty -m "${{ github.event.head_commit.message }}"
-            git push -f gitlab "$branch:$branch"
+            git push -f gitlab "${branch}:${branch}"
           done

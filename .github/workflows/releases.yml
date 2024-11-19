@@ -11,6 +11,7 @@ env:
   GITHUB_REGISTRY: ghcr.io
   GITLAB_REGISTRY: registry.gitlab.com
   GITHUB_IMAGE_NAME: ${{ github.repository }}
+  GITLAB_IMAGE_NAME: ${{ env.GITLAB_PROJECT_PATH }}
   GITLAB_PROJECT_ID: 64626588
   GITLAB_PROJECT_PATH: vikshan/devcontainers
 
@@ -142,7 +143,7 @@ jobs:
           git add README.md base/*/README.md
           git commit --amend --no-edit
           git push -f origin HEAD:${{ github.ref_name }}
-          
+
           # Push to GitLab
           git remote add gitlab "${GITLAB_REGISTRY}/${GITLAB_IMAGE_NAME}.git"
           git push -f gitlab HEAD:${{ github.ref_name }}
