@@ -41,27 +41,14 @@ const config = {
         }
       }
     ],
-    '@semantic-release/changelog',
-    [
-      '@semantic-release/git',
-      {
-        assets: ['CHANGELOG.md'],
-        message:
-          'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
-      }
-    ]
+    '@semantic-release/changelog'
   ]
 }
 
 // Dynamically add GitHub or GitLab plugin based on environment
-if (process.env.CI_SERVER_URL) {
-  config.plugins.push([
-    '@semantic-release/gitlab',
-    {
-      gitlabUrl: process.env.CI_SERVER_URL
-    }
-  ])
-} else {
+if (process.env.GITLAB_CI || process.env.CI_SERVER_URL) {
+  config.plugins.push('@semantic-release/gitlab')
+} else if (process.env.GITHUB_ACTIONS || process.env.GITHUB_WORKFLOW) {
   config.plugins.push([
     '@semantic-release/github',
     {

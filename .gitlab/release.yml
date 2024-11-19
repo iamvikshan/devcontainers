@@ -18,24 +18,18 @@ release:
     - docker login -u oauth2 -p $GITLAB_TOKEN $CI_REGISTRY
     - docker context create builders
     - docker context use builders
-    - docker buildx create --use --name builder --node builder0 --driver
-      docker-container
+    - docker buildx create --use --name builder --node builder0 --driver docker-container
     - docker buildx inspect --bootstrap
     - npm ci
   script:
     - |
-      # Get release version
-      VERSION=$(npx semantic-release --no-ci | tee /tmp/semrel.log | grep "The next release version is" | sed -n 's/.*The next release version is \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p')
+      # Run semantic-release first to generate version and changelog
+      npx semantic-release
+      VERSION=$(curl -s -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/latest" | jq -r '.tag_name' | sed 's/v//')
 
       if [ -z "$VERSION" ]; then
-        if grep -q "no new version" /tmp/semrel.log; then
-          echo "No new version to release"
-          exit 0
-        else
-          echo "Failed to get version"
-          cat /tmp/semrel.log
-          exit 1
-        fi
+        echo "Failed to get version from latest release"
+        exit 1
       fi
 
       # Build base containers
@@ -64,17 +58,15 @@ release:
         fi
       done
 
-      # Create GitLab Release with changelog
-      curl --request POST \
-        --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
-        --header "Content-Type: application/json" \
-        --data "{
-          \"name\": \"v${VERSION}\",
-          \"tag_name\": \"v${VERSION}\",
-          \"ref\": \"${CI_COMMIT_SHA}\",
-          \"description\": \"$(git log -1 --pretty=%B)\"
-        }" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+      # Update image sizes
+      npm run size
+
+      # Commit size updates
+      git config --global user.name 'vixshan'
+      git config --global user.email 'vixshan@gmail.com'
+      git add README.md base/*/README.md
+      git commit -m "chore: update container sizes [skip ci]"
+      git push origin HEAD:$CI_COMMIT_REF_NAME
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
