@@ -14,10 +14,10 @@ development environments.
 
 ### 2. GitLab Container Registry
 
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 170.85 MiB
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 371.09 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 213.98 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 39.89
+- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 211.91 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 512.27 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 306.85 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 510.71
   MiB
 
 ## Usage
@@ -72,12 +72,13 @@ docker build -t devcontainers/bun .
 ### Publishing Updates
 
 1. Make changes to the configuration
-2. Create a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
+2. Create a
+   [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
 3. Once merged, GitHub Actions will build and publish the updated image
 
 ## Contributing
 
 1. [Fork](https://gitlab.com/vikshan/devcontainers/-/forks/new) the repository
 2. Create a feature branch
-3. Submit a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
-
+3. Submit a
+   [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)

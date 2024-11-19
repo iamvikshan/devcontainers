@@ -1,6 +1,8 @@
 # .gitlab-ci.yml
 stages:
   - release
+  - sync-github
 
 include:
   - local: .gitlab/release.yml
+  - local: .gitlab/github-sync.yml

@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "format": "prettier --write \"**/*.*\"",
-"size": "chmod +x scripts/update-sizes.sh && scripts/update-sizes.sh"
+    "f": "prettier --write \"**/*.*\"",
+    "s": "chmod +x scripts/update-sizes.sh && scripts/update-sizes.sh"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",

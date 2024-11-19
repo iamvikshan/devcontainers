@@ -21,7 +21,7 @@ compatibility with other tools as this is a standard Ubuntu image.
 
 ### 2. GitLab Container Registry
 
-1. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 213.98 MiB
+1. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 306.85 MiB
 2. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 349.89
    MiB
 

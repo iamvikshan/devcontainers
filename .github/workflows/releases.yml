@@ -76,8 +76,10 @@ jobs:
               echo "No Dockerfile found in $dir"
             fi
           done
-      - name: Update image sizes
-        run: npm run size
+      - name: Wait for 5 seconds and Update image sizes
+        run: |
+          sleep 5
+          npm run s && npm run f
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
 

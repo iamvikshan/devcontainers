@@ -14,7 +14,7 @@ release:
   <<: *release_template
   stage: release
   before_script:
-    - apk add --no-cache curl jq git npm grep
+    - apk add --no-cache curl jq git npm grep bash
     - docker login -u oauth2 -p $GITLAB_TOKEN $CI_REGISTRY
     - docker context create builders
     - docker context use builders
@@ -58,11 +58,15 @@ release:
         fi
       done
 
+      # Wait for registry updates
+       - echo "Waiting for registry updates..."
+       - sleep 5
+
       # Update image sizes
-      npm run size
+      npm run s && npm run f
 
       # Commit size updates
-      git config --global user.name 'vixshan'
+      git config --global user.name 'vikshan'
       git config --global user.email 'vixshan@gmail.com'
       git add README.md base/*/README.md
       git commit -m "chore: update container sizes [skip ci]"

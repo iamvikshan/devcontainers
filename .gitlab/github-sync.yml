@@ -1,0 +1,44 @@
+sync-github:
+  image: alpine:latest
+  stage: sync
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+  before_script:
+    - apk add --no-cache git
+    - git config --global user.name "vixshan"
+    - git config --global user.email "vixshan@gmail.com"
+  script:
+    # Add GitHub remote
+    - git remote add github https://$GITHUB_TOKEN@github.com/vikshan/devcontainers.git
+
+    # Fetch all branches and tags
+    - git fetch github --prune
+    - git fetch origin --prune
+
+    # Get list of all branches
+    - |
+      gitlab_branches=$(git branch -r | grep 'origin/' | sed 's/origin\///')
+      github_branches=$(git branch -r | grep 'github/' | sed 's/github\///')
+
+      # Delete branches in GitHub that don't exist in GitLab
+      for branch in $github_branches; do
+        if ! echo "$gitlab_branches" | grep -q "^$branch$"; then
+          git push github --delete "$branch" || true
+        fi
+      done
+
+      # Update/create branches in GitHub
+      for branch in $gitlab_branches; do
+        git checkout -B "$branch" "origin/$branch"
+        git push -f github "$branch:$branch"
+      done
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: "0"
+  schedule:
+    - cron: "0 */6 * * *"
