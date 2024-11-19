@@ -1,3 +1,14 @@
+# v1.0.1 (2024-11-19)
+
+
+
+## [1.0.1](https://gitlab.com/vikshan/devcontainers/compare/v1.0.0...v1.0.1) (2024-11-19)
+
+### Bug Fixes
+
+* Enhance GitLab release configuration with buildx setup and improved error handling ([21cd75a](https://gitlab.com/vikshan/devcontainers/commit/21cd75a4ff375fe45715b224d311d844f81e9ea6))
+* Update GitLab release configuration for buildx setup and disable TLS ([ea8ca8d](https://gitlab.com/vikshan/devcontainers/commit/ea8ca8d47517f5f20d7a39b54d0258241269aab0))
+
 # v1.0.0 (2024-11-19)
 
 
