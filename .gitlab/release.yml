@@ -1,4 +1,4 @@
-# .gitlab-ci.yml
+# .gitlab/release.yml
 .release_template: &release_template
   image: docker:latest
   services:
@@ -6,28 +6,28 @@
       command: ["--tls=false"]
   variables:
     DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""  # Disable TLS since we're using TCP
+    DOCKER_TLS_CERTDIR: ""
     DOCKER_DRIVER: overlay2
     DOCKER_BUILDKIT: "1"
-  before_script:
-    - apk add --no-cache curl jq git npm grep
-    - docker login -u oauth2 -p $GITLAB_TOKEN $CI_REGISTRY
-    # Set up buildx with proper context
-    - docker context create builders
-    - docker context use builders
-    - docker buildx create --use --name builder --node builder0 --driver docker-container
-    - docker buildx inspect --bootstrap
-    - npm ci
 
 release:
   <<: *release_template
   stage: release
+  before_script:
+    - apk add --no-cache curl jq git npm grep
+    - docker login -u oauth2 -p $GITLAB_TOKEN $CI_REGISTRY
+    - docker context create builders
+    - docker context use builders
+    - docker buildx create --use --name builder --node builder0 --driver
+      docker-container
+    - docker buildx inspect --bootstrap
+    - npm ci
   script:
     - |
-      # Run semantic-release with explicit error handling
-      SEMVER=$(npx semantic-release --no-ci | tee /tmp/semrel.log | grep "The next release version is" | sed -n 's/.*The next release version is \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p')
-      
-      if [ -z "$SEMVER" ]; then
+      # Get release version
+      VERSION=$(npx semantic-release --no-ci | tee /tmp/semrel.log | grep "The next release version is" | sed -n 's/.*The next release version is \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p')
+
+      if [ -z "$VERSION" ]; then
         if grep -q "no new version" /tmp/semrel.log; then
           echo "No new version to release"
           exit 0
@@ -38,45 +38,41 @@ release:
         fi
       fi
 
-      echo "Building version ${SEMVER}"
-
-      # Build and push base containers
+      # Build base containers
       for dir in base/*/; do
         devcontainer_name=$(basename "$dir")
         if [ -f "$dir/.devcontainer/Dockerfile" ]; then
-          echo "Building base container: ${devcontainer_name}"
           docker buildx build \
             --file "$dir/.devcontainer/Dockerfile" \
             --push \
-            --tag "${CI_REGISTRY_IMAGE}/${devcontainer_name}:${SEMVER}" \
+            --tag "${CI_REGISTRY_IMAGE}/${devcontainer_name}:v${VERSION}" \
             --tag "${CI_REGISTRY_IMAGE}/${devcontainer_name}:latest" \
             "$dir/.devcontainer"
         fi
       done
 
-      # Build and push Ubuntu-based containers
+      # Build Ubuntu containers
       for dir in base/ubuntu/*/; do
         devcontainer_name=$(basename "$dir")
         if [ -f "$dir/Dockerfile" ]; then
-          echo "Building Ubuntu container: ${devcontainer_name}"
           docker buildx build \
             --file "$dir/Dockerfile" \
             --push \
-            --tag "${CI_REGISTRY_IMAGE}/ubuntu-${devcontainer_name}:${SEMVER}" \
+            --tag "${CI_REGISTRY_IMAGE}/ubuntu-${devcontainer_name}:v${VERSION}" \
             --tag "${CI_REGISTRY_IMAGE}/ubuntu-${devcontainer_name}:latest" \
             "$dir"
         fi
       done
 
-      # Create GitLab Release
+      # Create GitLab Release with changelog
       curl --request POST \
         --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
         --header "Content-Type: application/json" \
         --data "{
-          \"name\": \"Release ${SEMVER}\",
-          \"tag_name\": \"${SEMVER}\",
+          \"name\": \"v${VERSION}\",
+          \"tag_name\": \"v${VERSION}\",
           \"ref\": \"${CI_COMMIT_SHA}\",
-          \"description\": \"DevContainer release ${SEMVER}\"
+          \"description\": \"$(git log -1 --pretty=%B)\"
         }" \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
   rules:
