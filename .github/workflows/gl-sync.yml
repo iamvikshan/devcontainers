@@ -19,10 +19,22 @@ jobs:
           git config user.name "vikshan"
           git config user.email "vixshan@gmail.com"
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/vikshan/devcontainers.git
+          
+          # Fetch GitLab branches
+          git fetch gitlab
 
           # List and sync each branch
           git branch -r | grep 'origin/' | sed 's#origin/##' | while read branch; do
             git checkout -B "${branch}" "origin/${branch}"
-            git commit --allow-empty -m "${{ github.event.head_commit.message }}"
+            
+            # Check if branch exists on GitLab and is up to date
+            if git rev-parse --verify "gitlab/${branch}" >/dev/null 2>&1; then
+              if [ "$(git rev-parse HEAD)" = "$(git rev-parse gitlab/${branch})" ]; then
+                echo "Branch ${branch} is up to date on GitLab, skipping..."
+                continue
+              fi
+            fi
+            
+            # Push only if there are changes
             git push -f gitlab "${branch}:${branch}"
           done

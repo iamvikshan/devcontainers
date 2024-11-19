@@ -16,10 +16,20 @@ sync-github:
     - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
     - |
       git fetch origin --no-tags
+      git fetch github --no-tags
       for branch in $(git branch -r | grep 'origin/' | grep -v 'origin/HEAD' | sed 's#origin/##'); do
         if git show-ref --verify --quiet refs/remotes/origin/"$branch"; then
           git checkout -B "$branch" "origin/$branch"
-          git commit --allow-empty -m "$CI_COMMIT_MESSAGE"
+          
+          # Check if branch exists on GitHub and is up to date
+          if git rev-parse --verify "github/${branch}" >/dev/null 2>&1; then
+            if [ "$(git rev-parse HEAD)" = "$(git rev-parse github/${branch})" ]; then
+              echo "Branch ${branch} is up to date on GitHub, skipping..."
+              continue
+            fi
+          fi
+          
+          # Push only if there are changes
           git push -f github "$branch:$branch"
         fi
       done
