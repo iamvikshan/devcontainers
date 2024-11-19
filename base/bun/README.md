@@ -9,9 +9,9 @@ A minimal development container configuration with Bun and Git.
 
 ## Images
 
-1. `ghcr.io/vixshan/devcontainers/bun:latest` ~ 143.28 MiB
+1. `ghcr.io/vixshan/devcontainers/bun:latest` ~ 0.00 MiB
 
-2. `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 211.91 MiB
+2. `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 0.00 MiB
 
 ## Usage
 
