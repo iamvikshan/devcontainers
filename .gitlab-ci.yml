@@ -4,5 +4,5 @@ stages:
   - sync-github
 
 include:
-  - local: .gitlab/release.yml
-  - local: .gitlab/github-sync.yml
+  - local: .gitlab/gh-sync.yml
+  - local: .gitlab/gl-releases.yml

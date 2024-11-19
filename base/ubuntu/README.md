@@ -1,9 +1,8 @@
 # Ubuntu DevContainer
 
-A minimal development container configuration for bun and bun w/ node based on
-an Ubuntu image. There is no much difference between this image and the bun
-image image used in the base directory, well, maybe the size, and wider
-compatibility with other tools as this is a standard Ubuntu image.
+A minimal development container configuration for bun and bun w/ node based on an Ubuntu image.
+There is no much difference between this image and the bun image image used in the base directory,
+well, maybe the size, and wider compatibility with other tools as this is a standard Ubuntu image.
 
 ## Contents
 
@@ -22,8 +21,7 @@ compatibility with other tools as this is a standard Ubuntu image.
 ### 2. GitLab Container Registry
 
 1. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 306.85 MiB
-2. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 349.89
-   MiB
+2. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 510.71 MiB
 
 ## Installed Extensions
 
@@ -37,8 +35,8 @@ compatibility with other tools as this is a standard Ubuntu image.
 
 ### 1. Direct Usage
 
-we will use the ubuntu-bun image in this example, but you can replace it with
-ubuntu-bun-node if you need Node.js.
+we will use the ubuntu-bun image in this example, but you can replace it with ubuntu-bun-node if you
+need Node.js.
 
 Copy the `.devcontainer` directory to your project:
 
@@ -49,8 +47,8 @@ Copy the `.devcontainer` directory to your project:
 
 ### 2. Container Registry
 
-We will use the GitHub Container Registry in this example, but you can replace
-it with the GitLab Container Registry if you prefer.
+We will use the GitHub Container Registry in this example, but you can replace it with the GitLab
+Container Registry if you prefer.
 
 ```json
 {

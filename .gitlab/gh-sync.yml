@@ -16,9 +16,9 @@ sync-github:
     # Add GitHub remote
     - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
 
-    # Fetch all branches and tags
-    - git fetch github --prune
-    - git fetch origin --prune
+    # Fetch only branches, no tags
+    - git fetch github --prune --no-tags
+    - git fetch origin --prune --no-tags
 
     # Get list of all branches
     - |

@@ -23,7 +23,7 @@ release:
     - npm ci
   script:
     - |
-      # Run semantic-release first to generate version and changelog
+      # Run semantic-release first (now includes changelog generation + staging)
       npx semantic-release
       VERSION=$(curl -s -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/latest" | jq -r '.tag_name' | sed 's/v//')
 
@@ -65,12 +65,10 @@ release:
       # Update image sizes
       npm run s && npm run f
 
-      # Commit size updates
-      git config --global user.name 'vikshan'
-      git config --global user.email 'vixshan@gmail.com'
+      # Amend the semantic-release commit with size updates
       git add README.md base/*/README.md
-      git commit -m "chore: update container sizes [skip ci]"
-      git push origin HEAD:$CI_COMMIT_REF_NAME
+      git commit --amend --no-edit
+      git push -f origin HEAD:$CI_COMMIT_REF_NAME
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always

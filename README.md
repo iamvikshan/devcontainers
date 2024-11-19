@@ -1,7 +1,7 @@
 # DevContainer Configurations
 
-This repository contains reusable DevContainer configurations for different
-development environments.
+This repository contains reusable DevContainer configurations for different development
+environments.
 
 ## Available Images
 
@@ -17,8 +17,7 @@ development environments.
 - `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 211.91 MiB
 - `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 512.27 MiB
 - `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 306.85 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 510.71
-  MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 510.71 MiB
 
 ## Usage
 
@@ -44,8 +43,7 @@ Add this to your `.devcontainer/devcontainer.json`:
 
 ### Option 3: Copy Configuration
 
-1. Copy the desired configuration from the [`base`](./base/) directory to your
-   project.
+1. Copy the desired configuration from the [`base`](./base/) directory to your project.
 2. Modify as needed for your specific requirements.
 
 ### Option 4: Extend Configuration
@@ -72,13 +70,11 @@ docker build -t devcontainers/bun .
 ### Publishing Updates
 
 1. Make changes to the configuration
-2. Create a
-   [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
+2. Create a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
 3. Once merged, GitHub Actions will build and publish the updated image
 
 ## Contributing
 
 1. [Fork](https://gitlab.com/vikshan/devcontainers/-/forks/new) the repository
 2. Create a feature branch
-3. Submit a
-   [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
+3. Submit a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
