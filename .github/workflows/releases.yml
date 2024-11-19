@@ -11,9 +11,8 @@ env:
   GITHUB_REGISTRY: ghcr.io
   GITLAB_REGISTRY: registry.gitlab.com
   GITHUB_IMAGE_NAME: ${{ github.repository }}
-  GITLAB_IMAGE_NAME: ${{ env.GITLAB_PROJECT_PATH }}
-  GITLAB_PROJECT_ID: 64626588
   GITLAB_PROJECT_PATH: vikshan/devcontainers
+  GITLAB_PROJECT_ID: 64626588
 
 jobs:
   release:
@@ -89,8 +88,8 @@ jobs:
               docker buildx build \
                 --file "$dir/.devcontainer/Dockerfile" \
                 --push \
-                --tag "${GITLAB_REGISTRY}/${GITLAB_IMAGE_NAME}/${devcontainer_name}:v${VERSION}" \
-                --tag "${GITLAB_REGISTRY}/${GITLAB_IMAGE_NAME}/${devcontainer_name}:latest" \
+                --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:v${VERSION}" \
+                --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:latest" \
                 "$dir/.devcontainer"
             fi
           done
@@ -112,8 +111,8 @@ jobs:
               docker buildx build \
                 --file "$dir/Dockerfile" \
                 --push \
-                --tag "${GITLAB_REGISTRY}/${GITLAB_IMAGE_NAME}/ubuntu-${devcontainer_name}:v${VERSION}" \
-                --tag "${GITLAB_REGISTRY}/${GITLAB_IMAGE_NAME}/ubuntu-${devcontainer_name}:latest" \
+                --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:v${VERSION}" \
+                --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:latest" \
                 "$dir"
             fi
           done
@@ -145,5 +144,5 @@ jobs:
           git push -f origin HEAD:${{ github.ref_name }}
 
           # Push to GitLab
-          git remote add gitlab "${GITLAB_REGISTRY}/${GITLAB_IMAGE_NAME}.git"
+          git remote add gitlab "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}.git"
           git push -f gitlab HEAD:${{ github.ref_name }}
