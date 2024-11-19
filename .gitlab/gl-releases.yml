@@ -70,7 +70,9 @@ release:
       git config --global user.email 'vixshan@gmail.com'
       git add README.md base/*/README.md
       git commit --amend --no-edit
-      git push -f origin HEAD:$CI_COMMIT_REF_NAME
+
+      # Push changes (use the correct URL and branch)
+      git push -f https://oauth2:${GITLAB_TOKEN}@gitlab.com/vikshan/devcontainers.git HEAD:$CI_COMMIT_REF_NAME
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
