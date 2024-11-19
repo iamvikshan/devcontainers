@@ -2,7 +2,7 @@ sync-github:
   image: alpine:latest
   stage: sync-github
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^GitHub Sync/
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^GitHub Sync/ && $CI_COMMIT_MESSAGE !~ /Release/
       when: always
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
