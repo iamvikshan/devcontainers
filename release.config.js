@@ -48,14 +48,6 @@ const config = {
         assets: ['CHANGELOG.md', 'package.json'],
         message:
           'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
-        committer: {
-          name: 'vixshan',
-          email: 'vixshan@gmail.com'
-        },
-        author: {
-          name: 'vixshan',
-          email: 'vixshan@gmail.com'
-        }
       }
     ]
   ]

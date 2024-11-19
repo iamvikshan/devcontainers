@@ -9,6 +9,11 @@
     DOCKER_TLS_CERTDIR: ""
     DOCKER_DRIVER: overlay2
     DOCKER_BUILDKIT: "1"
+    # Add Git environment variables
+    GIT_AUTHOR_NAME: "vikshan"
+    GIT_AUTHOR_EMAIL: "vixshan@gmail.com"
+    GIT_COMMITTER_NAME: "vikshan"
+    GIT_COMMITTER_EMAIL: "vixshan@gmail.com"
 
 release:
   <<: *release_template
@@ -21,9 +26,16 @@ release:
     - docker buildx create --use --name builder --node builder0 --driver docker-container
     - docker buildx inspect --bootstrap
     - npm ci
+    # Configure git authentication
+    - git config --global url."https://oauth2:${GITLAB_TOKEN}@gitlab.com/".insteadOf "https://gitlab.com/"
+    # Export Git environment variables
+    - export GIT_AUTHOR_NAME="vikshan"
+    - export GIT_AUTHOR_EMAIL="vixshan@gmail.com" 
+    - export GIT_COMMITTER_NAME="vikshan"
+    - export GIT_COMMITTER_EMAIL="vixshan@gmail.com"
   script:
     - |
-      # Run semantic-release first (now includes changelog generation + staging)
+      # Run semantic-release first
       npx semantic-release
       VERSION=$(curl -s -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/latest" | jq -r '.tag_name' | sed 's/v//')
 
@@ -65,14 +77,10 @@ release:
       # Update image sizes
       npm run s && npm run f
 
-      # Amend the semantic-release commit with size updates
-      git config --global user.name 'vixshan'
-      git config --global user.email 'vixshan@gmail.com'
+      # Git operations with environment variables already set
       git add README.md base/*/README.md
       git commit --amend --no-edit
-
-      # Push changes (use the correct URL and branch)
-      git push -f https://oauth2:${GITLAB_TOKEN}@gitlab.com/vikshan/devcontainers.git HEAD:$CI_COMMIT_REF_NAME
+      git push -f "https://oauth2:${GITLAB_TOKEN}@gitlab.com/${CI_PROJECT_PATH}.git" HEAD:$CI_COMMIT_REF_NAME
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
