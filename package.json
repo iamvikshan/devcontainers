@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "format": "prettier --write \"**/*.*\""
+    "format": "prettier --write \"**/*.*\"",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
@@ -9,8 +10,10 @@
     "@semantic-release/github": "^11.0.1",
     "@semantic-release/gitlab": "^13.2.1",
     "@semantic-release/release-notes-generator": "^14.0.1",
+    "axios": "^1.7.7",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "conventional-changelog-gitmoji": "^0.2.5",
+    "husky": "^9.1.7",
     "prettier": "^3.3.3",
     "semantic-release": "^24.2.0",
     "semantic-release-gitmoji": "^1.6.0"

@@ -2,6 +2,12 @@
 
 A minimal development container configuration with Bun, Node.js, and Git.
 
+## Images
+
+1. `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 229.94 MiB
+
+2. `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 371.09 MiB
+
 ## Contents
 
 - Bun (latest)
@@ -22,9 +28,19 @@ curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun
 
 ### Container Registry
 
+#### 1. GitHub Container Registry
+
 ```json
 {
   "image": "ghcr.io/vixshan/devcontainers/bun-node:latest"
+}
+```
+
+#### 2. GitLab Container Registry
+
+```json
+{
+  "image": "registry.gitlab.com/vikshan/devcontainers/bun-node:latest"
 }
 ```
 
@@ -47,20 +63,3 @@ curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun
 - Prettier
 - GitLens
 - Bun
-
-## Customizing
-
-1. Fork the repository
-2. Modify the configuration files
-3. Build your custom image:
-   ```bash
-   docker build -t my-custom-devcontainer .
-   ```
-
-## Version History
-
-- **1.0.0** - Initial release
-  - Bun (latest)
-  - Node.js (latest)
-  - Git
-  - Essential VS Code extensions

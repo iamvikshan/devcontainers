@@ -3,14 +3,22 @@
 This repository contains reusable DevContainer configurations for different
 development environments.
 
-## Available Configurations
+## Available Images
 
-### Base Configurations
+### 1. GitHub Container Registry
 
-- **[bun-node](./base/bun-node)**: A vanila development environment with Bun,
-  Node.js, eslint and Git.
-- **[bun](./base/bun)**: A clean vanila development environment with Bun and
-  Git.
+- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 143.28 MiB
+- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 229.94 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 121.94 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 189.93 MiB
+
+### 2. GitLab Container Registry
+
+- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 170.85 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 371.09 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 213.98 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 349.89
+  MiB
 
 ## Usage
 
@@ -20,51 +28,41 @@ Add this to your `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "image": "ghcr.io/vixshan/devcontainers/bun-node:latest"
-}
-```
-
-```json
-{
   "image": "ghcr.io/vixshan/devcontainers/bun:latest"
 }
 ```
 
-### Option 2: Copy Configuration
+### Option 2: Reference from GitLab
 
-1. Copy the desired configuration from the `base` directory to your project.
-2. Modify as needed for your specific requirements.
-
-### Option 3: Extend Configuration
+Add this to your `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "name": "My Custom Environment",
-  "build": {
-    "dockerfile": "./Dockerfile"
-  },
-  "extends": "ghcr.io/vixshan/devcontainers/bun-node"
+  "image": "registry.gitlab.com/vikshan/devcontainers/bun:latest"
 }
 ```
 
+### Option 3: Copy Configuration
+
+1. Copy the desired configuration from the `[base](./base/)` directory to your
+   project.
+2. Modify as needed for your specific requirements.
+
+### Option 4: Extend Configuration
+
 ```json
 {
   "name": "My Custom Environment",
   "build": {
     "dockerfile": "./Dockerfile"
   },
-  "extends": "ghcr.io/vixshan/devcontainers/bun"
+  "extends": "ghcr.io/vixshan/devcontainers/bun:latest"
 }
 ```
 
 ## Development
 
 ### Building Images Locally
-
-```bash
-# From the base/bun-node directory
-docker build -t devcontainers/bun-node .
-```
 
 ```bash
 # From the base/bun directory
@@ -74,12 +72,13 @@ docker build -t devcontainers/bun .
 ### Publishing Updates
 
 1. Make changes to the configuration
-2. Update version in the respective README.md
-3. Create a pull request
-4. Once merged, GitHub Actions will build and publish the updated image
+2. Create a pull request
+3. Once merged, GitHub Actions will build and publish the updated image
 
 ## Contributing
 
-1. Fork the repository
+1. [Fork](https://gitlab.com/vikshan/devcontainers/-/forks/new) the repository
 2. Create a feature branch
 3. Submit a pull request
+
+![Alt](https://repobeats.axiom.co/api/embed/4c4567be5d5226fd9349cc999f54ee8500605621.svg "Repobeats analytics image")

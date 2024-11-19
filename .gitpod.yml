@@ -1,4 +1,4 @@
-image: ghcr.io/vixshan/devcontainers/bun:latest
+image: ghcr.io/vixshan/devcontainers/bun-node:latest
 
 tasks:
   - name: Install Required Tools
