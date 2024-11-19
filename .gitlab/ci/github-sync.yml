@@ -5,36 +5,29 @@ github-sync:
   variables:
     GIT_STRATEGY: clone
     GH_TOKEN: $GH_TOKEN
-  script:
-    # Configure git
+  before_script:
     - git config --global user.name "vixshan"
     - git config --global user.email "vixshan@gmail.com"
-    
-    # Add GitHub remote
     - git remote add github https://$GH_TOKEN@github.com/vixshan/amina.git
-    
-    # Fetch from GitHub to ensure we have latest state
     - git fetch github
-    
-    # For each branch, try to sync
+  script:
     - |
-      for branch in $(git branch -r | grep -v '\->'); do
+      for branch in $(git branch -r | grep origin | grep -v '\->'); do
         branch_name=$(echo $branch | sed 's|origin/||')
-        
         echo "Syncing branch: $branch_name"
         
-        # Try normal push first
-        if git push github HEAD:$branch_name; then
+        git checkout -b sync-$branch_name $branch
+        
+        if git push github sync-$branch_name:$branch_name; then
           echo "Successfully pushed $branch_name"
         else
-          # If normal push fails, try to merge instead of force push
-          git checkout -b sync-$branch_name $branch
           git pull github $branch_name --no-edit || true
           git push github sync-$branch_name:$branch_name
-          git checkout -
-          git branch -D sync-$branch_name
         fi
+        
+        git checkout -
+        git branch -D sync-$branch_name
       done
-  only:
-    - pushes
-    - web
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "web"
