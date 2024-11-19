@@ -10,8 +10,6 @@ module.exports = {
           { type: 'fix', release: 'patch' },
           { type: 'perf', release: 'patch' },
           { type: 'feat', release: 'minor' },
-          { scope: 'no-release', release: false },
-          { scope: 'release', release: 'patch' },
         ],
         parserOpts: {
           noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
