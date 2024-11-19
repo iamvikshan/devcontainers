@@ -15,25 +15,42 @@ sync-github:
   script:
     # Add GitHub remote
     - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
-
-    # Fetch only branches, no tags
+    
+    # Debug logging
+    - echo "Fetching remotes..."
     - git fetch github --prune --no-tags
     - git fetch origin --prune --no-tags
-
-    # Get list of all branches
+    
+    # Get and display branch lists
     - |
+      echo "Listing branches:"
+      echo "GitLab branches:"
+      git branch -r | grep 'origin/'
+      echo "GitHub branches:"
+      git branch -r | grep 'github/'
+      
+      # Get branch lists
       gitlab_branches=$(git branch -r | grep 'origin/' | sed 's/origin\///')
       github_branches=$(git branch -r | grep 'github/' | sed 's/github\///')
-
-      # Delete branches in GitHub that don't exist in GitLab
+      
+      # Protected branches that shouldn't be deleted
+      protected_branches="main"
+      
+      # Delete non-protected branches in GitHub that don't exist in GitLab
       for branch in $github_branches; do
         if ! echo "$gitlab_branches" | grep -q "^$branch$"; then
-          git push github --delete "$branch" || true
+          if ! echo "$protected_branches" | grep -q "\b$branch\b"; then
+            echo "Deleting non-protected branch $branch from GitHub"
+            git push github --delete "$branch" || echo "Warning: Failed to delete $branch"
+          else
+            echo "Skipping deletion of protected branch: $branch"
+          fi
         fi
       done
-
+      
       # Update/create branches in GitHub
       for branch in $gitlab_branches; do
+        echo "Syncing branch: $branch"
         git checkout -B "$branch" "origin/$branch"
         git push -f github "$branch:$branch"
       done

@@ -24,14 +24,26 @@ get_repo_id() {
     echo "${repo_id:-0}"
 }
 
-# Function to get image size from GitHub Container Registry
 get_ghcr_size() {
     local image=$1
     local token=$(curl -s "https://ghcr.io/token?scope=repository:$image:pull" | jq -r .token)
-    local size=$(curl -s -H "Authorization: Bearer $token" \
-                     -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-                     "https://ghcr.io/v2/$image/manifests/latest" | jq -r '.config.size + (.layers[].size | tonumber)' | awk '{sum+=$1} END{printf "%.2f", sum/1024/1024}')
-    echo "$size"
+
+    # Get OCI index first
+    local index=$(curl -s -H "Authorization: Bearer $token" \
+                     -H "Accept: application/vnd.oci.image.index.v1+json" \
+                     "https://ghcr.io/v2/$image/manifests/latest")
+
+    # Get amd64 manifest digest
+    local digest=$(echo "$index" | jq -r '.manifests[] | select(.platform.architecture == "amd64") | .digest')
+    
+    # Get full manifest with layers
+    local manifest=$(curl -s -H "Authorization: Bearer $token" \
+                        -H "Accept: application/vnd.oci.image.manifest.v1+json" \
+                        "https://ghcr.io/v2/$image/manifests/$digest")
+
+    # Sum all layer sizes and convert to MiB
+    local size=$(echo "$manifest" | jq -r '[.layers[].size] | add / 1024 / 1024')
+    printf "%.2f" "${size:-0}"
 }
 
 # Function to get image size from GitLab
@@ -74,10 +86,6 @@ for image in "${!images[@]}"; do
     images[$image]=$size
     echo "Retrieved size for $image: ${size} MiB"
 done
-
-#!/usr/bin/env bash
-
-# Previous functions remain the same until the README update part
 
 # Update sizes in README files
 update_readme() {

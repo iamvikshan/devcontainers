@@ -66,6 +66,8 @@ release:
       npm run s && npm run f
 
       # Amend the semantic-release commit with size updates
+      git config --global user.name 'vixshan'
+      git config --global user.email 'vixshan@gmail.com'
       git add README.md base/*/README.md
       git commit --amend --no-edit
       git push -f origin HEAD:$CI_COMMIT_REF_NAME

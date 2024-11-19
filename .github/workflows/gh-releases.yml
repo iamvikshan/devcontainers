@@ -86,12 +86,13 @@ jobs:
       - name: Wait and Update image sizes
         run: |
           sleep 5
+          echo "GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}" > .env
           npm run s && npm run f
 
       - name: Commit README updates
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name 'vixshan'
+          git config --global user.email 'vixshan@gmail.com'
           git add README.md base/*/README.md
           git commit --amend --no-edit
           git push -f origin HEAD:${{ github.ref_name }}

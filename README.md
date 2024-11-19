@@ -7,10 +7,10 @@ environments.
 
 ### 1. GitHub Container Registry
 
-- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 143.28 MiB
-- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 229.94 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 121.94 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 189.93 MiB
+- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 129.79 MiB
+- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 229.90 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 121.24 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 189.20 MiB
 
 ### 2. GitLab Container Registry
 
@@ -78,3 +78,5 @@ docker build -t devcontainers/bun .
 1. [Fork](https://gitlab.com/vikshan/devcontainers/-/forks/new) the repository
 2. Create a feature branch
 3. Submit a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
+
+![Alt](https://repobeats.axiom.co/api/embed/4c4567be5d5226fd9349cc999f54ee8500605621.svg 'Repobeats analytics image')
