@@ -10,7 +10,7 @@ on:
 
 jobs:
   sync:
-    if: "!contains(github.event.head_commit.message, 'GitLab Sync') && !contains(github.event.head_commit.message, 'Release')"
+    if: "!contains(github.event.head_commit.message, 'GitLab Sync') || !contains(github.event.head_commit.message, 'Release')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
