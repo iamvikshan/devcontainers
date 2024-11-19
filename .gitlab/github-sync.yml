@@ -1,6 +1,6 @@
 sync-github:
   image: alpine:latest
-  stage: sync
+  stage: sync-github
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
       when: always
