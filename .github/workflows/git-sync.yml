@@ -3,15 +3,15 @@ name: Sync Repositories
 on:
   push:
     branches:
-      - '**'
+      - "**"
   delete: # Trigger on branch deletions
     branches:
-      - '**'
+      - "**"
   pull_request:
     types: [opened, closed]
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: "0 */6 * * *"
 
 jobs:
   sync:
@@ -28,23 +28,25 @@ jobs:
           git config user.email "vixshan@gmail.com"
 
       - name: Add GitLab remote
-        run: git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/vikshan/devcontainers.git
+        run:
+          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN
+          }}@gitlab.com/vikshan/devcontainers.git
 
       - name: Fetch and sync with GitLab
         run: |
           git fetch gitlab
           git fetch origin
-          
+
           # Get latest commit timestamps
           gitlab_timestamp=$(git log -1 --format=%ct gitlab/main)
           github_timestamp=$(git log -1 --format=%ct origin/main)
-          
+
           if [ "$gitlab_timestamp" -gt "$github_timestamp" ]; then
             latest_commit_message=$(git log -1 gitlab/main --pretty=%B)
           else
             latest_commit_message=$(git log -1 origin/main --pretty=%B)
           fi
-          
+
           # Merge only if there are differences
           if ! git diff --quiet origin/main gitlab/main; then
             git merge gitlab/main --allow-unrelated-histories -m "$latest_commit_message" || true

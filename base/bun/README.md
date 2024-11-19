@@ -60,4 +60,4 @@ curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun
 - **1.0.0** - Initial release
   - Bun (latest)
   - Git
-  - Essential VS Code extensions 
+  - Essential VS Code extensions

@@ -1,13 +1,16 @@
 # DevContainer Configurations
 
-This repository contains reusable DevContainer configurations for different development environments.
+This repository contains reusable DevContainer configurations for different
+development environments.
 
 ## Available Configurations
 
 ### Base Configurations
 
-- **[bun-node](./base/bun-node)**: A vanila development environment with Bun, Node.js, eslint and Git.
-- **[bun](./base/bun)**: A clean vanila development environment with Bun and Git.
+- **[bun-node](./base/bun-node)**: A vanila development environment with Bun,
+  Node.js, eslint and Git.
+- **[bun](./base/bun)**: A clean vanila development environment with Bun and
+  Git.
 
 ## Usage
 

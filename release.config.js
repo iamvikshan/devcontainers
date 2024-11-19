@@ -1,47 +1,74 @@
-// release.config.js
-module.exports = {
+const config = {
   branches: ['main'],
   plugins: [
     [
-      '@semantic-release/commit-analyzer',
+      'semantic-release-gitmoji',
       {
-        preset: 'angular',
-        releaseRules: [
-          { type: 'fix', release: 'patch' },
-          { type: 'perf', release: 'patch' },
-          { type: 'feat', release: 'minor' },
-        ],
-        parserOpts: {
-          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
-        },
-      },
+        releaseRules: {
+          patch: {
+            include: [':bug:', ':ambulance:', ':lock:', ':adhesive_bandage:']
+          },
+          minor: {
+            include: [':sparkles:', ':rocket:', ':boom:', ':lipstick:', ':zap:']
+          },
+          major: {
+            include: [':boom:', ':warning:']
+          }
+        }
+      }
     ],
-    '@semantic-release/release-notes-generator',
+    '@semantic-release/commit-analyzer',
     [
-      '@semantic-release/changelog',
+      '@semantic-release/release-notes-generator',
       {
-        changelogFile: 'CHANGELOG.md',
-        changelogTitle: '# Changelog',
-      },
+        preset: 'conventionalcommits',
+        writerOpts: {
+          types: [
+            { type: 'feat', section: '✨ Features' },
+            { type: 'fix', section: '🐛 Bug Fixes' },
+            { type: 'perf', section: '⚡ Performance Improvements' },
+            { type: 'revert', section: '⏪ Reverts' },
+            { type: 'docs', section: '📚 Documentation' },
+            { type: 'style', section: '💄 Styles' },
+            { type: 'chore', section: '🔧 Miscellaneous' },
+            { type: 'refactor', section: '♻️ Code Refactoring' },
+            { type: 'test', section: '✅ Tests' },
+            { type: 'build', section: '👷 Build System' },
+            { type: 'ci', section: '🔄 CI/CD' }
+          ]
+        }
+      }
     ],
-    // Conditionally include GitHub or GitLab plugin based on CI environment
-    ...(process.env.GITLAB_CI
-      ? ['@semantic-release/gitlab']
-      : [
-          [
-            '@semantic-release/github',
-            {
-              assets: ['CHANGELOG.md'],
-            },
-          ],
-        ]),
+    '@semantic-release/changelog',
     [
       '@semantic-release/git',
       {
-        assets: ['CHANGELOG.md', 'package.json'],
+        assets: ['CHANGELOG.md'],
         message:
-          'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
-      },
-    ],
-  ],
-};
+          'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
+      }
+    ]
+  ]
+}
+
+// Dynamically add GitHub or GitLab plugin based on environment
+if (process.env.CI_SERVER_URL) {
+  config.plugins.push([
+    '@semantic-release/gitlab',
+    {
+      gitlabUrl: process.env.CI_SERVER_URL
+    }
+  ])
+} else {
+  config.plugins.push([
+    '@semantic-release/github',
+    {
+      successComment:
+        '🎉 This ${issue.pull_request ? "PR is included" : "issue has been resolved"} in version ${nextRelease.version}',
+      failTitle: '❌ The release failed',
+      failComment: 'This release from branch ${branch.name} failed to publish.'
+    }
+  ])
+}
+
+module.exports = config
