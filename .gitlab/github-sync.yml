@@ -14,7 +14,7 @@ sync-github:
     - git config --global user.email "vixshan@gmail.com"
   script:
     # Add GitHub remote
-    - git remote add github https://$GH_TOKEN@github.com/vikshan/devcontainers.git
+    - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
 
     # Fetch all branches and tags
     - git fetch github --prune
