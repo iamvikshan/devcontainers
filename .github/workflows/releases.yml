@@ -127,7 +127,7 @@ jobs:
               \"tag_name\": \"v${VERSION}\",
               \"description\": \"Release v${VERSION}\"
             }" \
-            "${GITLAB_REGISTRY}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/releases"
+            "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/releases"
 
       - name: Wait and Update image sizes
         run: |
@@ -144,5 +144,5 @@ jobs:
           git push -f origin HEAD:${{ github.ref_name }}
 
           # Push to GitLab
-          git remote add gitlab "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}.git"
+          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/${GITLAB_PROJECT_PATH}.git
           git push -f gitlab HEAD:${{ github.ref_name }}

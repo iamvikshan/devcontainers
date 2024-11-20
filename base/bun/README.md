@@ -11,12 +11,12 @@ A minimal development container configuration with Bun and Git.
 
 <<<<<<< HEAD
 
-1. # `ghcr.io/vixshan/devcontainers/bun:latest` ~ 129.79 MiB
+1. # `ghcr.io/vixshan/devcontainers/bun:latest` ~ 0.00 MiB
 1. `ghcr.io/vixshan/devcontainers/bun:latest` ~ 0.00 MiB
 
    > > > > > > > origin/main
 
-1. `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 0.00 MiB
+1. `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 126.64 MiB
 
 ## Usage
 

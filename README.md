@@ -7,17 +7,17 @@ environments.
 
 ### 1. GitHub Container Registry
 
-- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 129.79 MiB
-- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 229.90 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 121.24 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 189.20 MiB
+- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 0.00 MiB
+- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 0.00 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
 
 ### 2. GitLab Container Registry
 
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 0.00 MiB
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 0.00 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 126.64 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 226.76 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 120.51 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 188.46 MiB
 
 ## Usage
 
@@ -80,3 +80,5 @@ docker build -t devcontainers/bun .
 3. Submit a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
 
 ![Alt](https://repobeats.axiom.co/api/embed/4c4567be5d5226fd9349cc999f54ee8500605621.svg 'Repobeats analytics image')
+
+https://gitlab.com/api/v4/projects/64626588/releases
