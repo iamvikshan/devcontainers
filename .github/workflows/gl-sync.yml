@@ -14,6 +14,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Update sizes
+        run: |
+          chmod +x scripts/update-sizes.sh
+          ./scripts/update-sizes.sh
+
       - name: Sync with GitLab
         run: |
           git config user.name "vikshan"
