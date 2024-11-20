@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - "*"
+  delete:
+    branches:
+      - "*"
+  pull_request:
+    types: [opened, closed, reopened, edited, labeled, unlabeled]
   schedule:
     - cron: "0 */6 * * *"
 
@@ -13,6 +18,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: false
+
+      - name: Install GitLab CLI
+        run: |
+          curl -L "https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh" | sudo bash
+          sudo apt-get install gitlab-cli
 
       - name: Update sizes
         run: |
@@ -20,35 +31,66 @@ jobs:
           chmod +x scripts/update-sizes.sh
           ./scripts/update-sizes.sh
 
-          # Commit size updates if there are changes
-          git add .
           git config user.name "vikshan"
           git config user.email "vixshan@gmail.com"
-          if git diff --staged --quiet; then
-            echo "No size changes to commit"
-          else
+
+          git add .
+          if ! git diff --staged --quiet; then
             git commit -m "chore: Update sizes [skip ci]"
+            git push origin HEAD
           fi
 
       - name: Sync with GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GITLAB_PROJECT_ID: "vikshan/devcontainers"
         run: |
-          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/vikshan/devcontainers.git
+          # Setup GitLab remote
+          git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gitlab.com/${GITLAB_PROJECT_ID}.git
+          git fetch --no-tags gitlab
 
-          # Fetch GitLab branches
-          git fetch gitlab
+          # Get list of active GitHub branches
+          GITHUB_BRANCHES=$(git branch -r | grep 'origin/' | sed 's#origin/##')
 
-          # List and sync each branch
-          git branch -r | grep 'origin/' | sed 's#origin/##' | while read branch; do
-            git checkout -B "${branch}" "origin/${branch}"
-            
-            # Check if branch exists on GitLab and is up to date
-            if git rev-parse --verify "gitlab/${branch}" >/dev/null 2>&1; then
-              if [ "$(git rev-parse HEAD)" = "$(git rev-parse gitlab/${branch})" ]; then
-                echo "Branch ${branch} is up to date on GitLab, skipping..."
-                continue
-              fi
+          # Get list of GitLab branches
+          GITLAB_BRANCHES=$(git branch -r | grep 'gitlab/' | sed 's#gitlab/##')
+
+          # Sync branches from GitHub to GitLab
+          echo "$GITHUB_BRANCHES" | while read branch; do
+            if [ -n "$branch" ]; then
+              echo "Processing branch: $branch"
+              git checkout -B "${branch}" "origin/${branch}"
+              
+              # Push to GitLab with skip CI
+              git push -f gitlab "${branch}:${branch}" -o ci.skip || {
+                echo "Failed to push branch ${branch}"
+                exit 1
+              }
             fi
-            
-            # Push only if there are changes
-            git push -f gitlab "${branch}:${branch}"
           done
+
+          # Delete branches on GitLab that don't exist on GitHub
+          echo "$GITLAB_BRANCHES" | while read branch; do
+            if [ -n "$branch" ] && ! echo "$GITHUB_BRANCHES" | grep -q "^${branch}$"; then
+              echo "Deleting branch ${branch} from GitLab"
+              git push gitlab --delete "${branch}" || echo "Warning: Failed to delete branch ${branch}"
+            fi
+          done
+
+          # Sync PR labels and descriptions using GitLab API
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            PR_DESC="${{ github.event.pull_request.body }}"
+            SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
+            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+            
+            # Create/Update merge request on GitLab
+            glab api "projects/${GITLAB_PROJECT_ID}/merge_requests" \
+              -X POST \
+              -f source_branch="${SOURCE_BRANCH}" \
+              -f target_branch="${TARGET_BRANCH}" \
+              -f title="${PR_TITLE}" \
+              -f description="${PR_DESC}" \
+              -f remove_source_branch=true || echo "Warning: Failed to sync PR details"
+          fi
