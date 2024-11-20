@@ -80,5 +80,3 @@ docker build -t devcontainers/bun .
 3. Submit a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
 
 ![Alt](https://repobeats.axiom.co/api/embed/4c4567be5d5226fd9349cc999f54ee8500605621.svg 'Repobeats analytics image')
-
-https://gitlab.com/api/v4/projects/64626588/releases

@@ -2,7 +2,7 @@ name: GitLab Sync
 on:
   push:
     branches:
-      - '*'
+      - "*"
   schedule:
     - cron: "0 */6 * * *"
 
@@ -19,7 +19,7 @@ jobs:
           git config user.name "vikshan"
           git config user.email "vixshan@gmail.com"
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/vikshan/devcontainers.git
-          
+
           # Fetch GitLab branches
           git fetch gitlab
 

@@ -56,7 +56,8 @@ const config = {
         successComment:
           '🎉 This ${issue.pull_request ? "PR is included" : "issue has been resolved"} in version ${nextRelease.version}',
         failTitle: '❌ The release failed',
-        failComment: 'This release from branch ${branch.name} failed to publish.'
+        failComment:
+          'This release from branch ${branch.name} failed to publish.'
       }
     ]
   ]
