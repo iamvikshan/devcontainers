@@ -117,21 +117,41 @@ jobs:
             fi
           done
 
-      - name: Create GitLab Release
+      - name: Create GitLab Release and Tag
         run: |
-          curl --request POST \
+          # Create tag first
+          git tag "v${VERSION}" || true
+          git push https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/${GITLAB_PROJECT_PATH}.git "v${VERSION}" || true
+          
+          # Get GitHub release details
+          GITHUB_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+          
+          RELEASE_NOTES=$(echo $GITHUB_RELEASE | jq -r '.body')
+          if [ "$RELEASE_NOTES" = "null" ]; then
+            RELEASE_NOTES="Release v${VERSION}"
+          fi
+          
+          # Create GitLab release
+          RESPONSE=$(curl --request POST \
             --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
             --header "Content-Type: application/json" \
             --data "{
               \"name\": \"v${VERSION}\",
               \"tag_name\": \"v${VERSION}\",
-              \"description\": \"Release v${VERSION}\"
+              \"description\": ${RELEASE_NOTES@J}
             }" \
-            "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/releases"
+            "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/releases")
 
-      - name: Wait and Update image sizes
+          # Verify response
+          if ! echo "$RESPONSE" | jq -e '.tag_name' > /dev/null; then
+            echo "Failed to create GitLab release:"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+      - name: Update image sizes
         run: |
-          sleep 5
           echo "GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}" > .env
           npm run s && npm run f
 

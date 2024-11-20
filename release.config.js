@@ -49,23 +49,17 @@ const config = {
         message:
           'Release ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
       }
+    ],
+    [
+      '@semantic-release/github',
+      {
+        successComment:
+          '🎉 This ${issue.pull_request ? "PR is included" : "issue has been resolved"} in version ${nextRelease.version}',
+        failTitle: '❌ The release failed',
+        failComment: 'This release from branch ${branch.name} failed to publish.'
+      }
     ]
   ]
-}
-
-// Dynamically add GitHub or GitLab plugin based on environment
-if (process.env.GITLAB_CI || process.env.CI_SERVER_URL) {
-  config.plugins.push('@semantic-release/gitlab')
-} else if (process.env.GITHUB_ACTIONS || process.env.GITHUB_WORKFLOW) {
-  config.plugins.push([
-    '@semantic-release/github',
-    {
-      successComment:
-        '🎉 This ${issue.pull_request ? "PR is included" : "issue has been resolved"} in version ${nextRelease.version}',
-      failTitle: '❌ The release failed',
-      failComment: 'This release from branch ${branch.name} failed to publish.'
-    }
-  ])
 }
 
 module.exports = config
