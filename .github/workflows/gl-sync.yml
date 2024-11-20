@@ -20,10 +20,18 @@ jobs:
           chmod +x scripts/update-sizes.sh
           ./scripts/update-sizes.sh
 
-      - name: Sync with GitLab
-        run: |
+          # Commit size updates if there are changes
+          git add .
           git config user.name "vikshan"
           git config user.email "vixshan@gmail.com"
+          if git diff --staged --quiet; then
+            echo "No size changes to commit"
+          else
+            git commit -m "chore: Update sizes [skip ci]"
+          fi
+
+      - name: Sync with GitLab
+        run: |
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/vikshan/devcontainers.git
 
           # Fetch GitLab branches
