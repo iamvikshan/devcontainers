@@ -5,37 +5,6 @@ if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)
 fi
 
-# Function to check if GHCR image is public
-check_ghcr_visibility() {
-    local image="$1"
-    
-    if [ -z "$GH_PAT" ]; then
-        echo "Error: GH_PAT not set in .env" >&2
-        return 1
-    fi
-    
-    response=$(curl -s -H "Authorization: Bearer $GH_PAT" \
-        "https://api.github.com/orgs/vixshan/packages/container/$image")
-    
-    echo "$response" | jq -r '.visibility // "private"'
-}
-
-# Function to make GHCR image public
-make_ghcr_public() {
-    local image="$1"
-    
-    if [ -z "$GH_PAT" ]; then
-        echo "Error: GH_PAT not set in .env" >&2
-        return 1
-    fi
-    
-    curl -X PATCH \
-        -H "Authorization: Bearer $GH_PAT" \
-        -H "Accept: application/vnd.github.v3+json" \
-        "https://api.github.com/orgs/vixshan/packages/container/$image" \
-        -d '{"visibility":"public"}'
-}
-
 # Function to get repository ID from GitLab
 get_repo_id() {
     local image_path="$1"

@@ -163,7 +163,6 @@ jobs:
       - name: Update image sizes
         run: |
           echo "GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}" > .env
-          echo "GH_PAT=${{ secrets.GH_PAT }}" > .env
           npm run s && npm run f
 
       - name: Commit README updates

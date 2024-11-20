@@ -63,7 +63,7 @@ async function deleteGHCRPackages(owner) {
       `/users/${owner}/packages?package_type=container`
     )
 
-    // Filter and delete devcontainers packages
+    // Filter and delete devcontainers packagesPAT
     for (const pkg of packages) {
       if (pkg.name.startsWith('devcontainers/')) {
         const encodedPackageName = encodeURIComponent(pkg.name)
