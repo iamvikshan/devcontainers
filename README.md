@@ -7,10 +7,10 @@ environments.
 
 ### 1. GitHub Container Registry
 
-- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 0.00 MiB
-- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 0.00 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
+- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 126.64 MiB
+- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 226.76 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 120.51 MiB
+- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 188.46 MiB
 
 ### 2. GitLab Container Registry
 
