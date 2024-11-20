@@ -19,8 +19,6 @@ sync-github:
       rm -rf gh*
     - git config --global user.name "vixshan"
     - git config --global user.email "vixshan@gmail.com"
-    - echo "$GH_TOKEN" > ~/.gh_token
-    - gh auth login --with-token < ~/.gh_token
   script:
     - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
     - |
@@ -84,3 +82,4 @@ sync-github:
   variables:
     GIT_STRATEGY: clone
     GIT_DEPTH: 0
+    GITHUB_TOKEN: $GH_TOKEN
