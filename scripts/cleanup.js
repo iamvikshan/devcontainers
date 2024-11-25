@@ -124,7 +124,7 @@ async function deleteGitLabRegistry(projectId) {
 }
 
 async function main() {
-  const owner = 'vixshan'
+  const owner = 'iamvikshan'
   const repo = 'devcontainers'
   const gitlabProjectId = '64626588'
 

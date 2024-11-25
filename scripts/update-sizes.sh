@@ -66,10 +66,10 @@ get_gitlab_size() {
 
 # Define images array
 declare -A images=(
-    ["ghcr.io/vixshan/devcontainers/bun"]=""
-    ["ghcr.io/vixshan/devcontainers/bun-node"]=""
-    ["ghcr.io/vixshan/devcontainers/ubuntu-bun"]=""
-    ["ghcr.io/vixshan/devcontainers/ubuntu-bun-node"]=""
+    ["ghcr.io/iamvikshan/devcontainers/bun"]=""
+    ["ghcr.io/iamvikshan/devcontainers/bun-node"]=""
+    ["ghcr.io/iamvikshan/devcontainers/ubuntu-bun"]=""
+    ["ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node"]=""
     ["vikshan/devcontainers/bun"]=""
     ["vikshan/devcontainers/bun-node"]=""
     ["vikshan/devcontainers/ubuntu-bun"]=""

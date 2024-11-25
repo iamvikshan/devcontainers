@@ -1,15 +1,18 @@
 name: GitLab Sync
 on:
   push:
-    branches:
-      - "*"
+    branches: ["*"]
   delete:
-    branches:
-      - "*"
+    branches: ["*"]
   pull_request:
     types: [opened, closed, reopened, edited, labeled, unlabeled]
   schedule:
     - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+env:
+  GITLAB_USERNAME: vikshan
+  GITHUB_USERNAME: ${{ github.repository_owner }}
 
 jobs:
   sync:
@@ -20,77 +23,22 @@ jobs:
           fetch-depth: 0
           fetch-tags: false
 
-      - name: Install GitLab CLI
+      - name: Set environment variables
         run: |
-          curl -L "https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh" | sudo bash
-          sudo apt-get install gitlab-cli
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+          echo "GITLAB_PROJECT_PATH=${{ env.GITLAB_USERNAME }}/$REPO_NAME" >> $GITHUB_ENV
 
-      - name: Update sizes
-        run: |
-          echo "GITLAB_TOKEN=${{ secrets.GITLAB_TOKEN }}" > .env
-          chmod +x scripts/update-sizes.sh
-          ./scripts/update-sizes.sh
+      - name: Setup GitLab CLI
+        uses: ./.github/actions/setup-gitlab-cli
 
-          git config user.name "vikshan"
-          git config user.email "vixshan@gmail.com"
+      - name: Manage GitLab Repository
+        uses: ./.github/actions/manage-gitlab-repo
+        with:
+          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
 
-          git add .
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: Update sizes [skip ci]"
-            git push origin HEAD
-          fi
-
-      - name: Sync with GitLab
-        env:
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          GITLAB_PROJECT_ID: "vikshan/devcontainers"
-        run: |
-          # Setup GitLab remote
-          git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gitlab.com/${GITLAB_PROJECT_ID}.git
-          git fetch --no-tags gitlab
-
-          # Get list of active GitHub branches
-          GITHUB_BRANCHES=$(git branch -r | grep 'origin/' | sed 's#origin/##')
-
-          # Get list of GitLab branches
-          GITLAB_BRANCHES=$(git branch -r | grep 'gitlab/' | sed 's#gitlab/##')
-
-          # Sync branches from GitHub to GitLab
-          echo "$GITHUB_BRANCHES" | while read branch; do
-            if [ -n "$branch" ]; then
-              echo "Processing branch: $branch"
-              git checkout -B "${branch}" "origin/${branch}"
-              
-              # Push to GitLab with skip CI
-              git push -f gitlab "${branch}:${branch}" -o ci.skip || {
-                echo "Failed to push branch ${branch}"
-                exit 1
-              }
-            fi
-          done
-
-          # Delete branches on GitLab that don't exist on GitHub
-          echo "$GITLAB_BRANCHES" | while read branch; do
-            if [ -n "$branch" ] && ! echo "$GITHUB_BRANCHES" | grep -q "^${branch}$"; then
-              echo "Deleting branch ${branch} from GitLab"
-              git push gitlab --delete "${branch}" || echo "Warning: Failed to delete branch ${branch}"
-            fi
-          done
-
-          # Sync PR labels and descriptions using GitLab API
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            PR_NUMBER="${{ github.event.pull_request.number }}"
-            PR_TITLE="${{ github.event.pull_request.title }}"
-            PR_DESC="${{ github.event.pull_request.body }}"
-            SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
-            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
-            
-            # Create/Update merge request on GitLab
-            glab api "projects/${GITLAB_PROJECT_ID}/merge_requests" \
-              -X POST \
-              -f source_branch="${SOURCE_BRANCH}" \
-              -f target_branch="${TARGET_BRANCH}" \
-              -f title="${PR_TITLE}" \
-              -f description="${PR_DESC}" \
-              -f remove_source_branch=true || echo "Warning: Failed to sync PR details"
-          fi
+      - name: Sync Repository
+        uses: ./.github/actions/sync-repository
+        with:
+          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
+          github-token: ${{ secrets.USR_TOKEN }}
