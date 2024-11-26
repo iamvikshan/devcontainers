@@ -1,12 +1,12 @@
-name: "Update Documentation"
-description: "Update README files and push changes"
+update-docsname: "Update Documentation"
+description: "Updates README files with image sizes and syncs changes"
 
 inputs:
   gitlab-token:
     description: "GitLab token"
     required: true
-  repo-owner:
-    description: "Repository owner"
+  gitlab-project-path:
+    description: "GitLab project path"
     required: true
   ref-name:
     description: "Git reference name"
@@ -24,11 +24,11 @@ runs:
     - name: Commit README updates
       shell: bash
       run: |
-        git config --global user.email "${{ inputs.repo-owner }}@users.noreply.github.com"
-        git config --global user.name "${{ inputs.repo-owner }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git config --global user.name "vixshan"
         git add README.md base/*/README.md
         git commit --amend --no-edit
         git push -f origin HEAD:${{ inputs.ref-name }}
 
-        git remote add gitlab https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_USERNAME}/${REPO_NAME}.git
+        git remote add gitlab https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_PROJECT_PATH}.git
         git push -f gitlab HEAD:${{ inputs.ref-name }}

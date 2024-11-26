@@ -10,10 +10,7 @@ on:
 env:
   GITHUB_REGISTRY: ghcr.io
   GITLAB_REGISTRY: registry.gitlab.com
-  GH_REPO: ${{ github.repository }}
-  REPO_NAME: ${{ github.event.repository.name }}
-  GITHUB_USERNAME: ${{ github.repository_owner }}
-  GITLAB_USERNAME: vikshan
+  GL_USERNAME: vikshan
 
 jobs:
   release:
@@ -26,34 +23,57 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Node and Bun
+      - name: Setup Node, Bun and run bun i
         uses: iamvikshan/.github/.github/actions/setup-node-bun@main
 
-      - name: Configure Container Registries
+      - name: Semantic Release
+        id: semantic_release
+        run: bunx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GIT_AUTHOR_NAME: ${{ env.GL_USERNAME }}
+          GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
+          GIT_COMMITTER_NAME: ${{ env.GL_USERNAME }}
+          GIT_COMMITTER_EMAIL: ${{ github.actor }}@users.noreply.github.com
+
+      - name: Get latest release tag
+        id: get_release_tag
+        run: |
+          VERSION=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
+            jq -r '.tag_name' | sed 's/v//')
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Configure registries
         uses: ./.github/actions/configure-registries
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-pat: ${{ secrets.GH_PAT }}
           gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          github-owner: ${{ github.repository_owner }}
+          github-registry: ${{ env.GITHUB_REGISTRY }}
+          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
+          github-username: ${{ github.actor }}
 
-      - name: Release
-        uses: ./.github/actions/release-containers
-        with:
-          gh-token: ${{ secrets.GH_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          repo-owner: ${{ github.repository_owner }}
-
-      - name: Build and Push Containers
+      - name: Build containers
         uses: ./.github/actions/build-containers
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
+          version: ${{ env.VERSION }}
+          github-registry: ${{ env.GITHUB_REGISTRY }}
+          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
+          gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
 
-      - name: Update Documentation
+      - name: Update sizes
         uses: ./.github/actions/update-docs
         with:
           gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          repo-owner: ${{ github.repository_owner }}
+          gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
           ref-name: ${{ github.ref_name }}
+
+      - name: Create GitLab Release
+        uses: iamvikshan/.github/.github/actions/create-gitlab-release
+        with:
+          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
+          gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
+          version: ${{ env.VERSION }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          github-repo: ${{ github.repository }}
