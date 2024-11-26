@@ -21,15 +21,15 @@ runs:
             docker buildx build \
               --file "$dir/.devcontainer/Dockerfile" \
               --push \
-              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/${devcontainer_name}:v${VERSION}" \
-              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/${devcontainer_name}:latest" \
+              --tag "${GITHUB_REGISTRY}/${GH_REPO}/${devcontainer_name}:v${VERSION}" \
+              --tag "${GITHUB_REGISTRY}/${GH_REPO}/${devcontainer_name}:latest" \
               "$dir/.devcontainer"
 
             docker buildx build \
               --file "$dir/.devcontainer/Dockerfile" \
               --push \
-              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:v${VERSION}" \
-              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:latest" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_USERNAME}/${REPO_NAME}/${devcontainer_name}:v${VERSION}" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_USERNAME}/${REPO_NAME}/${devcontainer_name}:latest" \
               "$dir/.devcontainer"
           fi
         done
@@ -43,15 +43,15 @@ runs:
             docker buildx build \
               --file "$dir/Dockerfile" \
               --push \
-              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/ubuntu-${devcontainer_name}:v${VERSION}" \
-              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/ubuntu-${devcontainer_name}:latest" \
+              --tag "${GITHUB_REGISTRY}/${GH_REPO}/ubuntu-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITHUB_REGISTRY}/${GH_REPO}/ubuntu-${devcontainer_name}:latest" \
               "$dir"
 
             docker buildx build \
               --file "$dir/Dockerfile" \
               --push \
-              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:v${VERSION}" \
-              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:latest" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_USERNAME}/${REPO_NAME}/ubuntu-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_USERNAME}/${REPO_NAME}/ubuntu-${devcontainer_name}:latest" \
               "$dir"
           fi
         done
@@ -59,9 +59,9 @@ runs:
     - name: Create GitLab Release
       shell: bash
       run: |
-        if ! git ls-remote --tags https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_PROJECT_PATH}.git "refs/tags/v${VERSION}" | grep -q "v${VERSION}"; then
+        if ! git ls-remote --tags https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_USERNAME}/${REPO_NAME}.git "refs/tags/v${VERSION}" | grep -q "v${VERSION}"; then
           git tag "v${VERSION}" || true
-          git push https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_PROJECT_PATH}.git "v${VERSION}"
+          git push https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_USERNAME}/${REPO_NAME}.git "v${VERSION}"
         fi
 
         GITHUB_RELEASE=$(curl -s -H "Authorization: Bearer ${{ inputs.github-token }}" \
@@ -82,7 +82,7 @@ runs:
             \"tag_name\": \"v${VERSION}\",
             \"description\": ${ESCAPED_NOTES}
           }" \
-          "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_PATH}/releases")
+          "https://gitlab.com/api/v4/projects/${GITLAB_USERNAME}/${REPO_NAME}/releases")
 
         if ! echo "$RESPONSE" | jq -e '.tag_name' > /dev/null; then
           echo "Failed to create GitLab release:"

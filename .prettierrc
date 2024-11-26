@@ -28,12 +28,6 @@
         "proseWrap": "always",
         "printWidth": 100
       }
-    },
-    {
-      "files": ["Dockerfile", "*.sh"],
-      "options": {
-        "tabWidth": 4
-      }
     }
   ]
 }

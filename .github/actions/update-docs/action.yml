@@ -30,5 +30,5 @@ runs:
         git commit --amend --no-edit
         git push -f origin HEAD:${{ inputs.ref-name }}
 
-        git remote add gitlab https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_PROJECT_PATH}.git
+        git remote add gitlab https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_USERNAME}/${REPO_NAME}.git
         git push -f gitlab HEAD:${{ inputs.ref-name }}

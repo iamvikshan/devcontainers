@@ -20,6 +20,7 @@
       "eamodio.gitlens"
       "oven.bun-vscode"
       "WakaTime.vscode-wakatime"
+      "ms-azuretools.vscode-docker"
     ];
 
     # Workspace lifecycle hooks

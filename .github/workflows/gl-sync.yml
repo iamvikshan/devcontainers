@@ -1,4 +1,5 @@
 name: GitLab Sync
+
 on:
   push:
     branches: ["*"]
@@ -10,10 +11,6 @@ on:
     - cron: "0 */6 * * *"
   workflow_dispatch:
 
-env:
-  GITLAB_USERNAME: vikshan
-  GITHUB_USERNAME: ${{ github.repository_owner }}
-
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -23,22 +20,30 @@ jobs:
           fetch-depth: 0
           fetch-tags: false
 
-      - name: Set environment variables
+      - name: Determine Default Branch
+        id: default-branch
         run: |
-          REPO_NAME=${GITHUB_REPOSITORY#*/}
-          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
-          echo "GITLAB_PROJECT_PATH=${{ env.GITLAB_USERNAME }}/$REPO_NAME" >> $GITHUB_ENV
+          DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          echo "default_branch=$DEFAULT_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Setup GitLab CLI
         uses: iamvikshan/.github/.github/actions/setup-gitlab-cli@main
+        with:
+          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
 
       - name: Manage GitLab Repository
         uses: iamvikshan/.github/.github/actions/manage-gitlab-repo@main
         with:
           gitlab-token: ${{ secrets.GITLAB_TOKEN }}
+          gitlab-username: "vikshan"
+          repo-name: ${{ github.event.repository.name }}
+          default-branch: ${{ steps.default-branch.outputs.default_branch }}
 
       - name: Sync Repository
         uses: iamvikshan/.github/.github/actions/sync-repository@main
         with:
           gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          github-token: ${{ secrets.USR_TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          gitlab-username: "vikshan"
+          repo-name: ${{ github.event.repository.name }}
+          default-branch: ${{ steps.default-branch.outputs.default_branch }}
