@@ -17,10 +17,10 @@ sync-github:
       tar xvf gh.tar.gz
       mv gh*/bin/gh /usr/local/bin/
       rm -rf gh*
-    - git config --global user.name "vixshan"
-    - git config --global user.email "vixshan@gmail.com"
+    - git config --global user.name "iamvikshan"
+    - git config --global user.email "iamvikshan@gmail.com"
   script:
-    - git remote add github https://$GH_TOKEN@github.com/vixshan/devcontainers.git
+    - git remote add github https://$GH_TOKEN@github.com/iamvikshan/devcontainers.git
     - |
       # Fetch from both remotes without tags
       git fetch origin --no-tags
@@ -73,11 +73,11 @@ sync-github:
           --body "$MR_DESC" \
           --head "$SOURCE_BRANCH" \
           --base "$TARGET_BRANCH" \
-          --repo "vixshan/devcontainers" \
+          --repo "iamvikshan/devcontainers" \
           || gh pr edit \
             --title "$MR_TITLE" \
             --body "$MR_DESC" \
-            --repo "vixshan/devcontainers"
+            --repo "iamvikshan/devcontainers"
       fi
   variables:
     GIT_STRATEGY: clone

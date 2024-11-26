@@ -1,6 +1,6 @@
 {
   "name": "Project with Bun+Node",
-  "image": "ghcr.io/vixshan/devcontainers/bun-node:latest",
+  "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
 
   // Optional: Override or add settings
   "customizations": {

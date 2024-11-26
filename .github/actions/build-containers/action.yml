@@ -1,0 +1,91 @@
+name: "Build Containers"
+description: "Build and push containers to registries"
+
+inputs:
+  github-token:
+    description: "GitHub token"
+    required: true
+  gitlab-token:
+    description: "GitLab token"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build base containers
+      shell: bash
+      run: |
+        for dir in base/*/; do
+          devcontainer_name=$(basename "$dir")
+          if [ -f "$dir/.devcontainer/Dockerfile" ]; then
+            docker buildx build \
+              --file "$dir/.devcontainer/Dockerfile" \
+              --push \
+              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/${devcontainer_name}:v${VERSION}" \
+              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/${devcontainer_name}:latest" \
+              "$dir/.devcontainer"
+
+            docker buildx build \
+              --file "$dir/.devcontainer/Dockerfile" \
+              --push \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:v${VERSION}" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:latest" \
+              "$dir/.devcontainer"
+          fi
+        done
+
+    - name: Build Ubuntu containers
+      shell: bash
+      run: |
+        for dir in base/ubuntu/*/; do
+          devcontainer_name=$(basename "$dir")
+          if [ -f "$dir/Dockerfile" ]; then
+            docker buildx build \
+              --file "$dir/Dockerfile" \
+              --push \
+              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/ubuntu-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITHUB_REGISTRY}/${REPO_NAME}/ubuntu-${devcontainer_name}:latest" \
+              "$dir"
+
+            docker buildx build \
+              --file "$dir/Dockerfile" \
+              --push \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:latest" \
+              "$dir"
+          fi
+        done
+
+    - name: Create GitLab Release
+      shell: bash
+      run: |
+        if ! git ls-remote --tags https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_PROJECT_PATH}.git "refs/tags/v${VERSION}" | grep -q "v${VERSION}"; then
+          git tag "v${VERSION}" || true
+          git push https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${GITLAB_PROJECT_PATH}.git "v${VERSION}"
+        fi
+
+        GITHUB_RELEASE=$(curl -s -H "Authorization: Bearer ${{ inputs.github-token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+
+        RELEASE_NOTES=$(echo $GITHUB_RELEASE | jq -r '.body')
+        if [ "$RELEASE_NOTES" = "null" ]; then
+          RELEASE_NOTES="Release v${VERSION}"
+        fi
+
+        ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | jq -R -s '.')
+
+        RESPONSE=$(curl --request POST \
+          --header "PRIVATE-TOKEN: ${{ inputs.gitlab-token }}" \
+          --header "Content-Type: application/json" \
+          --data "{
+            \"name\": \"v${VERSION}\",
+            \"tag_name\": \"v${VERSION}\",
+            \"description\": ${ESCAPED_NOTES}
+          }" \
+          "https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_PATH}/releases")
+
+        if ! echo "$RESPONSE" | jq -e '.tag_name' > /dev/null; then
+          echo "Failed to create GitLab release:"
+          echo "$RESPONSE"
+          exit 1
+        fi

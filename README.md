@@ -7,10 +7,10 @@ environments.
 
 ### 1. GitHub Container Registry
 
-- `ghcr.io/vixshan/devcontainers/bun:latest` ~ 0.00 MiB
-- `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 0.00 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
-- `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
+- `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 0.00 MiB
+- `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 0.00 MiB
+- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
+- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
 
 ### 2. GitLab Container Registry
 
@@ -27,7 +27,7 @@ Add this to your `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "image": "ghcr.io/vixshan/devcontainers/bun:latest"
+  "image": "ghcr.io/iamvikshan/devcontainers/bun:latest"
 }
 ```
 
@@ -54,7 +54,7 @@ Add this to your `.devcontainer/devcontainer.json`:
   "build": {
     "dockerfile": "./Dockerfile"
   },
-  "extends": "ghcr.io/vixshan/devcontainers/bun:latest"
+  "extends": "ghcr.io/iamvikshan/devcontainers/bun:latest"
 }
 ```
 

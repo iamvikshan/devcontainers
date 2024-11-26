@@ -17,10 +17,10 @@ well, maybe the size, and wider compatibility with other tools as this is a stan
 
 <<<<<<< HEAD
 
-1. `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
-2. # `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
-3. `ghcr.io/vixshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
-4. `ghcr.io/vixshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
+1. `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
+2. # `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
+3. `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
+4. `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
    > > > > > > > origin/main
 
 ### 2. GitLab Container Registry
@@ -46,8 +46,8 @@ need Node.js.
 Copy the `.devcontainer` directory to your project:
 
 ```bash
-    curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/ubuntu/bun/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
-    curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/ubuntu/bun/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
+    curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/ubuntu/bun/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
+    curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/ubuntu/bun/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
 ```
 
 ### 2. Container Registry
@@ -57,7 +57,7 @@ Container Registry if you prefer.
 
 ```json
 {
-  "image": "ghcr.io/vixshan/devcontainers/ubuntu-bun:latest"
+  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest"
 }
 ```
 
@@ -66,7 +66,7 @@ Container Registry if you prefer.
 ```json
 {
   "name": "Custom Environment",
-  "extends": "ghcr.io/vixshan/devcontainers/ubuntu-bun",
+  "extends": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun",
   "features": {
     // Add additional features
   }

@@ -6,8 +6,8 @@ A minimal development container configuration with Bun, Node.js, and Git.
 
 <<<<<<< HEAD
 
-1. # `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 0.00 MiB
-1. `ghcr.io/vixshan/devcontainers/bun-node:latest` ~ 0.00 MiB
+1. # `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 0.00 MiB
+1. `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 0.00 MiB
 
    > > > > > > > origin/main
 
@@ -27,8 +27,8 @@ A minimal development container configuration with Bun, Node.js, and Git.
 Copy the `.devcontainer` directory to your project:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun-node/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
-curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun-node/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
+curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/bun-node/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
+curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/bun-node/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
 ```
 
 ### Container Registry
@@ -37,7 +37,7 @@ curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun
 
 ```json
 {
-  "image": "ghcr.io/vixshan/devcontainers/bun-node:latest"
+  "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest"
 }
 ```
 
@@ -54,7 +54,7 @@ curl -fsSL https://raw.githubusercontent.com/vixshan/devcontainers/main/base/bun
 ```json
 {
   "name": "Custom Environment",
-  "extends": "ghcr.io/vixshan/devcontainers/bun-node",
+  "extends": "ghcr.io/iamvikshan/devcontainers/bun-node",
   "features": {
     // Add additional features
   }
