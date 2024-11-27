@@ -1,0 +1,25 @@
+image: ghcr.io/iamvikshan/devcontainers/bun-node:latest
+
+tasks:
+  - name: Install Required Tools
+    init: |
+      sudo apt-get update
+      sudo apt-get install -y openssh-client openssh-server curl tar bash
+      # Install Docker
+      sudo apt-get install -y docker.io
+      sudo systemctl start docker
+      sudo systemctl enable docker
+      sudo usermod -aG docker $USER
+      sudo sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding yes/' /etc/ssh/sshd_config
+      sudo service ssh restart
+
+  - name: Setup Environment
+    command: |
+      echo "Setting up environment..."
+      bun i
+
+  - name: Start SSH Server
+    before: |
+      sudo service ssh start
+      # Ensure Docker is running
+      sudo service docker start

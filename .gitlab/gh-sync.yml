@@ -1,0 +1,85 @@
+sync-github:
+  image: alpine:latest
+  stage: sync-github
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+  before_script:
+    - apk add --no-cache git curl jq
+    - |
+      curl -L https://github.com/cli/cli/releases/download/v2.46.0/gh_2.46.0_linux_amd64.tar.gz -o gh.tar.gz
+      tar xvf gh.tar.gz
+      mv gh*/bin/gh /usr/local/bin/
+      rm -rf gh*
+    - git config --global user.name "iamvikshan"
+    - git config --global user.email "iamvikshan@gmail.com"
+  script:
+    - git remote add github https://$GH_TOKEN@github.com/iamvikshan/devcontainers.git
+    - |
+      # Fetch from both remotes without tags
+      git fetch origin --no-tags
+      git fetch github --no-tags
+
+      # Get list of branches from both sides
+      GITLAB_BRANCHES=$(git branch -r | grep 'origin/' | grep -v 'origin/HEAD' | sed 's#origin/##')
+      GITHUB_BRANCHES=$(git branch -r | grep 'github/' | sed 's#github/##')
+
+      # Sync branches from GitLab to GitHub
+      echo "$GITLAB_BRANCHES" | while read branch; do
+        if [ -n "$branch" ]; then
+          echo "Processing branch: $branch"
+          git checkout -B "$branch" "origin/$branch"
+          
+          # Check if branch exists on GitHub and needs update
+          if git rev-parse --verify "github/${branch}" >/dev/null 2>&1; then
+            if [ "$(git rev-parse HEAD)" = "$(git rev-parse github/${branch})" ]; then
+              echo "Branch ${branch} is up to date on GitHub, skipping..."
+              continue
+            fi
+          fi
+          
+          git push -f github "$branch:$branch" || echo "Warning: Failed to push ${branch}"
+        fi
+      done
+
+      # Delete branches on GitHub that don't exist on GitLab
+      echo "$GITHUB_BRANCHES" | while read branch; do
+        if [ -n "$branch" ] && ! echo "$GITLAB_BRANCHES" | grep -q "^${branch}$"; then
+          echo "Deleting branch ${branch} from GitHub"
+          git push github --delete "$branch" || echo "Warning: Failed to delete ${branch}"
+        fi
+      done
+
+      # Sync merge request details if event is merge_request
+      if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then
+        # Get MR details
+        MR_IID=$CI_MERGE_REQUEST_IID
+        MR_TITLE=$CI_MERGE_REQUEST_TITLE
+        MR_DESC=$(curl --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+          "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests/$MR_IID" \
+          | jq -r '.description')
+        SOURCE_BRANCH=$CI_MERGE_REQUEST_SOURCE_BRANCH
+        TARGET_BRANCH=$CI_MERGE_REQUEST_TARGET_BRANCH
+        
+        # Create/Update PR on GitHub
+        gh pr create \
+          --title "$MR_TITLE" \
+          --body "$MR_DESC" \
+          --head "$SOURCE_BRANCH" \
+          --base "$TARGET_BRANCH" \
+          --repo "iamvikshan/devcontainers" \
+          || gh pr edit \
+            --title "$MR_TITLE" \
+            --body "$MR_DESC" \
+            --repo "iamvikshan/devcontainers"
+      fi
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 0
+    GITHUB_TOKEN: $GH_TOKEN

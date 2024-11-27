@@ -1,0 +1,16 @@
+{
+  "name": "Project with Bun",
+  "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
+
+  // Optional: Override or add settings
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Add project-specific extensions
+      ]
+    }
+  },
+
+  "postCreateCommand": "bun install",
+  "remoteUser": "root"
+}

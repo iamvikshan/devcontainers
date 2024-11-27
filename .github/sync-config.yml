@@ -1,0 +1,56 @@
+gitlab:
+  enabled: true
+  url: "gitlab.com" # Optional, defaults to gitlab.com
+  token: ${{ secrets.GITLAB_TOKEN }}
+  username: vikshan # Optional, defaults to GitHub repo owner
+  repo: # Optional, defaults to GitHub repo name
+
+gl-sync:
+  branches:
+    enabled: true
+    protected: true
+    pattern: "*"
+
+  pullRequests:
+    enabled: true
+    autoMerge: false
+    labels: ["synced-from-github"]
+
+  issues:
+    enabled: true
+    syncComments: true
+    labels: ["synced-from-github"]
+
+  releases:
+    enabled: true
+
+  tags:
+    enabled: true # atomatically enabled if releases = true
+
+github:
+  enabled: true
+  token: ${{ secrets.GH_TOKEN }}
+  username: # Optional, defaults to GitHub username
+  repo: # Optional, defaults to GitHub repo name
+
+gh-sync:
+  branches:
+    enabled: true
+    protected: true
+    pattern: "*"
+
+  pullRequests:
+    enabled: true
+    autoMerge: false
+    labels: ["synced-from-gitlab"]
+
+  issues:
+    enabled: true
+    syncComments: true
+    labels: ["synced-from-gitlab"]
+
+  releases:
+    enabled: true
+
+  tags:
+    enabled: true # atomatically enabled if releases = true

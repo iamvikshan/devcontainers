@@ -1,0 +1,71 @@
+name: Release DevContainers
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "base/**"
+
+env:
+  GITHUB_REGISTRY: ghcr.io
+  GITLAB_REGISTRY: registry.gitlab.com
+  GL_USERNAME: vikshan
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node, Bun and run bun i
+        uses: iamvikshan/.github/.github/actions/setup-node-bun@main
+
+      - name: Semantic Release
+        id: semantic_release
+        run: bunx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GIT_AUTHOR_NAME: ${{ env.GL_USERNAME }}
+          GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
+          GIT_COMMITTER_NAME: ${{ env.GL_USERNAME }}
+          GIT_COMMITTER_EMAIL: ${{ github.actor }}@users.noreply.github.com
+
+      - name: Get latest release tag
+        id: get_release_tag
+        run: |
+          VERSION=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
+            jq -r '.tag_name' | sed 's/v//')
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Configure registries
+        uses: ./.github/actions/configure-registries
+        with:
+          github-pat: ${{ secrets.GH_PAT }}
+          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
+          github-registry: ${{ env.GITHUB_REGISTRY }}
+          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
+          github-username: ${{ github.actor }}
+
+      - name: Build containers
+        uses: ./.github/actions/build-containers
+        with:
+          version: ${{ env.VERSION }}
+          github-registry: ${{ env.GITHUB_REGISTRY }}
+          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
+          gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
+
+      - name: Update sizes
+        uses: ./.github/actions/update-docs
+        with:
+          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
+          gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
+          ref-name: ${{ github.ref_name }}
+          gitlab-username: ${{ env.GL_USERNAME }}

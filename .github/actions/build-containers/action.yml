@@ -1,0 +1,77 @@
+name: "Build Container Images"
+description: "Builds and pushes container images to registries"
+
+inputs:
+  version:
+    description: "Release version"
+    required: true
+  github-registry:
+    description: "GitHub container registry URL"
+    required: true
+  gitlab-registry:
+    description: "GitLab container registry URL"
+    required: true
+  gitlab-project-path:
+    description: "GitLab project path"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build and push base containers
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        GITHUB_REGISTRY: ${{ inputs.github-registry }}
+        GITLAB_REGISTRY: ${{ inputs.gitlab-registry }}
+        GITLAB_PROJECT_PATH: ${{ inputs.gitlab-project-path }}
+      run: |
+        for dir in base/*/; do
+          devcontainer_name=$(basename "$dir")
+          if [ -f "$dir/.devcontainer/Dockerfile" ]; then
+            # Build and push to GitHub
+            docker buildx build \
+              --file "$dir/.devcontainer/Dockerfile" \
+              --push \
+              --tag "${GITHUB_REGISTRY}/${{ github.repository }}/${devcontainer_name}:v${VERSION}" \
+              --tag "${GITHUB_REGISTRY}/${{ github.repository }}/${devcontainer_name}:latest" \
+              "$dir/.devcontainer"
+
+            # Build and push to GitLab
+            docker buildx build \
+              --file "$dir/.devcontainer/Dockerfile" \
+              --push \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:v${VERSION}" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:latest" \
+              "$dir/.devcontainer"
+          fi
+        done
+
+    - name: Build and push Ubuntu containers
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        GITHUB_REGISTRY: ${{ inputs.github-registry }}
+        GITLAB_REGISTRY: ${{ inputs.gitlab-registry }}
+        GITLAB_PROJECT_PATH: ${{ inputs.gitlab-project-path }}
+      run: |
+        for dir in base/ubuntu/*/; do
+          devcontainer_name=$(basename "$dir")
+          if [ -f "$dir/Dockerfile" ]; then
+            # Build and push to GitHub
+            docker buildx build \
+              --file "$dir/Dockerfile" \
+              --push \
+              --tag "${GITHUB_REGISTRY}/${{ github.repository }}/ubuntu-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITHUB_REGISTRY}/${{ github.repository }}/ubuntu-${devcontainer_name}:latest" \
+              "$dir"
+
+            # Build and push to GitLab
+            docker buildx build \
+              --file "$dir/Dockerfile" \
+              --push \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:latest" \
+              "$dir"
+          fi
+        done

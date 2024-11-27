@@ -1,0 +1,38 @@
+update-docsname: "Update Documentation"
+description: "Updates README files with image sizes and syncs changes"
+
+inputs:
+  gitlab-token:
+    description: "GitLab token"
+    required: true
+  gitlab-project-path:
+    description: "GitLab project path"
+    required: true
+  ref-name:
+    description: "Git reference name"
+    required: true
+  gitlab-username:
+    description: "Gitlab Username"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update image sizes
+      shell: bash
+      run: |
+        echo "GITLAB_TOKEN=${{ inputs.gitlab-token }}" > .env
+        npm run s && npm run f
+
+    - name: Commit README updates
+      shell: bash
+      run: |
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git config --global user.name "${{ github.actor }}"
+        git add README.md base/*/README.md
+        git commit --amend --no-edit
+        git push -f origin HEAD:${{ inputs.ref-name }}
+
+        git config --global user.name "${{ inputs.gitlab-username }}"
+        git remote add gitlab https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${{ inputs.gitlab-project-path }}.git
+        git push -f gitlab HEAD:${{ inputs.ref-name }}

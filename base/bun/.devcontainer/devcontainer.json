@@ -1,0 +1,28 @@
+{
+  "name": "Ubuntu + Bun",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    // uncomment the following lines to install common-utils
+    // 		"ghcr.io/devcontainers/features/common-utils:latest": {
+    // 	"installZsh": "true",
+    // 	"username": "root",
+    // 	"upgradePackages": "true"
+    // },
+    // git is preinstalled in the bun image
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "GitHub.copilot", "esbenp.prettier-vscode", "eamodio.gitlens", "oven.bun-vscode"]
+    }
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bun install",
+
+  // Set `remoteUser` to `root` to connect as root.
+  "remoteUser": "root"
+}

@@ -1,0 +1,6 @@
+# .gitlab-ci.yml
+stages:
+  - sync-github
+
+include:
+  - local: .gitlab/gh-sync.yml
