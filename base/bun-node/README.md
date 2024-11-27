@@ -11,7 +11,7 @@ A minimal development container configuration with Bun, Node.js, and Git.
 
    > > > > > > > origin/main
 
-1. `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 226.76 MiB
+1. `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 226.91 MiB
 
 ## Contents
 

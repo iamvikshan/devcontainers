@@ -14,10 +14,10 @@ environments.
 
 ### 2. GitLab Container Registry
 
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 126.64 MiB
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 226.76 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 120.51 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 188.46 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 126.78 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 226.91 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 120.68 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 188.64 MiB
 
 ## Usage
 
