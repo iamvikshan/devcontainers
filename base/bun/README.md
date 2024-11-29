@@ -11,8 +11,8 @@ A minimal development container configuration with Bun and Git.
 
 <<<<<<< HEAD
 
-1. # `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 0.00 MiB
-1. `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 0.00 MiB
+1. # `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 126.78 MiB
+1. `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 126.78 MiB
 
    > > > > > > > origin/main
 

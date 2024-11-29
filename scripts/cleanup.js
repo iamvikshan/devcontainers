@@ -14,7 +14,7 @@ const githubApi = axios.create({
 const ghcrApi = axios.create({
   baseURL: 'https://api.github.com',
   headers: {
-    Authorization: `Bearer ${process.env.GH_PAT}`,
+    Authorization: `Bearer ${process.env.GH_TOKEN}`,
     Accept: 'application/vnd.github.v3+json'
   }
 })

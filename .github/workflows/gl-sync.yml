@@ -9,7 +9,7 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -26,6 +26,8 @@ jobs:
           fetch-depth: 0
 
       - name: Sync with GitLab
-        uses: OpenSaucedHub/git-sync-action@v1.1.0
+        uses: OpenSaucedHub/advanced-git-sync@v1.0.0
         with:
-          config_path: .github/sync-config.yml
+          CONFIG_PATH: .github/sync-config.yml # optional, defaults to .github/sync-config.yml
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }} # optional, unless you want to sync to GitLab
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # Optional, defaults to GITHUB_TOKEN

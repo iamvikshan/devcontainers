@@ -6,8 +6,8 @@ A minimal development container configuration with Bun, Node.js, and Git.
 
 <<<<<<< HEAD
 
-1. # `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 0.00 MiB
-1. `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 0.00 MiB
+1. # `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 226.90 MiB
+1. `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 226.90 MiB
 
    > > > > > > > origin/main
 
