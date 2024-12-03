@@ -1,3 +1,17 @@
+# v1.0.0 (2024-12-03)
+
+
+
+## 1.0.0 (2024-12-03)
+
+### Features
+
+* let's start over, shall we? update release workflows to prevent redundant triggers and enhance sync operations ([5aba3ef](https://github.com/iamvikshan/devcontainers/commit/5aba3ef22af4f11d7767f4c6de4876ad3c50d147))
+
+### Bug Fixes
+
+* update GitHub Actions workflow and dependencies; upgrade checkout action and sync action version. Uprade bun to v1.1.38 ([10bc7cd](https://github.com/iamvikshan/devcontainers/commit/10bc7cda116360c530b2d9a5a20d74a5d5983120))
+
 # v1.0.0 (2024-11-29)
 
 
