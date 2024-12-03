@@ -1,3 +1,12 @@
+<div align="center">
+
+[![wakatime](https://wakatime.com/badge/github/iamvikshan/devcontainers.svg)](https://wakatime.com/badge/github/iamvikshan/devcontainers)
+[![Sync to GitLab](https://github.com/iamvikshan/devcontainers/actions/workflows/gl-sync.yml/badge.svg)](https://github.com/iamvikshan/devcontainers/actions/workflows/gl-sync.yml)
+[![Release DevContainers](https://github.com/iamvikshan/devcontainers/actions/workflows/releases.yml/badge.svg)](https://github.com/iamvikshan/devcontainers/actions/workflows/releases.yml)
+[![CLA Assistant](https://github.com/iamvikshan/devcontainers/actions/workflows/cla.yml/badge.svg)](https://github.com/iamvikshan/devcontainers/actions/workflows/cla.yml)
+
+</div>
+
 # DevContainer Configurations
 
 This repository contains reusable DevContainer configurations for different development
