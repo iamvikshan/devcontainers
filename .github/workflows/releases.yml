@@ -20,22 +20,24 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
+          persist-credentials: false
+
       - name: Setup Node, Bun and install dependencies
         uses: iamvikshan/.github/.github/actions/setup-node-bun@main
 
       - name: Semantic Release
-        id: semantic_release
-        run: bunx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          GIT_AUTHOR_NAME: ${{ env.GL_USERNAME }}
+          GIT_AUTHOR_NAME: ${{ github.actor }}
           GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
-          GIT_COMMITTER_NAME: ${{ env.GL_USERNAME }}
+          GIT_COMMITTER_NAME: ${{ github.actor }}
           GIT_COMMITTER_EMAIL: ${{ github.actor }}@users.noreply.github.com
+        run: bunx semantic-release
 
       - name: Get latest release tag
         id: get_release_tag

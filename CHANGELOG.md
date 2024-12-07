@@ -1,18 +1,22 @@
 # v1.0.0 (2024-12-07)
 
-
-
 ## 1.0.0 (2024-12-07)
 
 ### Features
 
-* let's start over, shall we? update release workflows to prevent redundant triggers and enhance sync operations ([5aba3ef](https://github.com/iamvikshan/devcontainers/commit/5aba3ef22af4f11d7767f4c6de4876ad3c50d147))
+- let's start over, shall we? update release workflows to prevent redundant triggers and enhance
+  sync operations
+  ([5aba3ef](https://github.com/iamvikshan/devcontainers/commit/5aba3ef22af4f11d7767f4c6de4876ad3c50d147))
 
 ### Bug Fixes
 
-* implement image size updater script and update README files with new sizes ([e6c2811](https://github.com/iamvikshan/devcontainers/commit/e6c2811ff805e7677f67cd99144e5ff6d1a81238))
-* update advanced-git-sync action version to v1.1.5 in sync workflow ([18dda27](https://github.com/iamvikshan/devcontainers/commit/18dda275ce6dcc8d42ecfef0e62510ad056c0fc5))
-* update GitHub Actions workflow and dependencies; upgrade checkout action and sync action version. Uprade bun to v1.1.38 ([10bc7cd](https://github.com/iamvikshan/devcontainers/commit/10bc7cda116360c530b2d9a5a20d74a5d5983120))
+- implement image size updater script and update README files with new sizes
+  ([e6c2811](https://github.com/iamvikshan/devcontainers/commit/e6c2811ff805e7677f67cd99144e5ff6d1a81238))
+- update advanced-git-sync action version to v1.1.5 in sync workflow
+  ([18dda27](https://github.com/iamvikshan/devcontainers/commit/18dda275ce6dcc8d42ecfef0e62510ad056c0fc5))
+- update GitHub Actions workflow and dependencies; upgrade checkout action and sync action version.
+  Uprade bun to v1.1.38
+  ([10bc7cd](https://github.com/iamvikshan/devcontainers/commit/10bc7cda116360c530b2d9a5a20d74a5d5983120))
 
 # v1.0.0 (2024-12-03)
 
