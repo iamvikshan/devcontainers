@@ -1,7 +1,7 @@
 {
   "scripts": {
     "f": "prettier --write \"**/*.*\"",
-    "s": "chmod +x scripts/update-sizes.sh && scripts/update-sizes.sh",
+    "s": "bun scripts/sizes.js",
     "rs": "bun f && bun scripts/cleanup.js && git push -f"
   },
   "devDependencies": {

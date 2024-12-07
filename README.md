@@ -1,7 +1,7 @@
 <div align="center">
 
 [![wakatime](https://wakatime.com/badge/github/iamvikshan/devcontainers.svg)](https://wakatime.com/badge/github/iamvikshan/devcontainers)
-[![Sync to GitLab](https://github.com/iamvikshan/devcontainers/actions/workflows/gl-sync.yml/badge.svg)](https://github.com/iamvikshan/devcontainers/actions/workflows/gl-sync.yml)
+[![Sync to GitLab](https://github.com/iamvikshan/devcontainers/actions/workflows/sync.yml/badge.svg)](https://github.com/iamvikshan/devcontainers/actions/workflows/sync.yml)
 [![Release DevContainers](https://github.com/iamvikshan/devcontainers/actions/workflows/releases.yml/badge.svg)](https://github.com/iamvikshan/devcontainers/actions/workflows/releases.yml)
 [![CLA Assistant](https://github.com/iamvikshan/devcontainers/actions/workflows/cla.yml/badge.svg)](https://github.com/iamvikshan/devcontainers/actions/workflows/cla.yml)
 
@@ -23,10 +23,10 @@ environments.
 
 ### 2. GitLab Container Registry
 
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 126.86 MiB
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 227.01 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 120.76 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 188.71 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 0.00 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 0.00 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 0.00 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 0.00 MiB
 
 ## Usage
 

@@ -1,5 +1,4 @@
 // cleanup.js
-require('dotenv').config()
 const axios = require('axios')
 
 // API Clients

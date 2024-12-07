@@ -24,7 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          path-to-signatures: "signatures/cla.json"
+          path-to-signatures: "signatures/signatures.json"
           path-to-document: "https://github.com/iamvikshan/.github/blob/main/.github/CLA.md"
           branch: "main"
           remote-organization-name: ${{ github.repository_owner }}

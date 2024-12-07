@@ -16,7 +16,7 @@ A minimal development container configuration with Bun and Git.
 
    > > > > > > > origin/main
 
-1. `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 126.86 MiB
+1. `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 0.00 MiB
 
 ## Usage
 
