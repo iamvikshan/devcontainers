@@ -17,9 +17,9 @@ environments.
 ### 1. GitHub Container Registry
 
 - `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 126.86 MiB
-- `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 227.01 MiB
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 120.76 MiB
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 188.71 MiB
+- `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 227.40 MiB
+- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 120.79 MiB
+- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 189.09 MiB
 
 ### 2. GitLab Container Registry
 

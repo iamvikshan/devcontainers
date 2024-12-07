@@ -1,4 +1,4 @@
-update-docsname: "Update Documentation"
+name: "Update Documentation"
 description: "Updates README files with image sizes and syncs changes"
 
 inputs:
@@ -14,6 +14,12 @@ inputs:
   gitlab-username:
     description: "Gitlab Username"
     required: true
+  github-token:
+    description: "GitHub token"
+    required: true
+  version:
+    description: "Release version"
+    required: true
 
 runs:
   using: "composite"
@@ -24,15 +30,16 @@ runs:
         echo "GITLAB_TOKEN=${{ inputs.gitlab-token }}" > .env
         npm run s && npm run f
 
-    - name: Commit README updates
+    - name: Update commit and force push
       shell: bash
       run: |
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
         git config --global user.name "${{ github.actor }}"
         git add README.md base/*/README.md
         git commit --amend --no-edit
-        git push -f origin HEAD:${{ inputs.ref-name }}
+        git tag -f v${{ inputs.version }}
+        git push -f origin HEAD:${{ inputs.ref-name }} +v${{ inputs.version }}
 
         git config --global user.name "${{ inputs.gitlab-username }}"
         git remote add gitlab https://oauth2:${{ inputs.gitlab-token }}@gitlab.com/${{ inputs.gitlab-project-path }}.git
-        git push -f gitlab HEAD:${{ inputs.ref-name }}
+        git push -f gitlab HEAD:${{ inputs.ref-name }} +v${{ inputs.version }}

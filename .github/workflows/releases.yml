@@ -71,3 +71,5 @@ jobs:
           gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
           ref-name: ${{ github.ref_name }}
           gitlab-username: ${{ env.GL_USERNAME }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          version: ${{ env.VERSION }}
