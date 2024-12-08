@@ -1,12 +1,11 @@
 # [v1.0.1](https://github.com/iamvikshan/devcontainers/compare/v1.0.0...v1.0.1) (2024-12-07)
 
-
-
 ## [1.0.1](https://github.com/iamvikshan/devcontainers/compare/v1.0.0...v1.0.1) (2024-12-07)
 
 ### Bug Fixes
 
-* update README files with new image sizes and enhance GitHub Actions for documentation updates ([f47e47b](https://github.com/iamvikshan/devcontainers/commit/f47e47b31b5059a4a3015675e876a7010eeec0ac))
+- update README files with new image sizes and enhance GitHub Actions for documentation updates
+  ([f47e47b](https://github.com/iamvikshan/devcontainers/commit/f47e47b31b5059a4a3015675e876a7010eeec0ac))
 
 # v1.0.0 (2024-12-07)
 
