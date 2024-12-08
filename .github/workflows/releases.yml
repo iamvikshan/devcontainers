@@ -67,17 +67,6 @@ jobs:
           gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
           dockerhub-username: ${{ env.GL_USERNAME }}
 
-      - name: Cleanup old container versions
-        uses: ./.github/actions/cleanup-containers
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          github-registry: ${{ env.GITHUB_REGISTRY }}
-          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
-          gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
-          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          dockerhub-username: ${{ env.GL_USERNAME }}
-
       - name: Update sizes
         uses: ./.github/actions/update-docs
         with:

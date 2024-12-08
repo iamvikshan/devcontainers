@@ -23,12 +23,13 @@ environments.
 
 ### 2. GitLab Container Registry
 
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 126.86 MiB
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 227.40 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 120.79 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 189.09 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 204.13 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 505.76 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 305.64 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 510.51 MiB
 
 ### 3. Docker Hub
+
 - `docker.io/vikshan/bun:latest` ~ 126.86 MiB
 - `docker.io/vikshan/bun-node:latest` ~ 227.40 MiB
 - `docker.io/vikshan/ubuntu-bun:latest` ~ 120.79 MiB
@@ -36,7 +37,8 @@ environments.
 
 ## Usage
 
-You can use any image you like from the above list. They are all largely the same, but for this example, we will use the `bun` image from `ghcr`.
+You can use any image you like from the above list. They are all largely the same, but for this
+example, we will use the `bun` image from `ghcr`.
 
 ### Option 1: Reference from GitHub
 
@@ -48,22 +50,12 @@ Add this to your `.devcontainer/devcontainer.json`:
 }
 ```
 
-### Option 2: Reference from GitLab
-
-Add this to your `.devcontainer/devcontainer.json`:
-
-```json
-{
-  "image": "registry.gitlab.com/vikshan/devcontainers/bun:latest"
-}
-```
-
-### Option 3: Copy Configuration
+### Option 2: Copy Configuration
 
 1. Copy the desired configuration from the [`base`](./base/) directory to your project.
 2. Modify as needed for your specific requirements.
 
-### Option 4: Extend Configuration
+### Option 3: Extend Configuration
 
 ```json
 {
