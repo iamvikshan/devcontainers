@@ -14,6 +14,9 @@ inputs:
   gitlab-project-path:
     description: "GitLab project path"
     required: true
+  dockerhub-username:
+    description: "Docker Hub username"
+    required: true
 
 runs:
   using: "composite"
@@ -25,11 +28,12 @@ runs:
         GITHUB_REGISTRY: ${{ inputs.github-registry }}
         GITLAB_REGISTRY: ${{ inputs.gitlab-registry }}
         GITLAB_PROJECT_PATH: ${{ inputs.gitlab-project-path }}
+        GL_USERNAME: ${{ inputs.dockerhub-username }}
       run: |
         for dir in base/*/; do
           devcontainer_name=$(basename "$dir")
           if [ -f "$dir/.devcontainer/Dockerfile" ]; then
-            # Build and push to both registries with single build
+            # Build and push to all registries with single build
             docker buildx build \
               --file "$dir/.devcontainer/Dockerfile" \
               --push \
@@ -40,6 +44,8 @@ runs:
               --tag "${GITHUB_REGISTRY}/${{ github.repository }}/${devcontainer_name}:latest" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:v${VERSION}" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:latest" \
+              --tag "${GL_USERNAME}/${devcontainer_name}:v${VERSION}" \
+              --tag "${GL_USERNAME}/${devcontainer_name}:latest" \
               "$dir/.devcontainer"
           fi
         done
@@ -51,11 +57,12 @@ runs:
         GITHUB_REGISTRY: ${{ inputs.github-registry }}
         GITLAB_REGISTRY: ${{ inputs.gitlab-registry }}
         GITLAB_PROJECT_PATH: ${{ inputs.gitlab-project-path }}
+        GL_USERNAME: ${{ inputs.dockerhub-username }}
       run: |
         for dir in base/ubuntu/*/; do
           devcontainer_name=$(basename "$dir")
           if [ -f "$dir/Dockerfile" ]; then
-            # Build and push to both registries with single build
+            # Build and push to all registries with single build
             docker buildx build \
               --file "$dir/Dockerfile" \
               --push \
@@ -66,6 +73,8 @@ runs:
               --tag "${GITHUB_REGISTRY}/${{ github.repository }}/ubuntu-${devcontainer_name}:latest" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:v${VERSION}" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:latest" \
+              --tag "${GL_USERNAME}/ubuntu-${devcontainer_name}:v${VERSION}" \
+              --tag "${GL_USERNAME}/ubuntu-${devcontainer_name}:latest" \
               "$dir"
           fi
         done

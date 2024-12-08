@@ -4,14 +4,9 @@ A minimal development container configuration with Bun, Node.js, and Git.
 
 ## Images
 
-<<<<<<< HEAD
-
-1. # `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 227.40 MiB
 1. `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 227.40 MiB
-
-   > > > > > > > origin/main
-
-1. `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 227.40 MiB
+2. `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 227.40 MiB
+3. `docker.io/vikshan/bun-node:latest` ~ 227.40 MiB
 
 ## Contents
 

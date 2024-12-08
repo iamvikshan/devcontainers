@@ -14,6 +14,9 @@ inputs:
   version:
     description: "Release version"
     required: true
+  dockerhub-token:
+    description: "Dockerhub token"
+    required: true
 
 runs:
   using: "composite"
@@ -23,7 +26,8 @@ runs:
       run: |
         echo "GITLAB_TOKEN=${{ inputs.gitlab-token }}" > .env
         echo "GH_TOKEN=${{ inputs.github-token }}" >> .env
-        npm run s && npm run f
+        echo "DOCKERHUB_TOKEN=${{ inputs.dockerhub-token }}" >> .env
+        bun run s && bun run f
 
     - name: Update commit and force push
       shell: bash

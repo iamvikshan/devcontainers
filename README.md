@@ -28,7 +28,15 @@ environments.
 - `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 120.79 MiB
 - `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 189.09 MiB
 
+### 3. Docker Hub
+- `docker.io/vikshan/bun:latest` ~ 126.86 MiB
+- `docker.io/vikshan/bun-node:latest` ~ 227.40 MiB
+- `docker.io/vikshan/ubuntu-bun:latest` ~ 120.79 MiB
+- `docker.io/vikshan/ubuntu-bun-node:latest` ~ 189.09 MiB
+
 ## Usage
+
+You can use any image you like from the above list. They are all largely the same, but for this example, we will use the `bun` image from `ghcr`.
 
 ### Option 1: Reference from GitHub
 
