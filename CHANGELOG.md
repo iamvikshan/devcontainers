@@ -7,6 +7,18 @@
 ### Bug Fixes
 
 * streamline Docker image build process by combining build and push steps for GitHub and GitLab registries ([0b8c065](https://github.com/iamvikshan/devcontainers/commit/0b8c065ecb196182bd4ae218118bce00ba0b3795))
+* update documentation commit message and streamline push process for versioning ([5a90d62](https://github.com/iamvikshan/devcontainers/commit/5a90d6274c75a7669a0d26155e9fa24172960a08))
+* update README and action configurations to include Docker Hub support and streamline container registry authentication ([3163fbb](https://github.com/iamvikshan/devcontainers/commit/3163fbb4edb1d5820e82c9979789a253bc234fe8))
+
+# [v1.0.3](https://github.com/iamvikshan/devcontainers/compare/v1.0.2...v1.0.3) (2024-12-08)
+
+
+
+## [1.0.3](https://github.com/iamvikshan/devcontainers/compare/v1.0.2...v1.0.3) (2024-12-08)
+
+### Bug Fixes
+
+* streamline Docker image build process by combining build and push steps for GitHub and GitLab registries ([0b8c065](https://github.com/iamvikshan/devcontainers/commit/0b8c065ecb196182bd4ae218118bce00ba0b3795))
 
 # [v1.0.2](https://github.com/iamvikshan/devcontainers/compare/v1.0.1...v1.0.2) (2024-12-08)
 
