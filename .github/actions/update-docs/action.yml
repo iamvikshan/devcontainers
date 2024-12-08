@@ -29,13 +29,12 @@ runs:
         echo "DOCKERHUB_TOKEN=${{ inputs.dockerhub-token }}" >> .env
         bun run s && bun run f
 
-    - name: Update commit and force push
+    - name: Commit documentation changes
       shell: bash
       run: |
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
         git config --global user.name "${{ github.actor }}"
         git remote set-url origin https://${{ inputs.github-token }}@github.com/${GITHUB_REPOSITORY}.git
         git add README.md base/*/README.md
-        git commit --amend --no-edit
-        git tag -f v${{ inputs.version }}
-        git push -f origin HEAD:${{ inputs.ref-name }} +v${{ inputs.version }}
+        git commit -m "docs: update image sizes for version ${{ inputs.version }}"
+        git push origin HEAD:${{ inputs.ref-name }}
