@@ -29,22 +29,18 @@ runs:
         for dir in base/*/; do
           devcontainer_name=$(basename "$dir")
           if [ -f "$dir/.devcontainer/Dockerfile" ]; then
-            # Build the image
+            # Build and push to both registries with single build
             docker buildx build \
               --file "$dir/.devcontainer/Dockerfile" \
+              --push \
+              --platform linux/amd64 \
+              --provenance=false \
+              --output type=registry \
               --tag "${GITHUB_REGISTRY}/${{ github.repository }}/${devcontainer_name}:v${VERSION}" \
               --tag "${GITHUB_REGISTRY}/${{ github.repository }}/${devcontainer_name}:latest" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:v${VERSION}" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:latest" \
               "$dir/.devcontainer"
-
-            # Push the image to GitHub registry
-            docker push "${GITHUB_REGISTRY}/${{ github.repository }}/${devcontainer_name}:v${VERSION}"
-            docker push "${GITHUB_REGISTRY}/${{ github.repository }}/${devcontainer_name}:latest"
-
-            # Push the image to GitLab registry
-            docker push "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:v${VERSION}"
-            docker push "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/${devcontainer_name}:latest"
           fi
         done
 
@@ -59,21 +55,17 @@ runs:
         for dir in base/ubuntu/*/; do
           devcontainer_name=$(basename "$dir")
           if [ -f "$dir/Dockerfile" ]; then
-            # Build the image
+            # Build and push to both registries with single build
             docker buildx build \
               --file "$dir/Dockerfile" \
+              --push \
+              --platform linux/amd64 \
+              --provenance=false \
+              --output type=registry \
               --tag "${GITHUB_REGISTRY}/${{ github.repository }}/ubuntu-${devcontainer_name}:v${VERSION}" \
               --tag "${GITHUB_REGISTRY}/${{ github.repository }}/ubuntu-${devcontainer_name}:latest" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:v${VERSION}" \
               --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:latest" \
               "$dir"
-
-            # Push the image to GitHub registry
-            docker push "${GITHUB_REGISTRY}/${{ github.repository }}/ubuntu-${devcontainer_name}:v${VERSION}"
-            docker push "${GITHUB_REGISTRY}/${{ github.repository }}/ubuntu-${devcontainer_name}:latest"
-
-            # Push the image to GitLab registry
-            docker push "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:v${VERSION}"
-            docker push "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/ubuntu-${devcontainer_name}:latest"
           fi
         done
