@@ -1,3 +1,13 @@
+# [v1.0.3](https://github.com/iamvikshan/devcontainers/compare/v1.0.2...v1.0.3) (2024-12-08)
+
+
+
+## [1.0.3](https://github.com/iamvikshan/devcontainers/compare/v1.0.2...v1.0.3) (2024-12-08)
+
+### Bug Fixes
+
+* streamline Docker image build process by combining build and push steps for GitHub and GitLab registries ([0b8c065](https://github.com/iamvikshan/devcontainers/commit/0b8c065ecb196182bd4ae218118bce00ba0b3795))
+
 # [v1.0.2](https://github.com/iamvikshan/devcontainers/compare/v1.0.1...v1.0.2) (2024-12-08)
 
 
