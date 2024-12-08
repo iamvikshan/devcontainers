@@ -1,3 +1,13 @@
+# [v1.0.2](https://github.com/iamvikshan/devcontainers/compare/v1.0.1...v1.0.2) (2024-12-08)
+
+
+
+## [1.0.2](https://github.com/iamvikshan/devcontainers/compare/v1.0.1...v1.0.2) (2024-12-08)
+
+### Bug Fixes
+
+* update GitHub Actions for documentation updates and remove GitLab integration ([ba02651](https://github.com/iamvikshan/devcontainers/commit/ba02651bb04073c502f168449fb93c4d3c319fab))
+
 # [v1.0.1](https://github.com/iamvikshan/devcontainers/compare/v1.0.0...v1.0.1) (2024-12-07)
 
 ## [1.0.1](https://github.com/iamvikshan/devcontainers/compare/v1.0.0...v1.0.1) (2024-12-07)
