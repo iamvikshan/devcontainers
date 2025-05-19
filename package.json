@@ -13,7 +13,7 @@
     "@semantic-release/release-notes-generator": "^14.0.1",
     "@types/node": "^22.10.1",
     "axios": "^1.7.9",
-    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "conventional-changelog-conventionalcommits": "^9.0.0",
     "conventional-changelog-gitmoji": "^0.2.5",
     "node-fetch": "^3.3.2",
     "prettier": "^3.4.2",
