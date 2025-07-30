@@ -1,3 +1,13 @@
+# [v1.0.4](https://github.com/iamvikshan/devcontainers/compare/v1.0.3...v1.0.4) (2025-07-30)
+
+
+
+## [1.0.4](https://github.com/iamvikshan/devcontainers/compare/v1.0.3...v1.0.4) (2025-07-30)
+
+### Bug Fixes
+
+* update image sizes in documentation and streamline action configurations ([3f29d11](https://github.com/iamvikshan/devcontainers/commit/3f29d1164dfc89f350841c4f521a335f6288b2a7))
+
 # [v1.0.3](https://github.com/iamvikshan/devcontainers/compare/v1.0.2...v1.0.3) (2024-12-08)
 
 ## [1.0.3](https://github.com/iamvikshan/devcontainers/compare/v1.0.2...v1.0.3) (2024-12-08)
