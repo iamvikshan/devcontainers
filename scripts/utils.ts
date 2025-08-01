@@ -7,11 +7,13 @@ export const config = {
 }
 
 export function getTokens() {
-  const githubToken = process.env.GH_TOKEN
+  // GitHub Actions uses GITHUB_TOKEN, local dev uses GH_TOKEN
+  const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN
   const gitlabToken = process.env.GITLAB_TOKEN
   const dockerhubToken = process.env.DOCKERHUB_TOKEN
 
-  if (!githubToken) throw new Error('GH_TOKEN not set in environment')
+  if (!githubToken)
+    throw new Error('GITHUB_TOKEN or GH_TOKEN not set in environment')
   if (!gitlabToken) throw new Error('GITLAB_TOKEN not set in environment')
   if (!dockerhubToken) throw new Error('DOCKERHUB_TOKEN not set in environment')
 
@@ -22,7 +24,15 @@ export function getTokens() {
   }
 }
 
-const tokens = getTokens()
+// Lazy token loading - only get tokens when needed
+let _tokens: ReturnType<typeof getTokens> | null = null
+
+function getTokensLazy() {
+  if (!_tokens) {
+    _tokens = getTokens()
+  }
+  return _tokens
+}
 
 export const createApiClient = (
   baseURL: string,
@@ -35,14 +45,21 @@ export const createApiClient = (
     }
   })
 
+// Lazy API clients - only create when accessed
 export const apiClients = {
-  github: createApiClient('https://api.github.com', {
-    Authorization: `Bearer ${tokens.github}`,
-    Accept: 'application/vnd.github.v3+json'
-  }),
-  gitlab: createApiClient('https://gitlab.com/api/v4', {
-    'PRIVATE-TOKEN': tokens.gitlab
-  })
+  get github() {
+    const tokens = getTokensLazy()
+    return createApiClient('https://api.github.com', {
+      Authorization: `Bearer ${tokens.github}`,
+      Accept: 'application/vnd.github.v3+json'
+    })
+  },
+  get gitlab() {
+    const tokens = getTokensLazy()
+    return createApiClient('https://gitlab.com/api/v4', {
+      'PRIVATE-TOKEN': tokens.gitlab
+    })
+  }
   // Docker Hub authentication is handled separately in the getDockerHubSize function
 }
 

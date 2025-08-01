@@ -1,7 +1,13 @@
 import axios from 'axios'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { config } from './utils'
+
+// Configuration (moved here to avoid token loading issues)
+const config = {
+  owner: 'vikshan',
+  ghcrOwner: 'iamvikshan',
+  repoName: 'devcontainers'
+}
 
 // Centralized environment loading
 export function loadEnvironment(): void {

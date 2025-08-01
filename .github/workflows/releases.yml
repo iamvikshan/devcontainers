@@ -71,6 +71,10 @@ jobs:
           dockerhub-username: ${{ env.GL_USERNAME }}
 
       - name: Update versions and sizes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           # Wait a moment for images to be fully pushed to all registries
           echo "⏳ Waiting for images to be available across all registries..."

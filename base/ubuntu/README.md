@@ -15,18 +15,18 @@ well, maybe the size, and wider compatibility with other tools as this is a stan
 
 ### 1. GitHub Container Registry
 
-1. `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 130.67 MiB
-2. `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 200.61 MiB
+1. `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 95.97 MiB
+2. `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 167.88 MiB
 
 ### 2. GitLab Container Registry
 
-1. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 130.67 MiB
-2. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 200.61 MiB
+1. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 95.97 MiB
+2. `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 167.88 MiB
 
 ### 3. Docker Hub
 
-1. `docker.io/vikshan/ubuntu-bun:latest` ~ 130.67 MiB
-2. `docker.io/vikshan/ubuntu-bun-node:latest` ~ 200.61 MiB
+1. `docker.io/vikshan/ubuntu-bun:latest` ~ 95.97 MiB
+2. `docker.io/vikshan/ubuntu-bun-node:latest` ~ 167.88 MiB
 
 ## Installed Extensions
 
