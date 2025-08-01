@@ -1,3 +1,20 @@
+# [v1.1.0](https://github.com/iamvikshan/devcontainers/compare/v1.0.4...v1.1.0) (2025-08-01)
+
+## ✨ New Features
+- [`a2be3a8`](https://github.com/iamvikshan/devcontainers/commit/a2be3a8)  feat: fix GitHub Actions token issues and optimize version management 
+
+
+
+## [1.1.0](https://github.com/iamvikshan/devcontainers/compare/v1.0.4...v1.1.0) (2025-08-01)
+
+### ⚠ BREAKING CHANGES
+
+* Implement centralized registry client for Docker Hub, GHCR, and GitLab
+
+### Features
+
+* Implement centralized registry client for Docker Hub, GHCR, and GitLab ([0b833d5](https://github.com/iamvikshan/devcontainers/commit/0b833d594b9d918e5c937435309dda95f01637b9))
+
 # [v1.0.4](https://github.com/iamvikshan/devcontainers/compare/v1.0.3...v1.0.4) (2025-07-30)
 
 ## [1.0.4](https://github.com/iamvikshan/devcontainers/compare/v1.0.3...v1.0.4) (2025-07-30)
