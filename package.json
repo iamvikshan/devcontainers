@@ -1,23 +1,34 @@
 {
   "scripts": {
     "f": "prettier --write \"**/*.*\"",
-    "s": "bun scripts/sizes.ts",
+    "s": "bun scripts/update-versions.ts --sync-only",
     "rs": "bun f && bun scripts/keepOff.ts && git push -f",
-    "cl": "bun scripts/cleanup.ts"
+    "cl": "bun scripts/cleanup.ts",
+    "check-updates": "bun scripts/check-base-images.ts",
+    "analyze-sizes": "bun scripts/analyze-image-sizes.ts",
+    "build-all": "./scripts/build-all-images.sh",
+    "build-bun": "docker build -f base/bun/.devcontainer/Dockerfile -t devcontainers/bun:test base/bun/.devcontainer",
+    "build-bun-node": "docker build -f base/bun-node/.devcontainer/Dockerfile -t devcontainers/bun-node:test base/bun-node/.devcontainer",
+    "build-ubuntu-bun": "docker build -f base/ubuntu/bun/Dockerfile -t devcontainers/ubuntu-bun:test base/ubuntu/bun",
+    "build-ubuntu-bun-node": "docker build -f base/ubuntu/bun-node/Dockerfile -t devcontainers/ubuntu-bun-node:test base/ubuntu/bun-node",
+    "verify-docker": "./scripts/verify-docker-setup.sh",
+    "update-versions": "bun scripts/update-versions.ts",
+    "sync-sizes": "bun scripts/update-versions.ts --sync-only",
+    "test-workflows": "bun scripts/test-workflow-steps.ts"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^11.0.1",
-    "@semantic-release/release-notes-generator": "^14.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "@semantic-release/release-notes-generator": "^14.0.3",
     "@types/node": "^24.1.0",
-    "axios": "^1.7.9",
+    "axios": "^1.11.0",
     "conventional-changelog-conventionalcommits": "^9.1.0",
     "conventional-changelog-gitmoji": "^0.2.5",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.4.2",
-    "semantic-release": "^24.2.0",
+    "prettier": "^3.6.2",
+    "semantic-release": "^24.2.7",
     "semantic-release-gitmoji": "^1.6.8"
   }
 }

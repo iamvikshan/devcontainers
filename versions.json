@@ -1,0 +1,196 @@
+{
+  "version": "1.0.5-test",
+  "release_date": "2025-08-01T10:04:00.224Z",
+  "last_updated": "2025-08-01T10:04:00.224Z",
+  "images": {
+    "bun": {
+      "version": "1.0.5-test",
+      "base_image": "oven/bun:latest",
+      "base_image_digest": "sha256:31f25ad4c661322a3dc9d9d98fbf34989502b1ea588a2ca629da98c8e5a2d116",
+      "tools": {
+        "bun": "1.2.19",
+        "git": "2.39.5"
+      },
+      "registries": {
+        "ghcr": {
+          "url": "ghcr.io/iamvikshan/devcontainers/bun:latest",
+          "size_mb": 132.63,
+          "layers": 16,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "gitlab": {
+          "url": "registry.gitlab.com/vikshan/devcontainers/bun:latest",
+          "size_mb": 132.63,
+          "layers": 16,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "dockerhub": {
+          "url": "docker.io/vikshan/bun:latest",
+          "size_mb": 132.63,
+          "layers": 0,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        }
+      },
+      "changelog": [
+        "Optimized Dockerfile layers for smaller image size",
+        "Added comprehensive cleanup in single RUN command",
+        "Improved build caching"
+      ]
+    },
+    "bun-node": {
+      "version": "1.0.5-test",
+      "base_image": "oven/bun:latest",
+      "base_image_digest": "sha256:31f25ad4c661322a3dc9d9d98fbf34989502b1ea588a2ca629da98c8e5a2d116",
+      "tools": {
+        "bun": "1.2.19",
+        "git": "2.39.5",
+        "node": "v24.5.0",
+        "npm": "11.5.1",
+        "eslint": "global"
+      },
+      "registries": {
+        "ghcr": {
+          "url": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
+          "size_mb": 239.22,
+          "layers": 18,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "gitlab": {
+          "url": "registry.gitlab.com/vikshan/devcontainers/bun-node:latest",
+          "size_mb": 239.22,
+          "layers": 18,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "dockerhub": {
+          "url": "docker.io/vikshan/bun-node:latest",
+          "size_mb": 239.22,
+          "layers": 0,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        }
+      },
+      "changelog": [
+        "Combined Node.js installation with package cleanup",
+        "Added npm cache cleanup to reduce image size",
+        "Optimized layer structure"
+      ]
+    },
+    "ubuntu-bun": {
+      "version": "1.0.5-test",
+      "base_image": "ubuntu:latest",
+      "base_image_digest": "sha256:a08e551cb33850e4740772b38217fc1796a66da2506d312abe51acda354ff061",
+      "tools": {
+        "bun": "1.2.19",
+        "git": "2.43.0"
+      },
+      "registries": {
+        "ghcr": {
+          "url": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest",
+          "size_mb": 130.67,
+          "layers": 12,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "gitlab": {
+          "url": "registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest",
+          "size_mb": 130.67,
+          "layers": 12,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "dockerhub": {
+          "url": "docker.io/vikshan/ubuntu-bun:latest",
+          "size_mb": 130.67,
+          "layers": 0,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        }
+      },
+      "changelog": [
+        "Fixed Bun symlinks for root user",
+        "Combined package installation in single layer",
+        "Added comprehensive cleanup commands"
+      ]
+    },
+    "ubuntu-bun-node": {
+      "version": "1.0.5-test",
+      "base_image": "ubuntu:latest",
+      "base_image_digest": "sha256:a08e551cb33850e4740772b38217fc1796a66da2506d312abe51acda354ff061",
+      "tools": {
+        "bun": "1.2.19",
+        "git": "2.43.0",
+        "node": "v24.5.0",
+        "npm": "11.5.1",
+        "eslint": "global (non-root)"
+      },
+      "registries": {
+        "ghcr": {
+          "url": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
+          "size_mb": 200.61,
+          "layers": 14,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "gitlab": {
+          "url": "registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest",
+          "size_mb": 200.61,
+          "layers": 14,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        },
+        "dockerhub": {
+          "url": "docker.io/vikshan/ubuntu-bun-node:latest",
+          "size_mb": 200.61,
+          "layers": 0,
+          "last_pushed": "2025-08-01T10:04:00.224Z"
+        }
+      },
+      "changelog": [
+        "Fixed Bun symlinks for root user",
+        "Combined all package installations in single layer",
+        "Added npm cache cleanup",
+        "Optimized for both root and non-root users"
+      ]
+    }
+  },
+  "release_notes": [
+    "🔧 Fixed Ubuntu image Bun symlinks for root user",
+    "📦 Optimized Dockerfile layers to reduce image sizes",
+    "🧹 Added comprehensive cleanup commands",
+    "🚀 Improved build performance with better caching",
+    "✅ All images now build and test successfully",
+    "🐳 Added Docker-in-Docker support to devcontainer",
+    "📊 Added image size analysis tools",
+    "🔄 Implemented intelligent bidirectional sync"
+  ],
+  "automation": {
+    "weekly_releases": {
+      "enabled": true,
+      "schedule": "Sunday 2 AM UTC",
+      "workflow": ".github/workflows/releases.yml"
+    },
+    "base_image_monitoring": {
+      "enabled": true,
+      "schedule": "Daily 6 AM UTC",
+      "workflow": ".github/workflows/check-base-images.yml"
+    },
+    "sync": {
+      "github_to_gitlab": {
+        "enabled": true,
+        "schedule": "Every 6 hours",
+        "workflow": ".github/workflows/sync.yml"
+      },
+      "gitlab_to_github": {
+        "enabled": true,
+        "triggers": [
+          "push",
+          "merge_request",
+          "schedule"
+        ],
+        "workflow": ".gitlab/gh-sync.yml"
+      }
+    }
+  },
+  "next_release": {
+    "estimated_date": "2025-08-03T02:00:00.000Z",
+    "planned_changes": [
+      "Update to latest base images",
+      "Security patches",
+      "Documentation improvements"
+    ]
+  }
+}

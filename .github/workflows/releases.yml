@@ -2,6 +2,9 @@ name: Release DevContainers
 
 on:
   workflow_dispatch:
+  schedule:
+    # Run every Sunday at 2 AM UTC
+    - cron: "0 2 * * 0"
   push:
     branches: [main]
     paths:
@@ -67,11 +70,18 @@ jobs:
           gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
           dockerhub-username: ${{ env.GL_USERNAME }}
 
-      - name: Update sizes
-        uses: ./.github/actions/update-docs
-        with:
-          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          ref-name: ${{ github.ref_name }}
-          github-token: ${{ secrets.GH_TOKEN }}
-          version: ${{ env.VERSION }}
-          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Update versions and sizes
+        run: |
+          # Wait a moment for images to be fully pushed to all registries
+          echo "⏳ Waiting for images to be available across all registries..."
+          sleep 30
+
+          # Update versions.json and README files with real-time data
+          bun run update-versions --version=${{ env.VERSION }} --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
+
+          # Commit all updated files
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add versions.json README.md base/*/README.md
+          git commit -m "chore: update versions and sizes for release ${{ env.VERSION }} [skip-sync]" || exit 0
+          git push

@@ -1,6 +1,13 @@
 # .gitlab-ci.yml
-stages:
-  - sync-github
+# Sync is now handled by GitHub Actions using advanced-git-sync
+# This file is kept for future GitLab CI/CD needs
 
-include:
-  - local: .gitlab/gh-sync.yml
+stages:
+  - placeholder
+
+placeholder-job:
+  stage: placeholder
+  script:
+    - echo "GitLab CI/CD placeholder - sync handled by GitHub Actions"
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /\[run-gitlab-ci\]/

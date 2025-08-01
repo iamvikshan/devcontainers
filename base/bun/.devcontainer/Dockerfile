@@ -3,14 +3,16 @@ FROM oven/bun:${VARIANT}
 
 ARG USERNAME=root
 
-# Install Git, sudo, OpenSSH client, and curl non-interactively
+# Install all packages in a single layer to minimize image size
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     git \
     sudo \
     openssh-client \
-    curl && \
-    rm -rf /var/lib/apt/lists/*
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && rm -rf /tmp/* /var/tmp/*
 
 # Configure SSH server to allow TCP forwarding
 RUN echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config

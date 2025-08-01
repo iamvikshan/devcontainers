@@ -42,10 +42,8 @@ export const apiClients = {
   }),
   gitlab: createApiClient('https://gitlab.com/api/v4', {
     'PRIVATE-TOKEN': tokens.gitlab
-  }),
-  dockerhub: createApiClient('https://hub.docker.com/v2', {
-    Authorization: `Bearer ${tokens.dockerhub}`
   })
+  // Docker Hub authentication is handled separately in the getDockerHubSize function
 }
 
 export interface Tag {

@@ -3,9 +3,8 @@ FROM ubuntu:${VARIANT}
 
 ARG USERNAME=root
 
-# Install Git and sudo non-interactively
+# Install all packages in a single layer to minimize image size
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y git sudo
 
 # Create the user if it doesn't exist (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \
@@ -25,18 +24,25 @@ RUN if [ "${USERNAME}" != "root" ]; then \
 # Ensure necessary directories have the correct permissions
 RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var/lib/apt/lists
 
-# Install Bun
+# Install all packages and Bun in a single layer
 RUN apt-get update && apt-get install -y \
+    git \
+    sudo \
     curl \
     unzip \
     && curl -fsSL https://bun.sh/install | bash \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && rm -rf /tmp/* /var/tmp/*
 
-# Move .bun directory and create symbolic links for non-root user
+# Create symbolic links for Bun (for both root and non-root users)
 RUN if [ "${USERNAME}" != "root" ]; then \
     mv /root/.bun /home/${USERNAME}/.bun \
     && ln -s /home/${USERNAME}/.bun/bin/bun /usr/local/bin/bun \
     && ln -s /home/${USERNAME}/.bun/bin/bunx /usr/local/bin/bunx; \
+    else \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun \
+    && ln -s /root/.bun/bin/bunx /usr/local/bin/bunx; \
     fi
 
 # Copy the setup script and make it executable

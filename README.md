@@ -16,24 +16,24 @@ environments.
 
 ### 1. GitHub Container Registry
 
-- `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 126.86 MiB
-- `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 227.40 MiB
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 120.79 MiB
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 189.09 MiB
+- `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 132.63 MiB
+- `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 239.22 MiB
+- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 130.67 MiB
+- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 200.61 MiB
 
 ### 2. GitLab Container Registry
 
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 204.13 MiB
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 505.76 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 305.64 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 510.51 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 132.63 MiB
+- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 239.22 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 130.67 MiB
+- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 200.61 MiB
 
 ### 3. Docker Hub
 
-- `docker.io/vikshan/bun:latest` ~ 126.86 MiB
-- `docker.io/vikshan/bun-node:latest` ~ 227.40 MiB
-- `docker.io/vikshan/ubuntu-bun:latest` ~ 120.79 MiB
-- `docker.io/vikshan/ubuntu-bun-node:latest` ~ 189.09 MiB
+- `docker.io/vikshan/bun:latest` ~ 132.63 MiB
+- `docker.io/vikshan/bun-node:latest` ~ 239.22 MiB
+- `docker.io/vikshan/ubuntu-bun:latest` ~ 130.67 MiB
+- `docker.io/vikshan/ubuntu-bun-node:latest` ~ 200.61 MiB
 
 ## Usage
 
@@ -67,20 +67,85 @@ Add this to your `.devcontainer/devcontainer.json`:
 }
 ```
 
+## 📚 Documentation
+
+For comprehensive setup instructions and detailed information:
+
+- **[Setup Guide](docs/SETUP.md)** - Complete setup instructions for all images
+- **[Image Variants](docs/IMAGE_VARIANTS.md)** - Detailed comparison and use cases
+- **[Build Commands](docs/BUILD_COMMANDS.md)** - Building and testing images locally
+- **[Optimization Guide](docs/OPTIMIZATION_GUIDE.md)** - Performance optimization tips
+- **[Sync Architecture](docs/SYNC_ARCHITECTURE.md)** - GitHub ↔ GitLab synchronization
+- **[Script Optimization](docs/SCRIPT_OPTIMIZATION.md)** - Optimized scripts and architecture
+- **[Version Management](docs/VERSION_MANAGEMENT.md)** - Automated version and size tracking
+- **[Current Versions](versions.json)** - Latest versions, sizes, and changelogs
+
 ## Development
 
 ### Building Images Locally
 
+The `.devcontainer` of this codespace includes Docker-in-Docker for building and testing images,
+else install docker locally:
+
 ```bash
-# From the base/bun directory
-docker build -t devcontainers/bun .
+# Build all images with comprehensive testing
+npm run build-all
+
+# Build individual images
+npm run build-bun
+npm run build-bun-node
+npm run build-ubuntu-bun
+npm run build-ubuntu-bun-node
+
+# Manual Docker commands
+docker build -f base/bun/.devcontainer/Dockerfile -t devcontainers/bun:test base/bun/.devcontainer
 ```
+
+See [`docs/BUILD_COMMANDS.md`](docs/BUILD_COMMANDS.md) for complete build and testing instructions.
 
 ### Publishing Updates
 
 1. Make changes to the configuration
 2. Create a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
 3. Once merged, GitHub Actions will build and publish the updated image
+
+## Automated Updates
+
+This repository includes automated systems to keep the devcontainers up to date:
+
+### 🔄 Weekly Releases
+
+- **Automatic releases** run every Sunday at 2 AM UTC
+- Rebuilds all containers with the latest base images
+- Updates documentation with current image sizes
+
+### 🔍 Base Image Monitoring
+
+- **Daily checks** for updates to base images (`oven/bun`, `ubuntu`)
+- Automatically creates issues when updates are detected
+- Triggers releases when base images are updated
+
+### 📦 Dependency Management
+
+- **Dependabot** monitors Docker base images weekly
+- **npm dependencies** checked daily
+- **GitHub Actions** updated daily
+
+### Manual Checks
+
+You can manually check for base image updates and analyze image sizes:
+
+```bash
+# Check for base image updates
+bun run check-updates
+
+# Analyze image sizes and detect bloat
+bun run analyze-sizes
+
+# Update documentation with current sizes
+bun run sync-sizes
+# or bun run s
+```
 
 ## Contributing
 

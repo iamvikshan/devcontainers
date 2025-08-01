@@ -3,25 +3,22 @@ FROM oven/bun:${VARIANT}
 
 ARG USERNAME=root
 
-# Install Git, sudo, OpenSSH client, and curl non-interactively
+# Install all packages in a single layer to minimize image size
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     git \
     sudo \
     openssh-client \
-    curl && \
-    rm -rf /var/lib/apt/lists/*
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g eslint \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && rm -rf /tmp/* /var/tmp/*
 
 # Configure SSH server to allow TCP forwarding
 RUN echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config
-
-
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
-    apt-get install -y nodejs
-
-# Install ESLint globally
-RUN npm install -g eslint
 
 # Create the user if it doesn't exist (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \

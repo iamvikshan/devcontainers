@@ -1,0 +1,221 @@
+name: Check Base Image Updates
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run daily at 6 AM UTC to check for new base images
+    - cron: "0 6 * * *"
+
+env:
+  GITHUB_REGISTRY: ghcr.io
+  GITLAB_REGISTRY: registry.gitlab.com
+  GL_USERNAME: vikshan
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Node, Bun and install dependencies
+        uses: iamvikshan/.github/.github/actions/setup-node-bun@main
+
+      - name: Check for base image updates
+        id: check_updates
+        run: |
+          echo "UPDATES_FOUND=false" >> $GITHUB_ENV
+          echo "UPDATE_DETAILS=" >> $GITHUB_ENV
+
+          # Create script to check image updates
+          cat > check_updates.ts << 'EOF'
+          import axios from 'axios'
+
+          interface DockerHubTag {
+            name: string
+            last_updated: string
+            digest: string
+          }
+
+          interface DockerHubResponse {
+            results: DockerHubTag[]
+          }
+
+          interface ImageInfo {
+            image: string
+            currentDigest: string
+            latestDigest: string
+            lastUpdated: string
+            hasUpdate: boolean
+          }
+
+          async function getDockerHubDigest(image: string, tag: string = 'latest'): Promise<{ digest: string, lastUpdated: string }> {
+            try {
+              const response = await axios.get<DockerHubResponse>(
+                `https://hub.docker.com/v2/repositories/${image}/tags`,
+                {
+                  params: { page_size: 100 }
+                }
+              )
+              
+              const latestTag = response.data.results.find(t => t.name === tag)
+              return {
+                digest: latestTag?.digest || '',
+                lastUpdated: latestTag?.last_updated || ''
+              }
+            } catch (error) {
+              console.error(`Error checking ${image}:`, error.message)
+              return { digest: '', lastUpdated: '' }
+            }
+          }
+
+          async function getCurrentDigest(image: string, tag: string = 'latest'): Promise<string> {
+            try {
+              // Get current digest from the built image
+              const response = await axios.get(
+                `https://ghcr.io/token?scope=repository:iamvikshan/devcontainers/${image}:pull`
+              )
+              
+              const manifestResponse = await axios.get(
+                `https://ghcr.io/v2/iamvikshan/devcontainers/${image}/manifests/${tag}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${response.data.token}`,
+                    Accept: 'application/vnd.docker.distribution.manifest.v2+json'
+                  }
+                }
+              )
+              
+              return manifestResponse.headers['docker-content-digest'] || ''
+            } catch (error) {
+              console.error(`Error getting current digest for ${image}:`, error.message)
+              return ''
+            }
+          }
+
+          async function main() {
+            const imagesToCheck = [
+              { name: 'bun', baseImage: 'oven/bun' },
+              { name: 'bun-node', baseImage: 'oven/bun' },
+              { name: 'ubuntu-bun', baseImage: 'library/ubuntu' },
+              { name: 'ubuntu-bun-node', baseImage: 'library/ubuntu' }
+            ]
+            
+            const updates: ImageInfo[] = []
+            
+            for (const { name, baseImage } of imagesToCheck) {
+              console.log(`Checking ${baseImage} for ${name}...`)
+              
+              const { digest: latestDigest, lastUpdated } = await getDockerHubDigest(baseImage)
+              const currentDigest = await getCurrentDigest(name)
+              
+              const hasUpdate = latestDigest && currentDigest && latestDigest !== currentDigest
+              
+              updates.push({
+                image: name,
+                currentDigest: currentDigest.substring(0, 12),
+                latestDigest: latestDigest.substring(0, 12),
+                lastUpdated,
+                hasUpdate
+              })
+              
+              console.log(`${name}: ${hasUpdate ? 'UPDATE AVAILABLE' : 'UP TO DATE'}`)
+            }
+            
+            const hasAnyUpdates = updates.some(u => u.hasUpdate)
+            
+            if (hasAnyUpdates) {
+              console.log('UPDATES_FOUND=true')
+              const updateDetails = updates
+                .filter(u => u.hasUpdate)
+                .map(u => `- **${u.image}**: ${u.currentDigest} → ${u.latestDigest} (${new Date(u.lastUpdated).toLocaleDateString()})`)
+                .join('\\n')
+              
+              console.log(`UPDATE_DETAILS=${updateDetails}`)
+            } else {
+              console.log('UPDATES_FOUND=false')
+            }
+          }
+
+          main().catch(console.error)
+          EOF
+
+          # Run the check
+          bun run check_updates.ts
+
+      - name: Create or update issue for base image updates
+        if: env.UPDATES_FOUND == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const title = '🔄 Base Image Updates Available'
+            const body = `## Base Image Updates Detected
+
+            The following base images have been updated and the devcontainers should be rebuilt:
+
+            ${process.env.UPDATE_DETAILS}
+
+            ### Next Steps
+            1. Review the changes in the base images
+            2. Test the updated containers locally if needed
+            3. Trigger a new release to rebuild with updated base images
+
+            ### Auto-generated
+            This issue was automatically created by the base image update checker.
+
+            **Detected on:** ${new Date().toISOString()}
+            `
+
+            // Check if issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['base-image-update']
+            })
+
+            const existingIssue = issues.find(issue => issue.title === title)
+
+            if (existingIssue) {
+              // Update existing issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: body
+              })
+              console.log(`Updated existing issue #${existingIssue.number}`)
+            } else {
+              // Create new issue
+              const { data: newIssue } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['base-image-update', 'enhancement']
+              })
+              console.log(`Created new issue #${newIssue.number}`)
+            }
+
+      - name: Trigger release workflow if updates found
+        if: env.UPDATES_FOUND == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'releases.yml',
+              ref: 'main'
+            })
+            console.log('Triggered release workflow due to base image updates')
