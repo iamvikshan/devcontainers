@@ -32,7 +32,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/base/bun/.devcontainer"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 2
     labels:
       - "docker"
@@ -43,7 +43,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/base/bun-node/.devcontainer"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 2
     labels:
       - "docker"
@@ -54,7 +54,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/base/ubuntu/bun"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 2
     labels:
       - "docker"
@@ -65,7 +65,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/base/ubuntu/bun-node"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 2
     labels:
       - "docker"
