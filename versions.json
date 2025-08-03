@@ -1,7 +1,7 @@
 {
   "version": "1.1.0",
-  "release_date": "2025-08-01T10:46:24.668Z",
-  "last_updated": "2025-08-01T10:46:24.668Z",
+  "release_date": "2025-08-03T02:54:33.184Z",
+  "last_updated": "2025-08-03T02:54:33.184Z",
   "images": {
     "bun": {
       "version": "1.1.0",
@@ -16,19 +16,19 @@
           "url": "ghcr.io/iamvikshan/devcontainers/bun:latest",
           "size_mb": 132.64,
           "layers": 16,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "gitlab": {
           "url": "registry.gitlab.com/vikshan/devcontainers/bun:latest",
           "size_mb": 132.64,
           "layers": 16,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "dockerhub": {
           "url": "docker.io/vikshan/bun:latest",
           "size_mb": 132.64,
           "layers": 0,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         }
       },
       "changelog": [
@@ -53,19 +53,19 @@
           "url": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
           "size_mb": 225.94,
           "layers": 16,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "gitlab": {
           "url": "registry.gitlab.com/vikshan/devcontainers/bun-node:latest",
           "size_mb": 225.94,
           "layers": 16,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "dockerhub": {
           "url": "docker.io/vikshan/bun-node:latest",
           "size_mb": 225.94,
           "layers": 0,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         }
       },
       "changelog": [
@@ -87,19 +87,19 @@
           "url": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest",
           "size_mb": 95.97,
           "layers": 11,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "gitlab": {
           "url": "registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest",
           "size_mb": 95.97,
           "layers": 11,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "dockerhub": {
           "url": "docker.io/vikshan/ubuntu-bun:latest",
           "size_mb": 95.97,
           "layers": 0,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         }
       },
       "changelog": [
@@ -124,19 +124,19 @@
           "url": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
           "size_mb": 167.88,
           "layers": 11,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "gitlab": {
           "url": "registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest",
           "size_mb": 167.88,
           "layers": 11,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         },
         "dockerhub": {
           "url": "docker.io/vikshan/ubuntu-bun-node:latest",
           "size_mb": 167.88,
           "layers": 0,
-          "last_pushed": "2025-08-01T10:46:24.668Z"
+          "last_pushed": "2025-08-03T02:54:33.184Z"
         }
       },
       "changelog": [
@@ -181,7 +181,7 @@
     }
   },
   "next_release": {
-    "estimated_date": "2025-08-03T02:00:00.000Z",
+    "estimated_date": "2025-08-10T02:00:00.000Z",
     "planned_changes": [
       "Update to latest base images",
       "Security patches",
