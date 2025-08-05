@@ -16,8 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      issues: write
-      pull-requests: write
+      actions: write
 
     steps:
       - name: Checkout
@@ -151,71 +150,24 @@ jobs:
           # Run the check
           bun run check_updates.ts
 
-      - name: Create or update issue for base image updates
-        if: env.UPDATES_FOUND == 'true'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          script: |
-            const title = '🔄 Base Image Updates Available'
-            const body = `## Base Image Updates Detected
-
-            The following base images have been updated and the devcontainers should be rebuilt:
-
-            ${process.env.UPDATE_DETAILS}
-
-            ### Next Steps
-            1. Review the changes in the base images
-            2. Test the updated containers locally if needed
-            3. Trigger a new release to rebuild with updated base images
-
-            ### Auto-generated
-            This issue was automatically created by the base image update checker.
-
-            **Detected on:** ${new Date().toISOString()}
-            `
-
-            // Check if issue already exists
-            const { data: issues } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: ['base-image-update']
-            })
-
-            const existingIssue = issues.find(issue => issue.title === title)
-
-            if (existingIssue) {
-              // Update existing issue
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: existingIssue.number,
-                body: body
-              })
-              console.log(`Updated existing issue #${existingIssue.number}`)
-            } else {
-              // Create new issue
-              const { data: newIssue } = await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: title,
-                body: body,
-                labels: ['base-image-update', 'enhancement']
-              })
-              console.log(`Created new issue #${newIssue.number}`)
-            }
-
       - name: Trigger release workflow if updates found
         if: env.UPDATES_FOUND == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GH_TOKEN }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'releases.yml',
-              ref: 'main'
-            })
-            console.log('Triggered release workflow due to base image updates')
+            try {
+              const response = await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'releases.yml',
+                ref: 'main',
+                inputs: {
+                  reason: 'Base image updates detected'
+                }
+              })
+              console.log('Successfully triggered release workflow due to base image updates')
+            } catch (error) {
+              console.error('Failed to trigger release workflow:', error.message)
+              throw error
+            }

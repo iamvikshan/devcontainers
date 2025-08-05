@@ -2,6 +2,12 @@ name: Release DevContainers
 
 on:
   workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for triggering the release"
+        required: false
+        default: "Manual trigger"
+        type: string
   schedule:
     # Run every Sunday at 2 AM UTC
     - cron: "0 2 * * 0"
@@ -23,6 +29,10 @@ jobs:
       packages: write
 
     steps:
+      - name: Log trigger reason
+        run: |
+          echo "🚀 Release triggered: ${{ github.event.inputs.reason || 'Scheduled or push trigger' }}"
+
       - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
