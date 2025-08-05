@@ -22,28 +22,28 @@ class WorkflowTester {
 
   async runCommand(command: string, args: string[] = []): Promise<TestResult> {
     console.log(`🧪 Testing: ${command} ${args.join(' ')}`)
-    
+
     try {
-      const child = spawn(command, args, { 
+      const child = spawn(command, args, {
         stdio: ['pipe', 'pipe', 'pipe'],
-        shell: true 
+        shell: true
       })
-      
+
       let stdout = ''
       let stderr = ''
-      
-      child.stdout?.on('data', (data) => {
+
+      child.stdout?.on('data', data => {
         stdout += data.toString()
       })
-      
-      child.stderr?.on('data', (data) => {
+
+      child.stderr?.on('data', data => {
         stderr += data.toString()
       })
-      
-      const exitCode = await new Promise<number>((resolve) => {
+
+      const exitCode = await new Promise<number>(resolve => {
         child.on('close', resolve)
       })
-      
+
       const success = exitCode === 0
       const result: TestResult = {
         step: `${command} ${args.join(' ')}`,
@@ -51,14 +51,14 @@ class WorkflowTester {
         output: stdout,
         error: stderr
       }
-      
+
       if (success) {
         console.log(`✅ PASS: ${command}`)
       } else {
         console.log(`❌ FAIL: ${command}`)
         console.log(`Error: ${stderr}`)
       }
-      
+
       return result
     } catch (error) {
       const result: TestResult = {
@@ -66,7 +66,7 @@ class WorkflowTester {
         success: false,
         error: error.message
       }
-      
+
       console.log(`❌ FAIL: ${command} - ${error.message}`)
       return result
     }
@@ -74,40 +74,47 @@ class WorkflowTester {
 
   async testSyncWorkflow(): Promise<void> {
     console.log('\n🔄 Testing Sync Workflow Steps...\n')
-    
+
     // Test checkout (simulate)
     console.log('✅ SKIP: Checkout (GitHub Actions only)')
-    
+
     // Test sync config validation
-    const configExists = await this.runCommand('test', ['-f', '.github/sync-config.yml'])
+    const configExists = await this.runCommand('test', [
+      '-f',
+      '.github/sync-config.yml'
+    ])
     this.results.push(configExists)
-    
+
     console.log('✅ SKIP: Advanced Git Sync (requires secrets)')
   }
 
   async testReleasesWorkflow(): Promise<void> {
     console.log('\n🚀 Testing Releases Workflow Steps...\n')
-    
+
     // Test Node/Bun setup (simulate)
     console.log('✅ SKIP: Node/Bun setup (GitHub Actions only)')
-    
+
     // Test semantic release (dry run)
     console.log('✅ SKIP: Semantic release (requires secrets)')
-    
+
     // Test version retrieval simulation
     const versionTest = await this.runCommand('echo', ['1.0.5'])
     this.results.push({ ...versionTest, step: 'Version retrieval simulation' })
-    
+
     // Test registry configuration (simulate)
     console.log('✅ SKIP: Registry configuration (requires secrets)')
-    
+
     // Test container build (simulate - don't actually build)
     console.log('✅ SKIP: Container build (would push images)')
-    
+
     // Test our version update script
-    const versionUpdate = await this.runCommand('bun', ['run', 'update-versions', '--version=1.0.5-test'])
+    const versionUpdate = await this.runCommand('bun', [
+      'run',
+      'update-versions',
+      '--version=1.0.5-test'
+    ])
     this.results.push({ ...versionUpdate, step: 'Version update script' })
-    
+
     // Test git operations (simulate)
     const gitConfig = await this.runCommand('git', ['config', 'user.name'])
     this.results.push({ ...gitConfig, step: 'Git configuration check' })
@@ -115,37 +122,37 @@ class WorkflowTester {
 
   async testCheckBaseImagesWorkflow(): Promise<void> {
     console.log('\n🔍 Testing Check Base Images Workflow Steps...\n')
-    
+
     // Test our check-updates script
     const checkUpdates = await this.runCommand('bun', ['run', 'check-updates'])
     this.results.push({ ...checkUpdates, step: 'Check base image updates' })
-    
+
     console.log('✅ SKIP: Issue creation (requires GitHub API)')
     console.log('✅ SKIP: Workflow trigger (requires GitHub API)')
   }
 
   async testAllWorkflows(): Promise<void> {
     console.log('🧪 Starting Workflow Testing (Safe Mode)\n')
-    console.log('=' .repeat(60))
-    
+    console.log('='.repeat(60))
+
     await this.testSyncWorkflow()
     await this.testReleasesWorkflow()
     await this.testCheckBaseImagesWorkflow()
-    
+
     this.printSummary()
   }
 
   private printSummary(): void {
     console.log('\n📊 Test Summary')
-    console.log('=' .repeat(60))
-    
+    console.log('='.repeat(60))
+
     const passed = this.results.filter(r => r.success).length
     const failed = this.results.filter(r => !r.success).length
-    
+
     console.log(`✅ Passed: ${passed}`)
     console.log(`❌ Failed: ${failed}`)
     console.log(`📊 Total: ${this.results.length}`)
-    
+
     if (failed > 0) {
       console.log('\n❌ Failed Tests:')
       this.results
@@ -157,7 +164,7 @@ class WorkflowTester {
           }
         })
     }
-    
+
     console.log('\n💡 Next Steps:')
     if (failed === 0) {
       console.log('  ✅ All testable components passed!')

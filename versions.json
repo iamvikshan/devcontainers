@@ -147,11 +147,7 @@
       ]
     }
   },
-  "release_notes": [
-    "Automated release with latest base images",
-    "Security patches and updates",
-    "Documentation improvements"
-  ],
+  "release_notes": ["Automated release with latest base images", "Security patches and updates", "Documentation improvements"],
   "automation": {
     "weekly_releases": {
       "enabled": true,
@@ -171,21 +167,13 @@
       },
       "gitlab_to_github": {
         "enabled": true,
-        "triggers": [
-          "push",
-          "merge_request",
-          "schedule"
-        ],
+        "triggers": ["push", "merge_request", "schedule"],
         "workflow": ".gitlab/gh-sync.yml"
       }
     }
   },
   "next_release": {
     "estimated_date": "2025-08-10T02:00:00.000Z",
-    "planned_changes": [
-      "Update to latest base images",
-      "Security patches",
-      "Documentation improvements"
-    ]
+    "planned_changes": ["Update to latest base images", "Security patches", "Documentation improvements"]
   }
 }

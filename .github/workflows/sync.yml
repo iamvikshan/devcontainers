@@ -16,19 +16,16 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: write
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4.2.2
-        with:
-          fetch-depth: 0
 
-      - name: Bidirectional Sync with GitLab
-        uses: OpenSaucedHub/advanced-git-sync@v1.2.0
+      - name: Sync with GitLab
+        uses: OpenSaucedHub/advanced-git-sync@v1.3.0
         with:
-          CONFIG_PATH: .github/sync-config.yml
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
