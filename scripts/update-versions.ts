@@ -1,4 +1,4 @@
-import { versionManager } from './version-manager'
+import { versionsMdManager } from './versions-md-manager'
 
 async function main() {
   const args = process.argv.slice(2)
@@ -15,13 +15,13 @@ async function main() {
 
   try {
     if (syncOnly) {
-      // Just sync sizes between README and versions.json
+      // Just sync sizes between README and VERSIONS.md
       console.log('📊 Syncing sizes only...')
-      await versionManager.syncAllSizes()
+      await versionsMdManager.syncAllSizes()
     } else {
       // Full version update with real-time data
-      console.log('📝 Updating versions with real-time data...')
-      await versionManager.updateVersionsFile(newVersion, releaseNotes)
+      console.log('📝 Updating VERSIONS.md with real-time data...')
+      await versionsMdManager.updateVersionsFile(newVersion, releaseNotes)
     }
 
     console.log('\n🎉 Version management complete!')

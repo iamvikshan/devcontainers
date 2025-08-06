@@ -229,7 +229,7 @@ All images are automatically updated:
 
 ## 📈 Version History
 
-See [versions.json](versions.json) for detailed version history and changelogs.
+See [VERSIONS.md](../VERSIONS.md) for detailed version history and changelogs.
 
 ## 🤝 Contributing
 

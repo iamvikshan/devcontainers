@@ -5,6 +5,7 @@
     "rs": "bun f && bun scripts/keepOff.ts && git push -f",
     "cl": "bun scripts/cleanup.ts",
     "check-updates": "bun scripts/check-base-images.ts",
+    "check-base-images": "bun scripts/check-base-images.ts",
     "analyze-sizes": "bun scripts/analyze-image-sizes.ts",
     "build-all": "./scripts/build-all-images.sh",
     "build-bun": "docker build -f base/bun/.devcontainer/Dockerfile -t devcontainers/bun:test base/bun/.devcontainer",

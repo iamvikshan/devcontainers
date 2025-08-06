@@ -78,7 +78,7 @@ For comprehensive setup instructions and detailed information:
 - **[Sync Architecture](docs/SYNC_ARCHITECTURE.md)** - GitHub ↔ GitLab synchronization
 - **[Script Optimization](docs/SCRIPT_OPTIMIZATION.md)** - Optimized scripts and architecture
 - **[Version Management](docs/VERSION_MANAGEMENT.md)** - Automated version and size tracking
-- **[Current Versions](versions.json)** - Latest versions, sizes, and changelogs
+- **[Current Versions](VERSIONS.md)** - Latest versions, sizes, and changelogs
 
 ## Development
 

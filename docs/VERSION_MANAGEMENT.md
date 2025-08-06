@@ -8,7 +8,7 @@ across all files and registries.
 Previously, we had several issues:
 
 1. **Manual version tracking** - Versions hardcoded in multiple places
-2. **Size inconsistencies** - README sizes didn't match `versions.json`
+2. **Size inconsistencies** - README sizes didn't match `VERSIONS.md`
 3. **Timing issues** - Versions updated before images were actually built
 4. **No real-time data** - Fallback to hardcoded values instead of actual registry data
 
@@ -24,7 +24,7 @@ graph TD
     D --> E[Get Real-Time Sizes]
     D --> F[Detect Tool Versions]
     D --> G[Get Base Image Digests]
-    E --> H[Update versions.json]
+    E --> H[Update VERSIONS.md]
     F --> H
     G --> H
     H --> I[Update README Files]
@@ -38,7 +38,7 @@ graph TD
 - **Real-time size retrieval** from all registries (GHCR, GitLab, Docker Hub)
 - **Automatic tool version detection** (Bun, Node.js, npm, Git)
 - **Base image digest tracking** for precise version control
-- **Synchronized updates** across `versions.json` and README files
+- **Synchronized updates** across `VERSIONS.md` and README files
 
 #### **2. `update-versions-optimized.ts` - Smart Update Script**
 
@@ -57,14 +57,14 @@ graph TD
    - Detect tool versions from base images
    - Get latest base image digests
 4. **Synchronized Updates**:
-   - Update `versions.json` with real data
+   - Update `VERSIONS.md` with real data
    - Update all README files with consistent sizes
    - Commit all changes together
 
 ### **Manual Size Sync**
 
 ```bash
-# Sync sizes between README and versions.json
+# Sync sizes between README and VERSIONS.md
 bun run sync-sizes
 
 # Full version update with real-time data
@@ -75,11 +75,11 @@ bun run update-versions-optimized --version=1.0.5
 
 ### **Size Synchronization**
 
-| Source               | Target          | Method                  |
-| -------------------- | --------------- | ----------------------- |
-| **All Registries** → | `versions.json` | Real-time API queries   |
-| **All Registries** → | README files    | Image operations module |
-| **versions.json** ↔ | README files    | Bidirectional sync      |
+| Source               | Target        | Method                  |
+| -------------------- | ------------- | ----------------------- |
+| **All Registries** → | `VERSIONS.md` | Real-time API queries   |
+| **All Registries** → | README files  | Image operations module |
+| **VERSIONS.md** ↔   | README files  | Bidirectional sync      |
 
 ### **Version Detection**
 
@@ -159,7 +159,7 @@ export const IMAGE_DEFINITIONS = {
     bun run s
 
     # Commit everything
-    git add versions.json README.md base/*/README.md
+    git add VERSIONS.md README.md base/*/README.md
     git commit -m "chore: update versions and sizes [skip-sync]"
 ```
 
@@ -186,7 +186,7 @@ The system tracks:
 - **Image sizes** across all registries
 - **Layer counts** for optimization analysis
 - **Size differences** between registries
-- **Historical changes** in versions.json
+- **Historical changes** in VERSIONS.md
 
 ### **Version Tracking**
 

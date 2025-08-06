@@ -1,10 +1,10 @@
-name: Check Base Image Updates
+name: Check Base Images
 
 on:
-  workflow_dispatch:
   schedule:
-    # Run daily at 6 AM UTC to check for new base images
+    # Run daily at 6 AM UTC
     - cron: "0 6 * * *"
+  workflow_dispatch:
 
 env:
   GITHUB_REGISTRY: ghcr.io
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      actions: write
+      packages: read
 
     steps:
       - name: Checkout
@@ -30,144 +30,133 @@ jobs:
 
       - name: Check for base image updates
         id: check_updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          echo "UPDATES_FOUND=false" >> $GITHUB_ENV
-          echo "UPDATE_DETAILS=" >> $GITHUB_ENV
+          echo "🔍 Checking for base image updates..."
 
-          # Create script to check image updates
-          cat > check_updates.ts << 'EOF'
-          import axios from 'axios'
+          # Run the check-base-images script and capture output
+          if bun run check-updates > update_check.log 2>&1; then
+            echo "✅ Base image check completed successfully"
+          else
+            echo "❌ Base image check failed"
+            cat update_check.log
+            exit 1
+          fi
 
-          interface DockerHubTag {
-            name: string
-            last_updated: string
-            digest: string
-          }
+          # Check if updates were found
+          if grep -q "🚀 Updates found!" update_check.log; then
+            echo "has_updates=true" >> $GITHUB_OUTPUT
+            echo "📦 Base image updates detected!"
+          else
+            echo "has_updates=false" >> $GITHUB_OUTPUT
+            echo "✅ All base images are up to date"
+          fi
 
-          interface DockerHubResponse {
-            results: DockerHubTag[]
-          }
+      - name: Generate update notes
+        if: steps.check_updates.outputs.has_updates == 'true'
+        id: generate_notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo "📝 Generating detailed update notes..."
 
-          interface ImageInfo {
-            image: string
-            currentDigest: string
-            latestDigest: string
-            lastUpdated: string
-            hasUpdate: boolean
-          }
+          # Create a script to generate detailed update information
+          cat > generate_update_notes.ts << 'EOF'
+          import { imageOperations } from './scripts/image-operations'
+          import { readFileSync, writeFileSync, existsSync } from 'fs'
 
-          async function getDockerHubDigest(image: string, tag: string = 'latest'): Promise<{ digest: string, lastUpdated: string }> {
-            try {
-              const response = await axios.get<DockerHubResponse>(
-                `https://hub.docker.com/v2/repositories/${image}/tags`,
-                {
-                  params: { page_size: 100 }
-                }
-              )
-              
-              const latestTag = response.data.results.find(t => t.name === tag)
-              return {
-                digest: latestTag?.digest || '',
-                lastUpdated: latestTag?.last_updated || ''
-              }
-            } catch (error) {
-              console.error(`Error checking ${image}:`, error.message)
-              return { digest: '', lastUpdated: '' }
-            }
-          }
-
-          async function getCurrentDigest(image: string, tag: string = 'latest'): Promise<string> {
-            try {
-              // Get current digest from the built image
-              const response = await axios.get(
-                `https://ghcr.io/token?scope=repository:iamvikshan/devcontainers/${image}:pull`
-              )
-              
-              const manifestResponse = await axios.get(
-                `https://ghcr.io/v2/iamvikshan/devcontainers/${image}/manifests/${tag}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${response.data.token}`,
-                    Accept: 'application/vnd.docker.distribution.manifest.v2+json'
-                  }
-                }
-              )
-              
-              return manifestResponse.headers['docker-content-digest'] || ''
-            } catch (error) {
-              console.error(`Error getting current digest for ${image}:`, error.message)
-              return ''
-            }
-          }
-
-          async function main() {
-            const imagesToCheck = [
-              { name: 'bun', baseImage: 'oven/bun' },
-              { name: 'bun-node', baseImage: 'oven/bun' },
-              { name: 'ubuntu-bun', baseImage: 'library/ubuntu' },
-              { name: 'ubuntu-bun-node', baseImage: 'library/ubuntu' }
-            ]
+          async function generateUpdateNotes() {
+            const updates = await imageOperations.checkBaseImageUpdates()
+            const hasUpdates = updates.some(u => u.hasUpdate)
             
-            const updates: ImageInfo[] = []
-            
-            for (const { name, baseImage } of imagesToCheck) {
-              console.log(`Checking ${baseImage} for ${name}...`)
-              
-              const { digest: latestDigest, lastUpdated } = await getDockerHubDigest(baseImage)
-              const currentDigest = await getCurrentDigest(name)
-              
-              const hasUpdate = latestDigest && currentDigest && latestDigest !== currentDigest
-              
-              updates.push({
-                image: name,
-                currentDigest: currentDigest.substring(0, 12),
-                latestDigest: latestDigest.substring(0, 12),
-                lastUpdated,
-                hasUpdate
-              })
-              
-              console.log(`${name}: ${hasUpdate ? 'UPDATE AVAILABLE' : 'UP TO DATE'}`)
+            if (!hasUpdates) {
+              console.log('No updates found')
+              return
             }
             
-            const hasAnyUpdates = updates.some(u => u.hasUpdate)
+            const now = new Date()
+            const dateStr = now.toISOString().split('T')[0]
+            const timeStr = now.toISOString()
             
-            if (hasAnyUpdates) {
-              console.log('UPDATES_FOUND=true')
-              const updateDetails = updates
-                .filter(u => u.hasUpdate)
-                .map(u => `- **${u.image}**: ${u.currentDigest} → ${u.latestDigest} (${new Date(u.lastUpdated).toLocaleDateString()})`)
-                .join('\\n')
-              
-              console.log(`UPDATE_DETAILS=${updateDetails}`)
+            // Read existing VERSIONS.md or create new one
+            let versionsContent = ''
+            if (existsSync('VERSIONS.md')) {
+              versionsContent = readFileSync('VERSIONS.md', 'utf-8')
             } else {
-              console.log('UPDATES_FOUND=false')
+              versionsContent = `# DevContainer Versions\n\nThis file tracks base image updates and releases for our DevContainer configurations.\n\n## Latest Updates\n\n`
             }
+            
+            // Generate update entry
+            const updatedImages = updates.filter(u => u.hasUpdate)
+            let updateEntry = `### ${dateStr} - Base Image Updates\n\n`
+            updateEntry += `**Updated at:** ${timeStr}\n\n`
+            updateEntry += `**Base images updated:**\n`
+            
+            for (const update of updatedImages) {
+              const lastUpdated = new Date(update.lastUpdated).toLocaleDateString()
+              updateEntry += `- **${update.containerName}**: \`${update.baseImage}\`\n`
+              updateEntry += `  - Base image last updated: ${lastUpdated}\n`
+              updateEntry += `  - Digest: \`${update.latestDigest}\`\n`
+            }
+            
+            updateEntry += `\n**Changes:**\n`
+            updateEntry += `- Updated base images to latest versions\n`
+            updateEntry += `- Security patches and bug fixes from upstream\n`
+            updateEntry += `- Improved compatibility and performance\n\n`
+            updateEntry += `**Impact:** Patch release - DevContainers will be rebuilt with updated base images\n\n`
+            updateEntry += `---\n\n`
+            
+            // Insert at the beginning of the Latest Updates section
+            const latestUpdatesIndex = versionsContent.indexOf('## Latest Updates')
+            if (latestUpdatesIndex !== -1) {
+              const insertIndex = versionsContent.indexOf('\n\n', latestUpdatesIndex) + 2
+              versionsContent = versionsContent.slice(0, insertIndex) + updateEntry + versionsContent.slice(insertIndex)
+            } else {
+              versionsContent += updateEntry
+            }
+            
+            writeFileSync('VERSIONS.md', versionsContent)
+            console.log('✅ VERSIONS.md updated with base image changes')
+            
+            // Also create a summary for the commit message
+            const summary = updatedImages.map(u => u.containerName).join(', ')
+            writeFileSync('update_summary.txt', summary)
           }
 
-          main().catch(console.error)
+          generateUpdateNotes().catch(console.error)
           EOF
 
-          # Run the check
-          bun run check_updates.ts
+          # Run the update notes generator
+          bun run generate_update_notes.ts
 
-      - name: Trigger release workflow if updates found
-        if: env.UPDATES_FOUND == 'true'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          script: |
-            try {
-              const response = await github.rest.actions.createWorkflowDispatch({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: 'releases.yml',
-                ref: 'main',
-                inputs: {
-                  reason: 'Base image updates detected'
-                }
-              })
-              console.log('Successfully triggered release workflow due to base image updates')
-            } catch (error) {
-              console.error('Failed to trigger release workflow:', error.message)
-              throw error
-            }
+      - name: Commit base image updates
+        if: steps.check_updates.outputs.has_updates == 'true'
+        run: |
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Read the summary of updated images
+          UPDATED_IMAGES=$(cat update_summary.txt 2>/dev/null || echo "base images")
+
+          # Add the updated VERSIONS.md file
+          git add VERSIONS.md
+
+          # Create commit with conventional commit format to trigger patch release
+          git commit -m "fix: update base images for ${UPDATED_IMAGES}" -m "- Updated base images to latest versions" -m "- Security patches and bug fixes from upstream" -m "- Improved compatibility and performance" -m "" -m "This commit triggers an automated patch release to rebuild DevContainers with updated base images."
+
+          # Push the changes
+          git push
+
+          echo "✅ Base image updates committed successfully"
+          echo "🚀 This will trigger a patch release via semantic-release"
+
+      - name: Clean up temporary files
+        if: always()
+        run: |
+          rm -f update_check.log generate_update_notes.ts update_summary.txt

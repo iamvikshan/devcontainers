@@ -2,19 +2,11 @@ name: Release DevContainers
 
 on:
   workflow_dispatch:
-    inputs:
-      reason:
-        description: "Reason for triggering the release"
-        required: false
-        default: "Manual trigger"
-        type: string
   schedule:
     # Run every Sunday at 2 AM UTC
     - cron: "0 2 * * 0"
   push:
     branches: [main]
-    paths:
-      - "base/**/Dockerfile"
 
 env:
   GITHUB_REGISTRY: ghcr.io
@@ -29,10 +21,6 @@ jobs:
       packages: write
 
     steps:
-      - name: Log trigger reason
-        run: |
-          echo "🚀 Release triggered: ${{ github.event.inputs.reason || 'Scheduled or push trigger' }}"
-
       - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
@@ -90,12 +78,12 @@ jobs:
           echo "⏳ Waiting for images to be available across all registries..."
           sleep 30
 
-          # Update versions.json and README files with real-time data
+          # Update VERSIONS.md and README files with real-time data
           bun run update-versions --version=${{ env.VERSION }} --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
 
           # Commit all updated files
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add versions.json README.md base/*/README.md
+          git add VERSIONS.md README.md base/*/README.md
           git commit -m "chore: update versions and sizes for release ${{ env.VERSION }} [skip-sync]" || exit 0
           git push
