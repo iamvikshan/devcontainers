@@ -75,6 +75,27 @@ This file tracks base image updates and releases for our DevContainer configurat
 
 ## Latest Updates
 
+### 2025-08-11 - Base Image Updates
+
+**Updated at:** 2025-08-11T06:09:34.240Z
+
+**Base images updated:**
+- **bun**: `oven/bun:latest`
+  - Base image last updated: 8/10/2025
+  - Digest: `sha256:78f46`
+- **bun-node**: `oven/bun:latest`
+  - Base image last updated: 8/10/2025
+  - Digest: `sha256:78f46`
+
+**Changes:**
+- Updated base images to latest versions
+- Security patches and bug fixes from upstream
+- Improved compatibility and performance
+
+**Impact:** Patch release - DevContainers will be rebuilt with updated base images
+
+---
+
 ### 2025-08-11 - Release 1.1.0
 
 **Changes:**
