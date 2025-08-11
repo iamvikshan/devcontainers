@@ -6,7 +6,7 @@ This file tracks base image updates and releases for our DevContainer configurat
 
 **Version:** 1.1.1  
 **Release Date:** 2025-08-11  
-**Last Updated:** 2025-08-11T06:15:11.886Z
+**Last Updated:** 2025-08-11T12:16:53.490Z
 
 ## Container Images
 
@@ -74,6 +74,17 @@ This file tracks base image updates and releases for our DevContainer configurat
 - **GitLab → GitHub:** On push/MR events via `.gitlab/gh-sync.yml`
 
 ## Latest Updates
+
+### 2025-08-11 - Release 1.1.1
+
+**Changes:**
+- Automated release with latest base images
+- Security patches and updates
+- Documentation improvements
+
+**Impact:** Patch release
+
+---
 
 ### 2025-08-11 - Release 1.1.1
 
