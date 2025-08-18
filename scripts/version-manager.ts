@@ -1,11 +1,10 @@
 import { versionsMdManager } from './versions-md-manager'
 
-// This version manager now delegates to versions-md-manager for VERSIONS.md operations
-// It provides compatibility with the existing interface while using the markdown file
+// This version manager delegates to versions-md-manager for VERSIONS.md operations
 
 export class VersionManager {
   constructor() {
-    // This class now delegates all operations to versionsMdManager
+    // This class delegates all operations to versionsMdManager
   }
 
   // Update VERSIONS.md with real-time data (delegates to versionsMdManager)
@@ -27,8 +26,7 @@ export class VersionManager {
     return versionsMdManager.syncAllSizes()
   }
 
-  // Additional methods can be added here if needed for compatibility
-  // All core functionality is now handled by versionsMdManager
+  // All core functionality is handled by versionsMdManager
 }
 
 // Export singleton instance

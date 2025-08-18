@@ -13,15 +13,27 @@ interface PreReleaseCheckResult {
 }
 
 export class PreReleaseChecker {
+  private silent = false
+
+  setSilent(silent: boolean) {
+    this.silent = silent
+  }
+
+  private log(message: string) {
+    if (!this.silent) {
+      console.log(message)
+    }
+  }
+
   async checkReleaseNeeded(): Promise<PreReleaseCheckResult> {
-    console.log('🔍 Checking if release is needed...\n')
+    this.log('🔍 Checking if release is needed...\n')
 
     try {
       // Step 1: Check if semantic release would create a release
       const semanticReleaseResult = await this.checkSemanticRelease()
 
       if (semanticReleaseResult.shouldRelease) {
-        console.log(
+        this.log(
           `✅ Semantic release will create version: ${semanticReleaseResult.nextVersion}`
         )
         return {
@@ -31,14 +43,14 @@ export class PreReleaseChecker {
         }
       }
 
-      console.log('ℹ️  No semantic release needed based on commits')
+      this.log('ℹ️  No semantic release needed based on commits')
 
       // Step 2: Check for base image updates
-      console.log('🔍 Checking for base image updates...')
+      this.log('🔍 Checking for base image updates...')
       const hasBaseImageUpdates = await checkForUpdates()
 
       if (hasBaseImageUpdates) {
-        console.log('🚀 Base image updates found - will force a release')
+        this.log('🚀 Base image updates found - will force a release')
 
         // Get detailed base image update information
         const updates = await imageOperations.checkBaseImageUpdates()
@@ -58,7 +70,7 @@ export class PreReleaseChecker {
         }
       }
 
-      console.log('✅ No release needed - all images are up to date')
+      this.log('✅ No release needed - all images are up to date')
       return {
         shouldRelease: false,
         releaseType: 'none'
@@ -74,7 +86,7 @@ export class PreReleaseChecker {
     nextVersion?: string
   }> {
     try {
-      console.log('🔍 Running semantic release dry-run...')
+      this.log('🔍 Running semantic release dry-run...')
 
       // Run semantic release in dry-run mode
       const output = execSync('bunx semantic-release --dry-run --no-ci', {
@@ -120,7 +132,7 @@ export class PreReleaseChecker {
       }
     } catch (error) {
       // If semantic release fails, it usually means no release is needed
-      console.log('ℹ️  Semantic release dry-run indicates no release needed')
+      this.log('ℹ️  Semantic release dry-run indicates no release needed')
       return { shouldRelease: false }
     }
   }
@@ -160,7 +172,7 @@ export class PreReleaseChecker {
     commitMessage: string,
     commitBody: string[]
   ): Promise<void> {
-    console.log('📝 Creating force release commit...')
+    this.log('📝 Creating force release commit...')
 
     try {
       // Configure git
@@ -174,8 +186,8 @@ export class PreReleaseChecker {
       // Create an empty commit with the message
       execSync('git commit --allow-empty -F commit-message.txt')
 
-      console.log('✅ Force release commit created successfully')
-      console.log(`📝 Commit message: ${commitMessage}`)
+      this.log('✅ Force release commit created successfully')
+      this.log(`📝 Commit message: ${commitMessage}`)
     } catch (error) {
       console.error('❌ Error creating force release commit:', error.message)
       throw error
@@ -202,12 +214,18 @@ async function main() {
   const args = process.argv.slice(2)
   const createCommit = args.includes('--create-commit')
   const predictVersion = args.includes('--predict-version')
+  const workflowMode = args.includes('--workflow')
 
   try {
     if (predictVersion) {
       const version = await preReleaseChecker.predictNextVersion()
       console.log(version || 'no-version')
       return
+    }
+
+    // Set silent mode for workflow
+    if (workflowMode) {
+      preReleaseChecker.setSilent(true)
     }
 
     const result = await preReleaseChecker.checkReleaseNeeded()
@@ -223,11 +241,27 @@ async function main() {
       )
     }
 
-    // Output result for workflow consumption
-    console.log('\n📊 Pre-release check result:')
-    console.log(JSON.stringify(result, null, 2))
+    if (workflowMode) {
+      // Output only the JSON for workflow parsing
+      console.log(JSON.stringify(result))
+    } else {
+      // Output result for human consumption
+      console.log('\n📊 Pre-release check result:')
+      console.log(JSON.stringify(result, null, 2))
+    }
   } catch (error) {
-    console.error('❌ Pre-release check failed:', error.message)
+    if (workflowMode) {
+      // In workflow mode, output a failure result
+      console.log(
+        JSON.stringify({
+          shouldRelease: false,
+          releaseType: 'none',
+          error: error.message
+        })
+      )
+    } else {
+      console.error('❌ Pre-release check failed:', error.message)
+    }
     process.exit(1)
   }
 }

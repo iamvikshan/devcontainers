@@ -39,28 +39,35 @@ jobs:
         run: |
           echo "🔍 Checking if release is needed..."
 
-          # Run pre-release check
-          RESULT=$(bun run pre-release-check 2>&1)
-          echo "$RESULT"
+          # Run pre-release check in workflow mode (outputs only JSON)
+          RESULT=$(bun scripts/pre-release-check.ts --workflow)
+          echo "📋 Pre-release check result: $RESULT"
 
-          # Parse the result
-          if echo "$RESULT" | grep -q '"shouldRelease": true'; then
+          # Parse the JSON result
+          SHOULD_RELEASE=$(echo "$RESULT" | jq -r '.shouldRelease')
+          RELEASE_TYPE=$(echo "$RESULT" | jq -r '.releaseType')
+          NEXT_VERSION=$(echo "$RESULT" | jq -r '.nextVersion // empty')
+
+          if [ "$SHOULD_RELEASE" = "true" ]; then
             echo "release_needed=true" >> $GITHUB_OUTPUT
+            echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
 
-            # Extract release type
-            if echo "$RESULT" | grep -q '"releaseType": "forced"'; then
-              echo "release_type=forced" >> $GITHUB_OUTPUT
+            if [ "$RELEASE_TYPE" = "forced" ]; then
               echo "🚀 Base image updates detected - will force a release"
             else
-              echo "release_type=semantic" >> $GITHUB_OUTPUT
               echo "✅ Semantic release will create a new version"
             fi
 
-            # Get predicted version for container building
-            PREDICTED_VERSION=$(bun run predict-version)
-            if [ "$PREDICTED_VERSION" != "no-version" ]; then
-              echo "predicted_version=$PREDICTED_VERSION" >> $GITHUB_OUTPUT
-              echo "📋 Predicted version: $PREDICTED_VERSION"
+            # Get predicted version for container building if not already available
+            if [ -n "$NEXT_VERSION" ] && [ "$NEXT_VERSION" != "null" ]; then
+              echo "predicted_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+              echo "📋 Predicted version: $NEXT_VERSION"
+            else
+              PREDICTED_VERSION=$(bun run predict-version)
+              if [ "$PREDICTED_VERSION" != "no-version" ]; then
+                echo "predicted_version=$PREDICTED_VERSION" >> $GITHUB_OUTPUT
+                echo "📋 Predicted version: $PREDICTED_VERSION"
+              fi
             fi
           else
             echo "release_needed=false" >> $GITHUB_OUTPUT
