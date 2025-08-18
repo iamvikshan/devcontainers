@@ -15,7 +15,10 @@
     "verify-docker": "./scripts/verify-docker-setup.sh",
     "update-versions": "bun scripts/update-versions.ts",
     "sync-sizes": "bun scripts/update-versions.ts --sync-only",
-    "test-workflows": "bun scripts/test-workflow-steps.ts"
+    "test-workflows": "bun scripts/test-workflow-steps.ts",
+    "test-workflow-logic": "bun scripts/test-workflow-logic.ts",
+    "pre-release-check": "bun scripts/pre-release-check.ts",
+    "predict-version": "bun scripts/predict-version.ts"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",

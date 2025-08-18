@@ -1,102 +1,114 @@
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-18)
 
-
-
 ## [1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-18)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([ab3155f](https://github.com/iamvikshan/devcontainers/commit/ab3155f0535cba2de5ebbed2f44202a43e5f6860))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
-* update base images for ubuntu-bun, ubuntu-bun-node ([6cfd75e](https://github.com/iamvikshan/devcontainers/commit/6cfd75eceb562156e6635e37ebc2907763cc826c))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([ab3155f](https://github.com/iamvikshan/devcontainers/commit/ab3155f0535cba2de5ebbed2f44202a43e5f6860))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
+- update base images for ubuntu-bun, ubuntu-bun-node
+  ([6cfd75e](https://github.com/iamvikshan/devcontainers/commit/6cfd75eceb562156e6635e37ebc2907763cc826c))
 
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-17)
-
-
 
 ## [1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-17)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([ab3155f](https://github.com/iamvikshan/devcontainers/commit/ab3155f0535cba2de5ebbed2f44202a43e5f6860))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([ab3155f](https://github.com/iamvikshan/devcontainers/commit/ab3155f0535cba2de5ebbed2f44202a43e5f6860))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
 
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-17)
-
-
 
 ## [1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-17)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
 
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-16)
-
-
 
 ## [1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-16)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([5bb948e](https://github.com/iamvikshan/devcontainers/commit/5bb948e4d7b7eebb6478c767d1cd572df45cd9b9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
 
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-15)
-
-
 
 ## [1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-15)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
 
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-15)
-
-
 
 ## [1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-15)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([0b5bffa](https://github.com/iamvikshan/devcontainers/commit/0b5bfface37eabb52a922325da6a5588b689105e))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
 
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-14)
-
-
 
 ## [1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-14)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
-* update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([2bf890e](https://github.com/iamvikshan/devcontainers/commit/2bf890e0c37c4dd0790e59020b96f41a6bb59ef9))
+- update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  ([e375dd4](https://github.com/iamvikshan/devcontainers/commit/e375dd4dc9a03a7345f0983e7a1d91943d59ffb1))
 
 # [v1.1.1](https://github.com/iamvikshan/devcontainers/compare/v1.1.0...v1.1.1) (2025-08-11)
-
-
 
 ## [1.1.1](https://github.com/iamvikshan/devcontainers/compare/v1.1.0...v1.1.1) (2025-08-11)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node ([abe2d81](https://github.com/iamvikshan/devcontainers/commit/abe2d81c7133c98d5fb4e74617c97d7ef0b1fdfb))
+- update base images for bun, bun-node
+  ([abe2d81](https://github.com/iamvikshan/devcontainers/commit/abe2d81c7133c98d5fb4e74617c97d7ef0b1fdfb))
 
 # [v1.1.0](https://github.com/iamvikshan/devcontainers/compare/v1.0.4...v1.1.0) (2025-08-01)
 

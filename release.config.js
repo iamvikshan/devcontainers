@@ -10,7 +10,7 @@ const config = {
             include: [':bug:', ':ambulance:', ':lock:', ':adhesive_bandage:']
           },
           minor: {
-            include: [':sparkles:', ':rocket:', ':boom:', ':lipstick:', ':zap:']
+            include: [':sparkles:', ':rocket:', ':lipstick:', ':zap:']
           },
           major: {
             include: [':boom:', ':warning:']
@@ -44,9 +44,15 @@ const config = {
     [
       '@semantic-release/git',
       {
-        assets: ['CHANGELOG.md', 'package.json', 'VERSIONS.md'],
+        assets: [
+          'CHANGELOG.md',
+          'package.json',
+          'VERSIONS.md',
+          'README.md',
+          'base/*/README.md'
+        ],
         message:
-          'Release ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
+          'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
       }
     ],
     [

@@ -25,31 +25,66 @@ jobs:
         uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
-          # Allow the workflow to push back to the repo using the action's token
-          persist-credentials: true
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Setup Node, Bun and install dependencies
         uses: iamvikshan/.github/.github/actions/setup-node-bun@main
 
-      - name: Semantic Release
+      - name: Pre-release check
+        id: pre_release_check
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          GIT_AUTHOR_NAME: ${{ github.actor }}
-          GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
-          GIT_COMMITTER_NAME: ${{ github.actor }}
-          GIT_COMMITTER_EMAIL: ${{ github.actor }}@users.noreply.github.com
-        run: bunx semantic-release
-
-      - name: Get latest release tag
-        id: get_release_tag
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          VERSION=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
-            jq -r '.tag_name' | sed 's/v//')
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "🔍 Checking if release is needed..."
+
+          # Run pre-release check
+          RESULT=$(bun run pre-release-check 2>&1)
+          echo "$RESULT"
+
+          # Parse the result
+          if echo "$RESULT" | grep -q '"shouldRelease": true'; then
+            echo "release_needed=true" >> $GITHUB_OUTPUT
+
+            # Extract release type
+            if echo "$RESULT" | grep -q '"releaseType": "forced"'; then
+              echo "release_type=forced" >> $GITHUB_OUTPUT
+              echo "🚀 Base image updates detected - will force a release"
+            else
+              echo "release_type=semantic" >> $GITHUB_OUTPUT
+              echo "✅ Semantic release will create a new version"
+            fi
+
+            # Get predicted version for container building
+            PREDICTED_VERSION=$(bun run predict-version)
+            if [ "$PREDICTED_VERSION" != "no-version" ]; then
+              echo "predicted_version=$PREDICTED_VERSION" >> $GITHUB_OUTPUT
+              echo "📋 Predicted version: $PREDICTED_VERSION"
+            fi
+          else
+            echo "release_needed=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  No release needed"
+          fi
+
+      - name: Create force release commit
+        if: steps.pre_release_check.outputs.release_needed == 'true' && steps.pre_release_check.outputs.release_type == 'forced'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo "📝 Creating force release commit for base image updates..."
+
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Create the force release commit
+          bun run pre-release-check --create-commit
+
+          echo "✅ Force release commit created"
 
       - name: Configure registries
+        if: steps.pre_release_check.outputs.release_needed == 'true'
         uses: ./.github/actions/configure-registries
         with:
           github-pat: ${{ secrets.GH_TOKEN }}
@@ -60,42 +95,47 @@ jobs:
           dockerhub-username: ${{ env.GL_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build containers
+      - name: Build containers with predicted version
+        if: steps.pre_release_check.outputs.release_needed == 'true' && steps.pre_release_check.outputs.predicted_version != ''
         uses: ./.github/actions/build-containers
         with:
-          version: ${{ env.VERSION }}
+          version: ${{ steps.pre_release_check.outputs.predicted_version }}
           github-registry: ${{ env.GITHUB_REGISTRY }}
           gitlab-registry: ${{ env.GITLAB_REGISTRY }}
           gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
           dockerhub-username: ${{ env.GL_USERNAME }}
 
-      - name: Update versions and sizes
+      - name: Update VERSIONS.md with real-time data
+        if: steps.pre_release_check.outputs.release_needed == 'true' && steps.pre_release_check.outputs.predicted_version != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          # Wait a moment for images to be fully pushed to all registries
           echo "⏳ Waiting for images to be available across all registries..."
           sleep 30
 
-          # Update VERSIONS.md and README files with real-time data
-          bun run update-versions --version=${{ env.VERSION }} --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
+          echo "📝 Updating VERSIONS.md with real-time data..."
+          bun run update-versions --version=${{ steps.pre_release_check.outputs.predicted_version }} --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
 
-          # Commit all updated files
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          echo "📋 Staging VERSIONS.md and README files for semantic release..."
           git add VERSIONS.md README.md base/*/README.md
-          git commit -m "chore: update versions and sizes for release ${{ env.VERSION }} [skip-sync]" || true
 
-          # Ensure we can push: set token-authenticated remote (uses GITHUB_TOKEN provided above)
-          if [ -n "${GITHUB_TOKEN}" ]; then
-            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" || true
-          fi
+      - name: Semantic Release
+        if: steps.pre_release_check.outputs.release_needed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GIT_AUTHOR_NAME: ${{ github.actor }}
+          GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
+          GIT_COMMITTER_NAME: ${{ github.actor }}
+          GIT_COMMITTER_EMAIL: ${{ github.actor }}@users.noreply.github.com
+        run: |
+          echo "🚀 Running semantic release..."
+          bunx semantic-release
 
-          # Fetch the current remote main, then rebase local changes on top so we don't fail when "behind"
-          git fetch origin main
-          git rebase origin/main || git pull --rebase origin main || true
-
-          # Push changes (will succeed if rebase completed cleanly)
-          git push
+      - name: No release needed
+        if: steps.pre_release_check.outputs.release_needed != 'true'
+        run: |
+          echo "ℹ️  No release needed - all images are up to date and no code changes require a release"
+          echo "✅ Workflow completed successfully"
