@@ -27,8 +27,8 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Setup Node, Bun and install dependencies
-        uses: iamvikshan/.github/.github/actions/setup-node-bun@main
+      - name: Setup Bun and install dependencies
+        uses: iamvikshan/.github/.github/actions/setup-bun@main
 
       - name: Pre-release check
         id: pre_release_check
