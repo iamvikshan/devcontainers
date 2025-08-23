@@ -24,6 +24,7 @@ export interface BaseImageUpdate {
 
 export class ImageOperations {
   private static instance: ImageOperations
+  private silent = false
 
   private constructor() {}
 
@@ -32,6 +33,22 @@ export class ImageOperations {
       ImageOperations.instance = new ImageOperations()
     }
     return ImageOperations.instance
+  }
+
+  public setSilent(silent: boolean): void {
+    this.silent = silent
+  }
+
+  private log(message: string): void {
+    if (!this.silent) {
+      console.log(message)
+    }
+  }
+
+  private logError(message: string): void {
+    if (!this.silent) {
+      console.error(message)
+    }
   }
 
   // Get sizes for all images across all registries
@@ -98,7 +115,7 @@ export class ImageOperations {
       const baseImage = RegistryClient.getBaseImageForContainer(containerName)
       if (!baseImage) continue
 
-      console.log(`🔍 Checking ${containerName} (base: ${baseImage})`)
+      this.log(`🔍 Checking ${containerName} (base: ${baseImage})`)
 
       try {
         const tags = await registryClient.getDockerHubTags(baseImage)
@@ -119,15 +136,15 @@ export class ImageOperations {
             lastUpdated: latestTag.last_updated
           })
 
-          console.log(
+          this.log(
             `  📊 Base image last updated: ${baseImageDate.toLocaleDateString()}`
           )
-          console.log(
+          this.log(
             `  ${daysSinceUpdate < 7 ? '🔄 Update available' : '✅ Up to date'}`
           )
         }
       } catch (error) {
-        console.error(`Error checking ${containerName}:`, error.message)
+        this.logError(`Error checking ${containerName}:`, error.message)
       }
     }
 
@@ -156,9 +173,9 @@ export class ImageOperations {
     for (const readmePath of readmeFiles) {
       try {
         await this.updateSingleReadme(readmePath, sizeMap)
-        console.log(`✅ Updated ${readmePath}`)
+        this.log(`✅ Updated ${readmePath}`)
       } catch (error) {
-        console.error(`❌ Error updating ${readmePath}:`, error.message)
+        this.logError(`❌ Error updating ${readmePath}:`, error.message)
       }
     }
   }
@@ -207,12 +224,12 @@ export class ImageOperations {
 
   // Analyze image sizes and detect bloat
   public async analyzeImageSizes(): Promise<void> {
-    console.log('🔍 Starting comprehensive image size analysis...\n')
+    this.log('🔍 Starting comprehensive image size analysis...\n')
 
     const sizes = await this.getAllImageSizes()
 
     if (sizes.length === 0) {
-      console.log('❌ No image size data available')
+      this.log('❌ No image size data available')
       return
     }
 
@@ -225,20 +242,18 @@ export class ImageOperations {
       imageGroups.get(size.name)!.push(size)
     })
 
-    console.log('📊 IMAGE SIZE ANALYSIS REPORT')
-    console.log('='.repeat(80))
+    this.log('📊 IMAGE SIZE ANALYSIS REPORT')
+    this.log('='.repeat(80))
 
     let hasBloat = false
 
     imageGroups.forEach((imageSizes, imageName) => {
-      console.log(`\n🐳 ${imageName.toUpperCase()}`)
-      console.log('-'.repeat(40))
+      this.log(`\n🐳 ${imageName.toUpperCase()}`)
+      this.log('-'.repeat(40))
 
       imageSizes.forEach(size => {
         const sizeInMB = RegistryClient.formatSize(size.size)
-        console.log(
-          `  ${size.registry}: ${sizeInMB} MB (${size.layers} layers)`
-        )
+        this.log(`  ${size.registry}: ${sizeInMB} MB (${size.layers} layers)`)
       })
 
       // Check for size discrepancies
@@ -252,33 +267,33 @@ export class ImageOperations {
         if (sizeDiff > 10 * 1024 * 1024) {
           // More than 10MB difference
           const diffInMB = RegistryClient.formatSize(sizeDiff)
-          console.log(
+          this.log(
             `  ⚠️  Size difference: ${diffInMB} MB (${sizeRatio.toFixed(1)}x)`
           )
 
           if (sizeRatio > 2) {
-            console.log(`  🚨 SIGNIFICANT SIZE BLOAT DETECTED!`)
+            this.log(`  🚨 SIGNIFICANT SIZE BLOAT DETECTED!`)
             hasBloat = true
           }
         }
       }
     })
 
-    console.log('\n💡 RECOMMENDATIONS')
-    console.log('-'.repeat(40))
+    this.log('\n💡 RECOMMENDATIONS')
+    this.log('-'.repeat(40))
 
     if (hasBloat) {
-      console.log('🔧 Size bloat detected. Consider:')
-      console.log('  1. Combining RUN commands to reduce layers')
-      console.log('  2. Cleaning package caches in the same layer')
-      console.log('  3. Using multi-stage builds')
-      console.log('  4. Reviewing .dockerignore files')
+      this.log('🔧 Size bloat detected. Consider:')
+      this.log('  1. Combining RUN commands to reduce layers')
+      this.log('  2. Cleaning package caches in the same layer')
+      this.log('  3. Using multi-stage builds')
+      this.log('  4. Reviewing .dockerignore files')
     } else {
-      console.log('✅ No significant size bloat detected!')
-      console.log('📈 Images are well-optimized across registries')
+      this.log('✅ No significant size bloat detected!')
+      this.log('📈 Images are well-optimized across registries')
     }
 
-    console.log('\n✅ Analysis complete!')
+    this.log('\n✅ Analysis complete!')
   }
 }
 

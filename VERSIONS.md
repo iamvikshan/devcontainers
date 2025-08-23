@@ -78,6 +78,7 @@ This file tracks base image updates and releases for our DevContainer configurat
 ### 2025-08-21 - Release 1.1.2
 
 **Changes:**
+
 - Automated release with latest base images
 - Security patches and updates
 - Documentation improvements
@@ -89,6 +90,7 @@ This file tracks base image updates and releases for our DevContainer configurat
 ### 2025-08-21 - Release 1.1.2
 
 **Changes:**
+
 - Automated release with latest base images
 - Security patches and updates
 - Documentation improvements

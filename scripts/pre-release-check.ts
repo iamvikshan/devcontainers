@@ -226,6 +226,7 @@ async function main() {
     // Set silent mode for workflow
     if (workflowMode) {
       preReleaseChecker.setSilent(true)
+      imageOperations.setSilent(true)
     }
 
     const result = await preReleaseChecker.checkReleaseNeeded()
