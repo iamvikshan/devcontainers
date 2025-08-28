@@ -30,68 +30,75 @@ jobs:
       - name: Setup Bun and install dependencies
         uses: iamvikshan/.github/.github/actions/setup-bun@main
 
-      - name: Pre-release check
-        id: pre_release_check
+      - name: Release analysis
+        id: release_analysis
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          echo "🔍 Checking if release is needed..."
+          echo "🔍 Analyzing changes for release..."
 
-          # Run pre-release check in workflow mode (outputs only JSON)
-          RESULT=$(bun scripts/pre-release-check.ts --workflow)
-          echo "📋 Pre-release check result: $RESULT"
-
-          # Parse the JSON result
-          SHOULD_RELEASE=$(echo "$RESULT" | jq -r '.shouldRelease')
-          RELEASE_TYPE=$(echo "$RESULT" | jq -r '.releaseType')
-          NEXT_VERSION=$(echo "$RESULT" | jq -r '.nextVersion // empty')
-
-          if [ "$SHOULD_RELEASE" = "true" ]; then
-            echo "release_needed=true" >> $GITHUB_OUTPUT
-            echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-
-            if [ "$RELEASE_TYPE" = "forced" ]; then
-              echo "🚀 Base image updates detected - will force a release"
-            else
-              echo "✅ Semantic release will create a new version"
-            fi
-
-            # Get predicted version for container building if not already available
-            if [ -n "$NEXT_VERSION" ] && [ "$NEXT_VERSION" != "null" ]; then
-              echo "predicted_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
-              echo "📋 Predicted version: $NEXT_VERSION"
-            else
-              PREDICTED_VERSION=$(bun run predict-version)
-              if [ "$PREDICTED_VERSION" != "no-version" ]; then
-                echo "predicted_version=$PREDICTED_VERSION" >> $GITHUB_OUTPUT
-                echo "📋 Predicted version: $PREDICTED_VERSION"
-              fi
-            fi
-          else
-            echo "release_needed=false" >> $GITHUB_OUTPUT
-            echo "ℹ️  No release needed"
+          # Determine trigger type
+          TRIGGER="push"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            TRIGGER="schedule"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TRIGGER="manual"
           fi
 
-      - name: Create force release commit
-        if: steps.pre_release_check.outputs.release_needed == 'true' && steps.pre_release_check.outputs.release_type == 'forced'
+          # Run release orchestrator in workflow mode
+          RESULT=$(bun scripts/releaseOrchestrator.ts --trigger=$TRIGGER --workflow)
+          echo "📋 Release analysis result: $RESULT"
+
+          # Parse the JSON result
+          SUCCESS=$(echo "$RESULT" | jq -r '.success')
+          SHOULD_RELEASE=$(echo "$RESULT" | jq -r '.outputs.should_release')
+          RELEASE_TYPE=$(echo "$RESULT" | jq -r '.outputs.release_type')
+          AFFECTED_CONTAINERS=$(echo "$RESULT" | jq -r '.outputs.affected_containers')
+          VERSION_MAP=$(echo "$RESULT" | jq -r '.outputs.version_map')
+
+          echo "success=$SUCCESS" >> $GITHUB_OUTPUT
+          echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
+          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          echo "affected_containers=$AFFECTED_CONTAINERS" >> $GITHUB_OUTPUT
+          echo "version_map=$VERSION_MAP" >> $GITHUB_OUTPUT
+
+          if [ "$SUCCESS" = "true" ] && [ "$SHOULD_RELEASE" = "true" ]; then
+            echo "release_needed=true" >> $GITHUB_OUTPUT
+            echo "🚀 Release needed: $RELEASE_TYPE"
+            echo "📦 Affected containers: $AFFECTED_CONTAINERS"
+
+            # Extract individual container versions for build process
+            echo "$VERSION_MAP" | jq -r 'to_entries[] | "\(.key)_version=\(.value)"' >> $GITHUB_OUTPUT
+          else
+            echo "release_needed=false" >> $GITHUB_OUTPUT
+            if [ "$SUCCESS" = "false" ]; then
+              ERROR=$(echo "$RESULT" | jq -r '.error // "Unknown error"')
+              echo "❌ Release analysis failed: $ERROR"
+            else
+              echo "ℹ️  No release needed"
+            fi
+          fi
+
+      - name: Create base image update commit
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.release_analysis.outputs.release_type == 'patch'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          echo "📝 Creating force release commit for base image updates..."
+          echo "📝 Creating base image update commit..."
 
           # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          # Create the force release commit
-          bun run pre-release-check --create-commit
-
-          echo "✅ Force release commit created"
+          # Create commit for base image updates if needed
+          if echo "${{ steps.release_analysis.outputs.version_map }}" | jq -e '. | length > 0' > /dev/null; then
+            echo "✅ Base image update commit will be handled by release process"
+          fi
 
       - name: Configure registries
-        if: steps.pre_release_check.outputs.release_needed == 'true'
+        if: steps.release_analysis.outputs.release_needed == 'true'
         uses: ./.github/actions/configure-registries
         with:
           github-pat: ${{ secrets.GH_TOKEN }}
@@ -102,47 +109,152 @@ jobs:
           dockerhub-username: ${{ env.GL_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build containers with predicted version
-        if: steps.pre_release_check.outputs.release_needed == 'true' && steps.pre_release_check.outputs.predicted_version != ''
-        uses: ./.github/actions/build-containers
-        with:
-          version: ${{ steps.pre_release_check.outputs.predicted_version }}
-          github-registry: ${{ env.GITHUB_REGISTRY }}
-          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
-          gitlab-project-path: ${{ env.GL_USERNAME }}/${{ github.event.repository.name }}
-          dockerhub-username: ${{ env.GL_USERNAME }}
-
-      - name: Update VERSIONS.md with real-time data
-        if: steps.pre_release_check.outputs.release_needed == 'true' && steps.pre_release_check.outputs.predicted_version != ''
+      - name: Build containers
+        if: steps.release_analysis.outputs.release_needed == 'true'
+        id: build_containers
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
+          AFFECTED_CONTAINERS: ${{ steps.release_analysis.outputs.affected_containers }}
+        run: |
+          echo "🔨 Building containers..."
+          echo "📦 Version map: $VERSION_MAP"
+          echo "📋 Affected containers: $AFFECTED_CONTAINERS"
+
+          # Create a custom build script that handles individual container versioning
+          cat > build_containers.sh << 'EOF'
+          #!/bin/bash
+          set -e
+
+          VERSION_MAP='${{ steps.release_analysis.outputs.version_map }}'
+          AFFECTED_CONTAINERS='${{ steps.release_analysis.outputs.affected_containers }}'
+
+          if [ "$AFFECTED_CONTAINERS" = "" ]; then
+            echo "ℹ️  No containers to build"
+            exit 0
+          fi
+
+          IFS=',' read -ra CONTAINERS <<< "$AFFECTED_CONTAINERS"
+
+          for container in "${CONTAINERS[@]}"; do
+            container=$(echo "$container" | xargs) # trim whitespace
+            version=$(echo "$VERSION_MAP" | jq -r ".[\"$container\"] // \"latest\"")
+
+            echo "🔨 Building $container:$version..."
+
+            # Determine dockerfile path
+            if [[ "$container" == ubuntu-* ]]; then
+              dockerfile_path="base/ubuntu/${container#ubuntu-}/Dockerfile"
+              context_dir="base/ubuntu/${container#ubuntu-}"
+            else
+              dockerfile_path="base/$container/.devcontainer/Dockerfile"
+              context_dir="base/$container/.devcontainer"
+            fi
+
+            if [ -f "$dockerfile_path" ]; then
+              # Build and push to all registries
+              docker buildx build \
+                --file "$dockerfile_path" \
+                --push \
+                --platform linux/amd64 \
+                --provenance=false \
+                --output type=registry \
+                --tag "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}" \
+                --tag "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:latest" \
+                --tag "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}" \
+                --tag "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:latest" \
+                --tag "${{ env.GL_USERNAME }}/${container}:v${version}" \
+                --tag "${{ env.GL_USERNAME }}/${container}:latest" \
+                "$context_dir"
+
+              echo "✅ Built and pushed $container:$version"
+
+              # Close any existing build failure issues
+              bun scripts/issueManager.ts --close-success --container="$container" --version="$version" --silent || true
+            else
+              echo "❌ Dockerfile not found: $dockerfile_path"
+
+              # Create build failure issue
+              bun scripts/issueManager.ts \
+                --container="$container" \
+                --version="$version" \
+                --error="Dockerfile not found: $dockerfile_path" \
+                --workflow="${{ github.workflow }}" \
+                --run-id="${{ github.run_id }}" \
+                --silent || true
+
+              exit 1
+            fi
+          done
+          EOF
+
+          chmod +x build_containers.sh
+
+          # Execute the build script with error handling
+          if ./build_containers.sh; then
+            echo "build_success=true" >> $GITHUB_OUTPUT
+            echo "✅ All containers built successfully"
+          else
+            echo "build_success=false" >> $GITHUB_OUTPUT
+            echo "❌ Container build failed"
+            exit 1
+          fi
+
+      - name: Extract tool versions
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          AFFECTED_CONTAINERS: ${{ steps.release_analysis.outputs.affected_containers }}
+          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
         run: |
           echo "⏳ Waiting for images to be available across all registries..."
           sleep 30
 
-          echo "📝 Updating VERSIONS.md with real-time data..."
-          bun run update-versions --version=${{ steps.pre_release_check.outputs.predicted_version }} --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
+          echo "🔍 Extracting tool versions from built containers..."
 
-          echo "📋 Staging VERSIONS.md and README files for semantic release..."
-          git add VERSIONS.md README.md base/*/README.md
+          # Extract tool versions from the newly built containers
+          if [ "$AFFECTED_CONTAINERS" != "" ]; then
+            bun scripts/toolVersionExtractor.ts --local --containers="$AFFECTED_CONTAINERS" --version="latest" --output="tool-versions.json" --silent
+          fi
 
-      - name: Semantic Release
-        if: steps.pre_release_check.outputs.release_needed == 'true'
+      - name: Update documentation with real-time data
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          GIT_AUTHOR_NAME: ${{ github.actor }}
-          GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
-          GIT_COMMITTER_NAME: ${{ github.actor }}
-          GIT_COMMITTER_EMAIL: ${{ github.actor }}@users.noreply.github.com
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
         run: |
-          echo "🚀 Running semantic release..."
-          bunx semantic-release
+          echo "📝 Updating VERSIONS.md with real-time data..."
+
+          # Update VERSIONS.md with new version information
+          bun scripts/versionsManager.ts --version-map="$VERSION_MAP" --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
+
+          echo "📋 Staging documentation files..."
+          git add VERSIONS.md README.md base/*/README.md CHANGELOG.md container-versions.json tool-versions.json || true
+
+      - name: Create GitHub Release
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
+          RELEASE_TYPE: ${{ steps.release_analysis.outputs.release_type }}
+        run: |
+          echo "🚀 Creating GitHub release..."
+
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Create release using our custom orchestrator
+          bun scripts/releaseOrchestrator.ts --trigger="${{ github.event_name == 'schedule' && 'schedule' || github.event_name == 'workflow_dispatch' && 'manual' || 'push' }}" --create-release
 
       - name: No release needed
-        if: steps.pre_release_check.outputs.release_needed != 'true'
+        if: steps.release_analysis.outputs.release_needed != 'true'
         run: |
           echo "ℹ️  No release needed - all images are up to date and no code changes require a release"
           echo "✅ Workflow completed successfully"

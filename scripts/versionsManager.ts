@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
-import { registryClient, IMAGE_DEFINITIONS } from './registry-client'
-import { imageOperations } from './image-operations'
+import { registryClient, IMAGE_DEFINITIONS } from './registryClient'
+import { imageOperations } from './imageOperations'
 
 export class VersionsMdManager {
   private versionsPath: string
@@ -256,3 +256,59 @@ ${releaseNotes.map(note => `- ${note}`).join('\n')}
 
 // Export singleton instance
 export const versionsMdManager = new VersionsMdManager()
+
+// CLI functionality
+async function main() {
+  const args = process.argv.slice(2)
+  const newVersion = args
+    .find(arg => arg.startsWith('--version='))
+    ?.split('=')[1]
+  const versionMapArg = args
+    .find(arg => arg.startsWith('--version-map='))
+    ?.split('=')[1]
+  const releaseNotesArg = args
+    .find(arg => arg.startsWith('--notes='))
+    ?.split('=')[1]
+  const releaseNotes = releaseNotesArg ? releaseNotesArg.split(',') : undefined
+  const syncOnly = args.includes('--sync-only')
+
+  console.log('🔄 Version Manager Starting...\n')
+
+  try {
+    if (syncOnly) {
+      // Just sync sizes between README and VERSIONS.md
+      console.log('📊 Syncing sizes only...')
+      await versionsMdManager.syncAllSizes()
+    } else if (versionMapArg) {
+      // Update with version map from new release system
+      console.log('📝 Updating VERSIONS.md with version map...')
+      const versionMap = JSON.parse(versionMapArg)
+
+      // Use the highest version from the map as the overall version
+      const versions = Object.values(versionMap) as string[]
+      const overallVersion = versions.sort((a, b) => {
+        const [aMajor, aMinor, aPatch] = a.split('.').map(Number)
+        const [bMajor, bMinor, bPatch] = b.split('.').map(Number)
+        if (aMajor !== bMajor) return bMajor - aMajor
+        if (aMinor !== bMinor) return bMinor - aMinor
+        return bPatch - aPatch
+      })[0]
+
+      await versionsMdManager.updateVersionsFile(overallVersion, releaseNotes)
+    } else {
+      // Full version update with real-time data
+      console.log('📝 Updating VERSIONS.md with real-time data...')
+      await versionsMdManager.updateVersionsFile(newVersion, releaseNotes)
+    }
+
+    console.log('\n🎉 Version management complete!')
+  } catch (error) {
+    console.error('❌ Version management failed:', error.message)
+    process.exit(1)
+  }
+}
+
+// Run CLI if called directly
+if (require.main === module) {
+  main().catch(console.error)
+}

@@ -94,8 +94,13 @@ export class RegistryClient {
           password: process.env.DOCKERHUB_TOKEN
         }
       )
+
+      if (!response.data.token) {
+        throw new Error('Docker Hub authentication failed: No token received')
+      }
+
       this.dockerHubToken = response.data.token
-      return this.dockerHubToken
+      return response.data.token
     } catch (error) {
       throw new Error(`Docker Hub authentication failed: ${error.message}`)
     }

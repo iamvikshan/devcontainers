@@ -200,9 +200,46 @@ docker build --progress=plain -t devcontainers/bun:test base/bun/.devcontainer
 docker build --no-cache -t devcontainers/bun:test base/bun/.devcontainer
 ```
 
+## 🎯 Image Optimization Tips
+
+### Best Practices for Smaller Images
+
+1. **Combine RUN commands** to reduce layers:
+
+   ```dockerfile
+   RUN apt-get update && apt-get install -y \
+       package1 \
+       package2 \
+       && rm -rf /var/lib/apt/lists/* \
+       && apt-get clean
+   ```
+
+2. **Clean up in the same layer**:
+
+   ```dockerfile
+   RUN install-something \
+       && rm -rf /var/lib/apt/lists/* \
+       && apt-get clean \
+       && rm -rf /tmp/* /var/tmp/*
+   ```
+
+3. **Use .dockerignore** to exclude unnecessary files from build context
+
+4. **Monitor image sizes** after changes:
+
+   ```bash
+   # Check current sizes across all registries
+   bun run sync-sizes
+   # or bun run s
+
+   # Analyze detailed size information
+   bun run analyze-sizes
+   ```
+
 ## 📝 Notes
 
 - All test images are tagged with `:test` to avoid conflicts
 - The build script automatically cleans up test images when done
 - Use `docker logs <container_id>` to debug container issues
 - Check Dockerfile syntax with `docker build --dry-run` (if available)
+- Images are automatically updated weekly and when base images change

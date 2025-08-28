@@ -56,15 +56,20 @@ This file tracks base image updates and releases for our DevContainer configurat
 
 ## Automation
 
-### 🔄 Weekly Releases
+### 🔄 Smart Release System
 
-- **Schedule:** Every Sunday at 2 AM UTC
+- **Schedule:** Push-triggered + Weekly on Sundays at 2 AM UTC
 - **Workflow:** `.github/workflows/releases.yml`
-- **Purpose:** Automated releases with latest base images and documentation updates
+- **Features:**
+  - Independent container versioning
+  - Semantic commit analysis
+  - Granular container rebuilds
+  - Tool version extraction
+  - Automatic issue creation for failed builds
 
 ### 🔍 Base Image Monitoring
 
-- **Schedule:** Daily at 6 AM UTC
+- **Schedule:** Weekly on Sundays at 6 AM UTC
 - **Workflow:** `.github/workflows/check-base-images.yml`
 - **Purpose:** Monitor base images (`oven/bun`, `ubuntu`) for updates and trigger patch releases
 
@@ -78,6 +83,7 @@ This file tracks base image updates and releases for our DevContainer configurat
 ### 2025-08-27 - Release 1.1.4
 
 **Changes:**
+
 - Automated release with latest base images
 - Security patches and updates
 - Documentation improvements
@@ -91,6 +97,7 @@ This file tracks base image updates and releases for our DevContainer configurat
 **Updated at:** 2025-08-27T06:07:53.121Z
 
 **Base images updated:**
+
 - **bun**: `oven/bun:latest`
   - Base image last updated: 8/25/2025
   - Digest: `sha256:5a201`
@@ -99,6 +106,7 @@ This file tracks base image updates and releases for our DevContainer configurat
   - Digest: `sha256:5a201`
 
 **Changes:**
+
 - Updated base images to latest versions
 - Security patches and bug fixes from upstream
 - Improved compatibility and performance
@@ -110,6 +118,7 @@ This file tracks base image updates and releases for our DevContainer configurat
 ### 2025-08-26 - Release 1.1.3
 
 **Changes:**
+
 - Automated release with latest base images
 - Security patches and updates
 - Documentation improvements
@@ -123,6 +132,7 @@ This file tracks base image updates and releases for our DevContainer configurat
 **Updated at:** 2025-08-26T06:08:35.181Z
 
 **Base images updated:**
+
 - **bun**: `oven/bun:latest`
   - Base image last updated: 8/25/2025
   - Digest: `sha256:5a201`
@@ -131,6 +141,7 @@ This file tracks base image updates and releases for our DevContainer configurat
   - Digest: `sha256:5a201`
 
 **Changes:**
+
 - Updated base images to latest versions
 - Security patches and bug fixes from upstream
 - Improved compatibility and performance

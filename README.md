@@ -14,57 +14,91 @@ environments.
 
 ## Available Images
 
-### 1. GitHub Container Registry
+| Image               | Size    | Base   | Bun | Node.js | Best For                  |
+| ------------------- | ------- | ------ | --- | ------- | ------------------------- |
+| **bun**             | ~133 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
+| **bun-node**        | ~227 MB | Alpine | ✅  | ✅      | Full-stack development    |
+| **ubuntu-bun**      | ~94 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
+| **ubuntu-bun-node** | ~166 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
 
-- `ghcr.io/iamvikshan/devcontainers/bun:latest` ~ 133.08 MiB
-- `ghcr.io/iamvikshan/devcontainers/bun-node:latest` ~ 226.39 MiB
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest` ~ 94.11 MiB
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest` ~ 166.02 MiB
+### 🎯 Choose Your Image
 
-### 2. GitLab Container Registry
+```
+Need Node.js compatibility?
+├─ Yes → Need Ubuntu base?
+│  ├─ Yes → ubuntu-bun-node
+│  └─ No  → bun-node
+└─ No  → Need Ubuntu base?
+   ├─ Yes → ubuntu-bun
+   └─ No  → bun
+```
 
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest` ~ 133.08 MiB
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest` ~ 226.39 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest` ~ 94.11 MiB
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest` ~ 166.02 MiB
+### 📦 Quick Start
 
-### 3. Docker Hub
+```bash
+# Lightweight Bun (most popular)
+docker pull ghcr.io/iamvikshan/devcontainers/bun:latest
 
-- `docker.io/vikshan/bun:latest` ~ 133.08 MiB
-- `docker.io/vikshan/bun-node:latest` ~ 226.39 MiB
-- `docker.io/vikshan/ubuntu-bun:latest` ~ 94.11 MiB
-- `docker.io/vikshan/ubuntu-bun-node:latest` ~ 166.02 MiB
+# Full-stack Bun + Node.js
+docker pull ghcr.io/iamvikshan/devcontainers/bun-node:latest
+
+# Ubuntu-based variants
+docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest
+docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest
+```
+
+> **Alternative Sources:** All images are also available on
+> [GitLab Container Registry](https://gitlab.com/vikshan/devcontainers/container_registry) and
+> [Docker Hub](https://hub.docker.com/u/vikshan)
 
 ## Usage
 
-You can use any image you like from the above list. They are all largely the same, but for this
-example, we will use the `bun` image from `ghcr`.
+### DevContainer Configuration
 
-### Option 1: Reference from GitHub
-
-Add this to your `.devcontainer/devcontainer.json`:
+Add your chosen image to `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "image": "ghcr.io/iamvikshan/devcontainers/bun:latest"
+  "name": "My Bun Project",
+  "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
+  "customizations": {
+    "vscode": {
+      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"]
+    }
+  },
+  "postCreateCommand": "bun install"
 }
 ```
 
-### Option 2: Copy Configuration
+### Docker Run
 
-1. Copy the desired configuration from the [`base`](./base/) directory to your project.
-2. Modify as needed for your specific requirements.
+```bash
+# Interactive development
+docker run -it --rm \
+  -v $(pwd):/workspace \
+  -w /workspace \
+  ghcr.io/iamvikshan/devcontainers/bun:latest \
+  bash
 
-### Option 3: Extend Configuration
+# Run commands directly
+docker run --rm \
+  -v $(pwd):/workspace \
+  -w /workspace \
+  ghcr.io/iamvikshan/devcontainers/bun:latest \
+  bun install
+```
 
-```json
-{
-  "name": "My Custom Environment",
-  "build": {
-    "dockerfile": "./Dockerfile"
-  },
-  "extends": "ghcr.io/iamvikshan/devcontainers/bun:latest"
-}
+### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  dev:
+    image: ghcr.io/iamvikshan/devcontainers/bun:latest
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: sleep infinity
 ```
 
 ## 📚 Documentation
@@ -74,77 +108,77 @@ For comprehensive setup instructions and detailed information:
 - **[Setup Guide](docs/SETUP.md)** - Complete setup instructions for all images
 - **[Image Variants](docs/IMAGE_VARIANTS.md)** - Detailed comparison and use cases
 - **[Build Commands](docs/BUILD_COMMANDS.md)** - Building and testing images locally
-- **[Optimization Guide](docs/OPTIMIZATION_GUIDE.md)** - Performance optimization tips
-- **[Sync Architecture](docs/SYNC_ARCHITECTURE.md)** - GitHub ↔ GitLab synchronization
-- **[Script Optimization](docs/SCRIPT_OPTIMIZATION.md)** - Optimized scripts and architecture
-- **[Version Management](docs/VERSION_MANAGEMENT.md)** - Automated version and size tracking
 - **[Current Versions](VERSIONS.md)** - Latest versions, sizes, and changelogs
 
-## Development
+## Image Details
 
-### Building Images Locally
+### What's Included
 
-The `.devcontainer` of this codespace includes Docker-in-Docker for building and testing images,
-else install docker locally:
+All images include:
 
-```bash
-# Build all images with comprehensive testing
-npm run build-all
+- **Git** - Version control
+- **SSH client** - Secure connections
+- **curl** - HTTP requests
+- **Basic development utilities**
 
-# Build individual images
-npm run build-bun
-npm run build-bun-node
-npm run build-ubuntu-bun
-npm run build-ubuntu-bun-node
+#### Alpine-based Images (`bun`, `bun-node`)
 
-# Manual Docker commands
-docker build -f base/bun/.devcontainer/Dockerfile -t devcontainers/bun:test base/bun/.devcontainer
-```
+- **Bun** 1.2.19 - Fast JavaScript runtime
+- **Node.js** v24.5.0 _(bun-node only)_
+- **npm** 11.5.1 _(bun-node only)_
+- **ESLint** _(bun-node only)_
 
-See [`docs/BUILD_COMMANDS.md`](docs/BUILD_COMMANDS.md) for complete build and testing instructions.
+#### Ubuntu-based Images (`ubuntu-bun`, `ubuntu-bun-node`)
 
-### Publishing Updates
+- **Bun** 1.2.19 - Installed via script
+- **Node.js** v24.5.0 _(ubuntu-bun-node only)_
+- **npm** 11.5.1 _(ubuntu-bun-node only)_
+- **sudo** - Administrative access
+- **Ubuntu package manager** (apt)
 
-1. Make changes to the configuration
-2. Create a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
-3. Once merged, GitHub Actions will build and publish the updated image
+### Building Locally
+
+Want to build or customize these images? See [`docs/BUILD_COMMANDS.md`](docs/BUILD_COMMANDS.md) for
+complete instructions.
 
 ## Automated Updates
 
 This repository includes automated systems to keep the devcontainers up to date:
 
-### 🔄 Weekly Releases
+### 🔄 Smart Release System
 
-- **Automatic releases** run every Sunday at 2 AM UTC
-- Rebuilds all containers with the latest base images
-- Updates documentation with current image sizes
+- **Independent container versioning** - each container has its own semantic version
+- **Semantic commit analysis** - automatic version bumping based on conventional commits
+- **Push-triggered releases** - releases created when changes are pushed to main
+- **Weekly scheduled releases** - every Sunday at 2 AM UTC for base image updates
 
 ### 🔍 Base Image Monitoring
 
-- **Daily checks** for updates to base images (`oven/bun`, `ubuntu`)
-- Automatically creates issues when updates are detected
-- Triggers releases when base images are updated
+- **Weekly checks** for updates to base images (`oven/bun`, `ubuntu`)
+- **Granular rebuilds** - only affected containers are rebuilt
+- **Automatic issue creation** when builds fail
+- **Tool version extraction** during build process
 
-### 📦 Dependency Management
+### 📦 Multi-Registry Support
 
-- **Dependabot** monitors Docker base images weekly
-- **npm dependencies** checked daily
+- **GitHub Container Registry** (ghcr.io) - primary registry
+- **GitLab Container Registry** (registry.gitlab.com) - mirror
+- **Docker Hub** (docker.io) - public access
 - **GitHub Actions** updated daily
 
-### Manual Checks
+### Image Management
 
-You can manually check for base image updates and analyze image sizes:
+Monitor and manage the images:
 
 ```bash
 # Check for base image updates
 bun run check-updates
 
-# Analyze image sizes and detect bloat
+# Analyze image sizes across all registries
 bun run analyze-sizes
 
 # Update documentation with current sizes
 bun run sync-sizes
-# or bun run s
 ```
 
 ## Contributing

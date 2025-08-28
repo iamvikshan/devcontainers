@@ -1,7 +1,7 @@
 import { execSync } from 'child_process'
 import { writeFileSync } from 'fs'
-import { checkForUpdates, getBaseImageCommitInfo } from './check-base-images'
-import { imageOperations } from './image-operations'
+import { checkForUpdates, getBaseImageCommitInfo } from './checkImages'
+import { imageOperations } from './imageOperations'
 
 interface PreReleaseCheckResult {
   shouldRelease: boolean

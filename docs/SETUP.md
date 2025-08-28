@@ -247,6 +247,5 @@ Check the [versions file](../VERSIONS.md) for current versions and changelog.
 
 - [Build Commands](BUILD_COMMANDS.md) - Building images locally
 - [Image Variants](IMAGE_VARIANTS.md) - Detailed image descriptions
-- [Optimization Guide](OPTIMIZATION_GUIDE.md) - Performance optimization
 - [GitHub Repository](https://github.com/iamvikshan/devcontainers)
 - [GitLab Repository](https://gitlab.com/vikshan/devcontainers)

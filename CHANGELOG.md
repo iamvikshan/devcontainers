@@ -1,22 +1,20 @@
 # [v1.1.4](https://github.com/iamvikshan/devcontainers/compare/v1.1.3...v1.1.4) (2025-08-27)
 
-
-
 ## [1.1.4](https://github.com/iamvikshan/devcontainers/compare/v1.1.3...v1.1.4) (2025-08-27)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node ([f19798f](https://github.com/iamvikshan/devcontainers/commit/f19798f5d05e6e0598dc815ab0fec2b6f9184cd6))
+- update base images for bun, bun-node
+  ([f19798f](https://github.com/iamvikshan/devcontainers/commit/f19798f5d05e6e0598dc815ab0fec2b6f9184cd6))
 
 # [v1.1.3](https://github.com/iamvikshan/devcontainers/compare/v1.1.2...v1.1.3) (2025-08-26)
-
-
 
 ## [1.1.3](https://github.com/iamvikshan/devcontainers/compare/v1.1.2...v1.1.3) (2025-08-26)
 
 ### Bug Fixes
 
-* update base images for bun, bun-node ([55537b6](https://github.com/iamvikshan/devcontainers/commit/55537b6fac2452ae47ba98432f27529e0f40bf7c))
+- update base images for bun, bun-node
+  ([55537b6](https://github.com/iamvikshan/devcontainers/commit/55537b6fac2452ae47ba98432f27529e0f40bf7c))
 
 # [v1.1.2](https://github.com/iamvikshan/devcontainers/compare/v1.1.1...v1.1.2) (2025-08-21)
 

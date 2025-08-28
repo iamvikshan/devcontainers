@@ -35,6 +35,15 @@ RUN if [ "${USERNAME}" != "root" ]; then \
 # Ensure necessary directories have the correct permissions
 RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var/lib/apt/lists
 
+# Extract tool versions during build
+RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && \
+    echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /usr/local/share/tool-versions.txt && \
+    echo "base_image=oven/bun:${VARIANT}" >> /usr/local/share/tool-versions.txt && \
+    echo "bun_version=$(bun --version)" >> /usr/local/share/tool-versions.txt && \
+    echo "debian_version=$(cat /etc/debian_version)" >> /usr/local/share/tool-versions.txt && \
+    echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
+    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
+
 # Copy the setup script and make it executable
 COPY setup.sh /usr/local/bin/setup.sh
 RUN chmod +x /usr/local/bin/setup.sh

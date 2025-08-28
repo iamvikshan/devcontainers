@@ -2,7 +2,7 @@ import {
   registryClient,
   IMAGE_DEFINITIONS,
   RegistryClient
-} from './registry-client'
+} from './registryClient'
 import { readFileSync, writeFileSync } from 'fs'
 
 export interface ImageSizeInfo {
@@ -144,7 +144,7 @@ export class ImageOperations {
           )
         }
       } catch (error) {
-        this.logError(`Error checking ${containerName}:`, error.message)
+        this.logError(`Error checking ${containerName}: ${error.message}`)
       }
     }
 
@@ -165,6 +165,7 @@ export class ImageOperations {
 
     const readmeFiles = [
       'README.md',
+      'docs/IMAGE_VARIANTS.md',
       'base/bun/README.md',
       'base/bun-node/README.md',
       'base/ubuntu/README.md'
@@ -175,7 +176,7 @@ export class ImageOperations {
         await this.updateSingleReadme(readmePath, sizeMap)
         this.log(`✅ Updated ${readmePath}`)
       } catch (error) {
-        this.logError(`❌ Error updating ${readmePath}:`, error.message)
+        this.logError(`❌ Error updating ${readmePath}: ${error.message}`)
       }
     }
   }
@@ -187,37 +188,95 @@ export class ImageOperations {
     const content = readFileSync(readmePath, 'utf8')
     let updatedContent = content
 
-    // Update patterns for different registries
-    const patterns = {
-      ghcr: /`ghcr\.io\/[^`]+:latest`.*?~\s*\d+(?:\.\d+)?\s*MiB/g,
-      gitlab:
-        /`registry\.gitlab\.com\/[^`]+:latest`.*?~\s*\d+(?:\.\d+)?\s*MiB/g,
-      dockerhub: /`docker\.io\/[^`]+:latest`.*?~\s*\d+(?:\.\d+)?\s*MiB/g
-    }
+    // Handle main README.md with new table format
+    if (readmePath === 'README.md') {
+      // Update the image comparison table
+      const tablePattern = /(\| \*\*[^*]+\*\* +\| ~)\d+( MB)/g
 
-    // Update each pattern
-    Object.entries(patterns).forEach(([registry, pattern]) => {
-      updatedContent = updatedContent.replace(pattern, match => {
-        // Extract image name from the match
-        const imageNameMatch = match.match(/([^\/]+):latest/)
-        if (!imageNameMatch) return match
+      updatedContent = updatedContent.replace(
+        tablePattern,
+        (match, prefix, suffix) => {
+          // Extract image name from the table row
+          const imageMatch = match.match(/\*\*([^*]+)\*\*/)
+          if (!imageMatch) return match
 
-        const imageName = imageNameMatch[1]
-        const registryMap = sizeMap.get(imageName)
-        if (!registryMap) return match
+          const imageName = imageMatch[1]
+          const registryMap = sizeMap.get(imageName)
+          if (!registryMap) return match
 
-        let registryKey = registry
-        if (registry === 'dockerhub') registryKey = 'docker.io'
-        if (registry === 'gitlab') registryKey = 'registry.gitlab.com'
-        if (registry === 'ghcr') registryKey = 'ghcr.io'
+          // Use GitHub Container Registry size as primary
+          const size = registryMap.get('ghcr.io')
+          if (!size) return match
 
-        const size = registryMap.get(registryKey)
-        if (!size) return match
+          const sizeInMB = Math.round(size / (1024 * 1024))
+          return `${prefix}${sizeInMB}${suffix}`
+        }
+      )
+    } else if (readmePath === 'docs/IMAGE_VARIANTS.md') {
+      // Update IMAGE_VARIANTS.md with new format
+      // Update the comparison table
+      const tablePattern = /(\| \*\*Size\*\* +\| ~)\d+( MB)/g
+      updatedContent = updatedContent.replace(
+        tablePattern,
+        (match, prefix, suffix) => {
+          // This updates the "Size" column in the comparison table
+          const rowMatch = updatedContent.match(
+            new RegExp(`\\| \\*\\*([^*]+)\\*\\* +\\| ~\\d+ MB`, 'g')
+          )
+          // For IMAGE_VARIANTS, we need to update each row individually
+          return match // Keep original for now, will be updated by individual image sections
+        }
+      )
 
-        const sizeInMB = RegistryClient.formatSize(size)
-        return match.replace(/~\s*\d+(?:\.\d+)?\s*MiB/, `~ ${sizeInMB} MiB`)
+      // Update individual image section headers with sizes
+      const imageSectionPattern = /### \d+\. ([^(]+) \(~\d+ MB\)/g
+      updatedContent = updatedContent.replace(
+        imageSectionPattern,
+        (match, imageName) => {
+          const cleanImageName = imageName.trim()
+          const registryMap = sizeMap.get(cleanImageName)
+          if (!registryMap) return match
+
+          const size = registryMap.get('ghcr.io')
+          if (!size) return match
+
+          const sizeInMB = Math.round(size / (1024 * 1024))
+          return match.replace(/~\d+ MB/, `~${sizeInMB} MB`)
+        }
+      )
+    } else {
+      // Handle individual README files with old format (if any exist)
+      const patterns = {
+        ghcr: /`ghcr\.io\/[^`]+:latest`.*?~\s*\d+(?:\.\d+)?\s*MiB/g,
+        gitlab:
+          /`registry\.gitlab\.com\/[^`]+:latest`.*?~\s*\d+(?:\.\d+)?\s*MiB/g,
+        dockerhub: /`docker\.io\/[^`]+:latest`.*?~\s*\d+(?:\.\d+)?\s*MiB/g
+      }
+
+      // Update each pattern
+      Object.entries(patterns).forEach(([registry, pattern]) => {
+        updatedContent = updatedContent.replace(pattern, match => {
+          // Extract image name from the match
+          const imageNameMatch = match.match(/([^\/]+):latest/)
+          if (!imageNameMatch) return match
+
+          const imageName = imageNameMatch[1]
+          const registryMap = sizeMap.get(imageName)
+          if (!registryMap) return match
+
+          let registryKey = registry
+          if (registry === 'dockerhub') registryKey = 'docker.io'
+          if (registry === 'gitlab') registryKey = 'registry.gitlab.com'
+          if (registry === 'ghcr') registryKey = 'ghcr.io'
+
+          const size = registryMap.get(registryKey)
+          if (!size) return match
+
+          const sizeInMB = RegistryClient.formatSize(size)
+          return match.replace(/~\s*\d+(?:\.\d+)?\s*MiB/, `~ ${sizeInMB} MiB`)
+        })
       })
-    })
+    }
 
     writeFileSync(readmePath, updatedContent)
   }
@@ -299,3 +358,39 @@ export class ImageOperations {
 
 // Export singleton instance
 export const imageOperations = ImageOperations.getInstance()
+
+// CLI functionality
+async function main() {
+  const args = process.argv.slice(2)
+
+  if (args.includes('--analyze') || args.includes('--analyze-sizes')) {
+    console.log('🔍 Starting comprehensive image size analysis...\n')
+    try {
+      await imageOperations.analyzeImageSizes()
+    } catch (error) {
+      console.error('❌ Error analyzing image sizes:', error.message)
+      process.exit(1)
+    }
+  } else if (args.includes('--sync-sizes')) {
+    console.log('🔄 Syncing README sizes...\n')
+    try {
+      const sizes = await imageOperations.getAllImageSizes()
+      await imageOperations.updateReadmeFiles(sizes)
+      console.log('✅ README sizes synced successfully!')
+    } catch (error) {
+      console.error('❌ Error syncing sizes:', error.message)
+      process.exit(1)
+    }
+  } else {
+    console.log('Usage:')
+    console.log(
+      '  --analyze, --analyze-sizes  Analyze image sizes across registries'
+    )
+    console.log('  --sync-sizes               Sync sizes in README files')
+  }
+}
+
+// Run CLI if called directly
+if (require.main === module) {
+  main().catch(console.error)
+}

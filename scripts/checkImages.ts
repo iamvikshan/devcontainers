@@ -1,4 +1,4 @@
-import { imageOperations } from './image-operations'
+import { imageOperations } from './imageOperations'
 
 interface BaseImageCommitInfo {
   containerName: string

@@ -1,53 +1,66 @@
 # DevContainer Image Variants
 
-This document provides detailed information about all available devcontainer images.
+This document provides detailed information about all available devcontainer images, focusing on
+their characteristics and use cases.
 
 ## 📊 Image Comparison
 
 | Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- |
-| **Base Image**  | oven/bun:latest   | oven/bun:latest        | ubuntu:latest    | ubuntu:latest     |
+| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     |
+| **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           |
 | **Bun Version** | 1.2.19            | 1.2.19                 | 1.2.19           | 1.2.19            |
 | **Node.js**     | ❌                | ✅ v24.5.0             | ❌               | ✅ v24.5.0        |
 | **npm**         | ❌                | ✅ 11.5.1              | ❌               | ✅ 11.5.1         |
-| **Git**         | ✅                | ✅                     | ✅               | ✅                |
-| **Size (GHCR)** | ~133 MB           | ~239 MB                | ~131 MB          | ~201 MB           |
-| **Layers**      | 27                | 27                     | 20               | 22                |
-| **Best For**    | Bun-only projects | Full-stack development | Ubuntu-based Bun | Ubuntu full-stack |
+| **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      |
+| **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack |
+
+## 🎯 Image Selection Guide
+
+### By Use Case
+
+- **Pure Bun Development** → `bun` or `ubuntu-bun`
+- **Full-Stack Projects** → `bun-node` or `ubuntu-bun-node`
+- **Need Ubuntu Packages** → `ubuntu-bun` or `ubuntu-bun-node`
+- **Smallest Size** → `ubuntu-bun` (94 MB)
+- **Most Features** → `bun-node` (227 MB)
 
 ## 🐳 Image Details
 
-### 1. bun
+### 1. bun (~133 MB)
 
-**Registry Paths:**
+**Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun:latest`
 
-- `ghcr.io/iamvikshan/devcontainers/bun:latest`
-- `registry.gitlab.com/vikshan/devcontainers/bun:latest`
-- `docker.io/vikshan/bun:latest`
+**Description:** Lightweight Bun development environment based on the official Alpine-based Bun
+image. Perfect for pure Bun projects that don't require Node.js compatibility.
 
-**Description:** Lightweight Bun development environment based on the official Bun image. Perfect
-for Bun-only projects that don't require Node.js compatibility.
+**Key Features:**
+
+- ⚡ **Fastest startup** - Minimal Alpine base
+- 🔧 **Bun 1.2.19** - Latest Bun runtime
+- 📦 **Alpine packages** - Access to apk package manager
+- 🚀 **Performance optimized** - Smallest footprint for Bun
 
 **Included Tools:**
 
 - Bun 1.2.19
-- Git
-- SSH client
-- curl
+- Git, SSH client, curl
+- Alpine package manager (apk)
 - Basic development utilities
 
-**Use Cases:**
+**Perfect For:**
 
 - Pure Bun applications
 - Bun package development
 - Lightweight scripting
 - Performance-critical applications
+- CI/CD pipelines
 
-**Example devcontainer.json:**
+**Example Configuration:**
 
 ```json
 {
-  "name": "Bun Project",
+  "name": "Pure Bun Project",
   "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
   "customizations": {
     "vscode": {
@@ -58,16 +71,19 @@ for Bun-only projects that don't require Node.js compatibility.
 }
 ```
 
-### 2. bun-node
+### 2. bun-node (~227 MB)
 
-**Registry Paths:**
-
-- `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
-- `registry.gitlab.com/vikshan/devcontainers/bun-node:latest`
-- `docker.io/vikshan/bun-node:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
 
 **Description:** Full-featured development environment with both Bun and Node.js. Ideal for projects
 that need Bun's performance with Node.js ecosystem compatibility.
+
+**Key Features:**
+
+- 🚀 **Best of both worlds** - Bun speed + Node.js compatibility
+- 📦 **Full npm ecosystem** - Access to all npm packages
+- 🔧 **Latest runtimes** - Bun 1.2.19 + Node.js v24.5.0
+- 🛠️ **Development tools** - ESLint pre-installed
 
 **Included Tools:**
 
@@ -75,22 +91,22 @@ that need Bun's performance with Node.js ecosystem compatibility.
 - Node.js v24.5.0
 - npm 11.5.1
 - ESLint (global)
-- Git
-- SSH client
-- curl
+- Git, SSH client, curl
+- Alpine package manager (apk)
 
-**Use Cases:**
+**Perfect For:**
 
 - Full-stack applications
 - Migration from Node.js to Bun
 - Projects requiring Node.js compatibility
 - Complex web applications
+- Teams using both Bun and Node.js
 
-**Example devcontainer.json:**
+**Example Configuration:**
 
 ```json
 {
-  "name": "Bun + Node.js Project",
+  "name": "Full-Stack Project",
   "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
   "customizations": {
     "vscode": {
@@ -101,37 +117,41 @@ that need Bun's performance with Node.js ecosystem compatibility.
 }
 ```
 
-### 3. ubuntu-bun
+### 3. ubuntu-bun (~94 MB)
 
-**Registry Paths:**
-
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest`
-- `docker.io/vikshan/ubuntu-bun:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
 
 **Description:** Ubuntu-based Bun environment for developers who prefer Ubuntu's package ecosystem
-and tooling. More familiar environment for Ubuntu users.
+and tooling. The smallest image in our collection!
+
+**Key Features:**
+
+- 🏆 **Smallest size** - Only 94 MB!
+- 🐧 **Ubuntu familiarity** - Standard Ubuntu environment
+- 📦 **Ubuntu packages** - Full access to apt repositories
+- 🔐 **sudo access** - Administrative privileges
 
 **Included Tools:**
 
 - Bun 1.2.19 (installed via script)
-- Git
-- sudo
-- curl, unzip
+- Git, SSH client, curl, unzip
+- sudo (administrative access)
 - Ubuntu package manager (apt)
+- Basic development utilities
 
-**Use Cases:**
+**Perfect For:**
 
 - Ubuntu-familiar developers
 - Projects requiring Ubuntu-specific packages
 - System administration scripts
 - Custom toolchain requirements
+- Size-conscious deployments
 
-**Example devcontainer.json:**
+**Example Configuration:**
 
 ```json
 {
-  "name": "Ubuntu + Bun Project",
+  "name": "Ubuntu Bun Project",
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest",
   "customizations": {
     "vscode": {
@@ -142,40 +162,43 @@ and tooling. More familiar environment for Ubuntu users.
 }
 ```
 
-### 4. ubuntu-bun-node
+### 4. ubuntu-bun-node (~166 MB)
 
-**Registry Paths:**
-
-- `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
-- `registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest`
-- `docker.io/vikshan/ubuntu-bun-node:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
 
 **Description:** Complete Ubuntu-based development environment with Bun, Node.js, and npm. Best of
 both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
+
+**Key Features:**
+
+- 🌟 **Complete solution** - Ubuntu + Bun + Node.js
+- 🔧 **Full toolchain** - Everything for full-stack development
+- 📦 **Ubuntu ecosystem** - Access to vast apt repositories
+- ⚖️ **Balanced size** - Feature-rich at only 166 MB
 
 **Included Tools:**
 
 - Bun 1.2.19 (installed via script)
 - Node.js v24.5.0
 - npm 11.5.1
-- ESLint (global, if non-root user)
-- Git
-- sudo
-- curl, unzip
+- ESLint (global)
+- Git, SSH client, curl, unzip
+- sudo (administrative access)
 - Ubuntu package manager (apt)
 
-**Use Cases:**
+**Perfect For:**
 
 - Full-stack development on Ubuntu
 - Complex projects with system dependencies
 - CI/CD pipelines requiring Ubuntu
 - Development teams using Ubuntu
+- Enterprise environments
 
-**Example devcontainer.json:**
+**Example Configuration:**
 
 ```json
 {
-  "name": "Ubuntu + Bun + Node.js Project",
+  "name": "Ubuntu Full-Stack Project",
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
   "customizations": {
     "vscode": {
@@ -219,6 +242,32 @@ Do you need Node.js compatibility?
 | **Ubuntu packages** | ❌         | ❌       | ✅         | ✅              |
 | **Alpine packages** | ✅         | ✅       | ❌         | ❌              |
 
+## 📦 Alternative Sources
+
+While we recommend using GitHub Container Registry as the primary source, all images are available
+from multiple registries:
+
+### GitHub Container Registry (Primary)
+
+```bash
+ghcr.io/iamvikshan/devcontainers/[image]:latest
+```
+
+### GitLab Container Registry
+
+```bash
+registry.gitlab.com/vikshan/devcontainers/[image]:latest
+```
+
+### Docker Hub
+
+```bash
+docker.io/vikshan/[image]:latest
+```
+
+> **Note:** All registries contain identical images. Choose based on your preference or
+> organizational requirements.
+
 ## 🔄 Update Schedule
 
 All images are automatically updated:
@@ -244,4 +293,5 @@ To contribute improvements to any image:
 
 - **Issues**: [GitHub Issues](https://github.com/iamvikshan/devcontainers/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/iamvikshan/devcontainers/discussions)
-- **Documentation**: [Setup Guide](SETUP.md)
+- **Setup Guide**: [SETUP.md](SETUP.md)
+- **Build Guide**: [BUILD_COMMANDS.md](BUILD_COMMANDS.md)
