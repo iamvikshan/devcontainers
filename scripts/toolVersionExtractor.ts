@@ -33,12 +33,17 @@ export class ToolVersionExtractor {
     imageName: string,
     tag: string = 'latest'
   ): Promise<ToolVersions> {
-    this.log(`🔍 Extracting tool versions from ${imageName}:${tag}...`)
+    // Clean the tag to remove any 'v' prefix if present
+    const cleanTag = tag.startsWith('v') ? tag.slice(1) : tag
+    const fullImageName =
+      tag === 'latest' ? `${imageName}:${tag}` : `${imageName}:${tag}`
+
+    this.log(`🔍 Extracting tool versions from ${fullImageName}...`)
 
     try {
       // Try to extract from the tool-versions.txt file first
       const toolVersionsOutput = execSync(
-        `docker run --rm ${imageName}:${tag} cat /usr/local/share/tool-versions.txt 2>/dev/null || echo "not_found"`,
+        `docker run --rm ${fullImageName} cat /usr/local/share/tool-versions.txt 2>/dev/null || echo "not_found"`,
         { encoding: 'utf-8' }
       ).trim()
 
@@ -48,12 +53,12 @@ export class ToolVersionExtractor {
 
       // Fallback: extract versions manually
       this.log(
-        `⚠️  tool-versions.txt not found in ${imageName}:${tag}, extracting manually...`
+        `⚠️  tool-versions.txt not found in ${fullImageName}, extracting manually...`
       )
       return await this.extractManually(imageName, tag)
     } catch (error) {
       this.log(
-        `❌ Error extracting tool versions from ${imageName}:${tag}: ${error.message}`
+        `❌ Error extracting tool versions from ${fullImageName}: ${error.message}`
       )
       return {}
     }
@@ -82,6 +87,8 @@ export class ToolVersionExtractor {
     tag: string
   ): Promise<ToolVersions> {
     const versions: ToolVersions = {}
+    const fullImageName =
+      tag === 'latest' ? `${imageName}:${tag}` : `${imageName}:${tag}`
 
     try {
       // Extract common tool versions
@@ -102,7 +109,7 @@ export class ToolVersionExtractor {
       for (const [key, command] of Object.entries(commands)) {
         try {
           const result = execSync(
-            `docker run --rm ${imageName}:${tag} bash -c "${command}"`,
+            `docker run --rm ${fullImageName} bash -c "${command}"`,
             { encoding: 'utf-8' }
           ).trim()
 
@@ -131,14 +138,18 @@ export class ToolVersionExtractor {
   // Extract tool versions from all containers in a registry
   async extractFromRegistry(
     registry: 'ghcr' | 'gitlab' | 'dockerhub',
-    version: string = 'latest'
+    version: string = 'latest',
+    containerFilter?: string[]
   ): Promise<ContainerToolVersions[]> {
     this.log(`🔍 Extracting tool versions from ${registry} registry...`)
 
     const results: ContainerToolVersions[] = []
     const registryUrl = this.getRegistryUrl(registry)
 
-    for (const containerName of IMAGE_DEFINITIONS.names) {
+    // Use provided container filter or default to all containers
+    const containersToProcess = containerFilter || IMAGE_DEFINITIONS.names
+
+    for (const containerName of containersToProcess) {
       try {
         const imageName = this.getImageName(registry, containerName)
         const versions = await this.extractFromImage(imageName, version)
@@ -254,8 +265,15 @@ export class ToolVersionExtractor {
 
     for (const containerName of containers) {
       try {
-        // Try different possible local image names
+        // Try different possible local image names based on common CI patterns
         const possibleNames = [
+          // GitHub Container Registry format (most likely in CI)
+          `ghcr.io/iamvikshan/devcontainers/${containerName}:${tag}`,
+          // GitLab registry format
+          `registry.gitlab.com/vikshan/devcontainers/${containerName}:${tag}`,
+          // Docker Hub format
+          `vikshan/${containerName}:${tag}`,
+          // Simple local names
           `devcontainers/${containerName}:${tag}`,
           `${containerName}:${tag}`,
           `devcontainer-${containerName}:${tag}`
@@ -263,13 +281,15 @@ export class ToolVersionExtractor {
 
         let versions: ToolVersions = {}
         let foundImage = false
+        let imageName = ''
 
-        for (const imageName of possibleNames) {
+        for (const possibleName of possibleNames) {
           try {
             // Check if image exists
-            execSync(`docker image inspect ${imageName}`, { stdio: 'pipe' })
-            versions = await this.extractFromImage(imageName, tag)
+            execSync(`docker image inspect ${possibleName}`, { stdio: 'pipe' })
+            versions = await this.extractFromImage(possibleName, tag)
             foundImage = true
+            imageName = possibleName
             this.log(`✅ Found and extracted from ${imageName}`)
             break
           } catch {
@@ -287,8 +307,9 @@ export class ToolVersionExtractor {
           })
         } else {
           this.log(
-            `⚠️  Could not find or extract from ${containerName} locally`
+            `⚠️  Could not find or extract from ${containerName} locally with tag ${tag}`
           )
+          this.log(`📋 Tried these image names: ${possibleNames.join(', ')}`)
         }
       } catch (error) {
         this.log(`❌ Error extracting from ${containerName}: ${error.message}`)
@@ -335,11 +356,12 @@ async function main() {
     } else if (registry) {
       results = await toolVersionExtractor.extractFromRegistry(
         registry,
-        version
+        version,
+        containers // Pass containers filter for registry extraction too
       )
     } else {
       console.error(
-        'Usage: bun scripts/toolVersionExtractor.ts --registry=ghcr|gitlab|dockerhub [--version=latest] [--output=path] [--silent]'
+        'Usage: bun scripts/toolVersionExtractor.ts --registry=ghcr|gitlab|dockerhub [--containers=bun,bun-node] [--version=latest] [--output=path] [--silent]'
       )
       console.error(
         '   or: bun scripts/toolVersionExtractor.ts --local --containers=bun,bun-node [--version=latest] [--output=path] [--silent]'

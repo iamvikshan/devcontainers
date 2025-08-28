@@ -313,6 +313,7 @@ async function main() {
   }
 
   try {
+    // Normal release analysis mode
     const result = await releaseOrchestrator.executeRelease(trigger)
 
     if (workflowMode) {

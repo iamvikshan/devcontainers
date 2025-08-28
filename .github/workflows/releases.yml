@@ -2,9 +2,12 @@ name: Release DevContainers
 
 on:
   workflow_dispatch:
-  schedule:
-    # Run every Sunday at 2 AM UTC
-    - cron: "0 2 * * 0"
+    inputs:
+      trigger_reason:
+        description: "Reason for manual trigger"
+        required: false
+        default: "Manual release trigger"
+        type: string
   push:
     branches: [main]
 
@@ -89,8 +92,8 @@ jobs:
           echo "📝 Creating base image update commit..."
 
           # Configure git
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
 
           # Create commit for base image updates if needed
           if echo "${{ steps.release_analysis.outputs.version_map }}" | jq -e '. | length > 0' > /dev/null; then
@@ -216,9 +219,16 @@ jobs:
 
           echo "🔍 Extracting tool versions from built containers..."
 
-          # Extract tool versions from the newly built containers
+          # Extract tool versions from the newly built containers using registry images
           if [ "$AFFECTED_CONTAINERS" != "" ]; then
-            bun scripts/toolVersionExtractor.ts --local --containers="$AFFECTED_CONTAINERS" --version="latest" --output="tool-versions.json" --silent
+            # Use the actual version from version map for the first container to determine the tag
+            FIRST_CONTAINER=$(echo "$AFFECTED_CONTAINERS" | cut -d',' -f1 | xargs)
+            VERSION_TAG=$(echo "$VERSION_MAP" | jq -r ".[\"$FIRST_CONTAINER\"] // \"latest\"")
+            
+            echo "📋 Using version tag: v$VERSION_TAG"
+            echo "🔍 Extracting from GitHub Container Registry images..."
+            
+            bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="$AFFECTED_CONTAINERS" --version="v$VERSION_TAG" --output="tool-versions.json" --silent
           fi
 
       - name: Update documentation with real-time data
@@ -237,24 +247,74 @@ jobs:
           echo "📋 Staging documentation files..."
           git add VERSIONS.md README.md base/*/README.md CHANGELOG.md container-versions.json tool-versions.json || true
 
-      - name: Create GitHub Release
+      - name: Commit documentation changes
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
           RELEASE_TYPE: ${{ steps.release_analysis.outputs.release_type }}
         run: |
-          echo "🚀 Creating GitHub release..."
+          echo "📝 Committing documentation changes..."
 
           # Configure git
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
 
-          # Create release using our custom orchestrator
-          bun scripts/releaseOrchestrator.ts --trigger="${{ github.event_name == 'schedule' && 'schedule' || github.event_name == 'workflow_dispatch' && 'manual' || 'push' }}" --create-release
+          # Check if there are any changes to commit
+          if git diff --staged --quiet; then
+            echo "ℹ️  No documentation changes to commit"
+          else
+            # Get the highest version for the commit message
+            HIGHEST_VERSION=$(echo "$VERSION_MAP" | jq -r 'to_entries | max_by(.value | split(".") | map(tonumber)) | .value')
+            
+            # Commit the documentation changes
+            git commit -m "docs: update documentation for release v$HIGHEST_VERSION" \
+                      -m "- Updated VERSIONS.md with new container versions" \
+                      -m "- Updated README files with latest image sizes" \
+                      -m "- Updated CHANGELOG.md with release notes" \
+                      -m "- Updated tool version information"
+            
+            echo "✅ Documentation changes committed"
+            
+            # Push the documentation commit
+            git push origin main
+            echo "✅ Documentation changes pushed to main branch"
+          fi
+
+      - name: Create Git Tag
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
+          RELEASE_TYPE: ${{ steps.release_analysis.outputs.release_type }}
+        run: |
+          echo "🏷️  Creating git tag for Docker image release..."
+
+          # Configure git
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
+
+          # Get the highest version for the tag
+          HIGHEST_VERSION=$(echo "$VERSION_MAP" | jq -r 'to_entries | max_by(.value | split(".") | map(tonumber)) | .value')
+          TAG_NAME="v$HIGHEST_VERSION"
+
+          echo "📋 Creating tag: $TAG_NAME"
+
+          # Create annotated tag with release information
+          AFFECTED_CONTAINERS=$(echo "$VERSION_MAP" | jq -r 'keys | join(", ")')
+          git tag -a "$TAG_NAME" -m "Docker Images Release $TAG_NAME" \
+                                 -m "Released containers: $AFFECTED_CONTAINERS" \
+                                 -m "Release type: $RELEASE_TYPE" \
+                                 -m "Build date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          # Push the tag
+          git push origin "$TAG_NAME"
+
+          echo "✅ Git tag $TAG_NAME created and pushed"
+          echo "🐳 Docker images are available in registries with version $TAG_NAME"
 
       - name: No release needed
         if: steps.release_analysis.outputs.release_needed != 'true'
         run: |
-          echo "ℹ️  No release needed - all images are up to date and no code changes require a release"
+          echo "ℹ️  No Docker image release needed - all images are up to date and no code changes require new image versions"
           echo "✅ Workflow completed successfully"

@@ -2,9 +2,15 @@ name: Check Base Images
 
 on:
   schedule:
-    # Run weekly on Sundays at 6 AM UTC
-    - cron: "0 6 * * 0"
+    # Run daily at 5 AM UTC to catch base image updates quickly
+    - cron: "0 5 * * *"
   workflow_dispatch:
+    inputs:
+      force_check:
+        description: "Force check even if no recent updates"
+        required: false
+        default: false
+        type: boolean
 
 env:
   GITHUB_REGISTRY: ghcr.io
@@ -17,6 +23,7 @@ jobs:
     permissions:
       contents: write
       packages: read
+      actions: write
 
     steps:
       - name: Checkout
@@ -34,129 +41,123 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          FORCE_CHECK: ${{ github.event.inputs.force_check }}
         run: |
           echo "🔍 Checking for base image updates..."
 
-          # Run the checkImages script and capture output
-          if bun run check-updates > update_check.log 2>&1; then
-            echo "✅ Base image check completed successfully"
-          else
-            echo "❌ Base image check failed"
-            cat update_check.log
-            exit 1
+          # Run comprehensive base image check
+          RESULT=$(bun scripts/checkImages.ts --comprehensive --output-json)
+          echo "📋 Base image check result: $RESULT"
+
+          # Parse the JSON result
+          HAS_UPDATES=$(echo "$RESULT" | jq -r '.hasUpdates')
+          AFFECTED_CONTAINERS=$(echo "$RESULT" | jq -r '.affectedContainers | join(",")')
+          UPDATE_COUNT=$(echo "$RESULT" | jq -r '.updateCount // 0')
+
+          # Override if force check is enabled
+          if [ "$FORCE_CHECK" = "true" ]; then
+            echo "⚠️  Force check enabled - treating as having updates"
+            HAS_UPDATES="true"
+            if [ "$AFFECTED_CONTAINERS" = "" ]; then
+              AFFECTED_CONTAINERS="bun,bun-node,ubuntu-bun,ubuntu-bun-node"
+            fi
           fi
 
-          # Check if updates were found
-          if grep -q "🚀 Updates found!" update_check.log; then
-            echo "has_updates=true" >> $GITHUB_OUTPUT
-            echo "📦 Base image updates detected!"
+          echo "has_updates=$HAS_UPDATES" >> $GITHUB_OUTPUT
+          echo "affected_containers=$AFFECTED_CONTAINERS" >> $GITHUB_OUTPUT
+          echo "update_count=$UPDATE_COUNT" >> $GITHUB_OUTPUT
+
+          if [ "$HAS_UPDATES" = "true" ]; then
+            echo "📦 Base image updates detected for: $AFFECTED_CONTAINERS"
+            echo "🔢 Total updates: $UPDATE_COUNT"
           else
-            echo "has_updates=false" >> $GITHUB_OUTPUT
             echo "✅ All base images are up to date"
           fi
 
-      - name: Generate update notes
+      - name: Update documentation
         if: steps.check_updates.outputs.has_updates == 'true'
-        id: generate_notes
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          AFFECTED_CONTAINERS: ${{ steps.check_updates.outputs.affected_containers }}
+          UPDATE_COUNT: ${{ steps.check_updates.outputs.update_count }}
         run: |
-          echo "📝 Generating detailed update notes..."
+          echo "📝 Updating documentation with base image changes..."
 
-          # Create a script to generate detailed update information
-          cat > generate_update_notes.ts << 'EOF'
-          import { imageOperations } from './scripts/imageOperations'
-          import { readFileSync, writeFileSync, existsSync } from 'fs'
+          # Generate detailed update notes using dedicated script
+          bun scripts/checkImages.ts --generate-update-notes --containers="$AFFECTED_CONTAINERS"
 
-          async function generateUpdateNotes() {
-            const updates = await imageOperations.checkBaseImageUpdates()
-            const hasUpdates = updates.some(u => u.hasUpdate)
-            
-            if (!hasUpdates) {
-              console.log('No updates found')
-              return
-            }
-            
-            const now = new Date()
-            const dateStr = now.toISOString().split('T')[0]
-            const timeStr = now.toISOString()
-            
-            // Read existing VERSIONS.md or create new one
-            let versionsContent = ''
-            if (existsSync('VERSIONS.md')) {
-              versionsContent = readFileSync('VERSIONS.md', 'utf-8')
-            } else {
-              versionsContent = `# DevContainer Versions\n\nThis file tracks base image updates and releases for our DevContainer configurations.\n\n## Latest Updates\n\n`
-            }
-            
-            // Generate update entry
-            const updatedImages = updates.filter(u => u.hasUpdate)
-            let updateEntry = `### ${dateStr} - Base Image Updates\n\n`
-            updateEntry += `**Updated at:** ${timeStr}\n\n`
-            updateEntry += `**Base images updated:**\n`
-            
-            for (const update of updatedImages) {
-              const lastUpdated = new Date(update.lastUpdated).toLocaleDateString()
-              updateEntry += `- **${update.containerName}**: \`${update.baseImage}\`\n`
-              updateEntry += `  - Base image last updated: ${lastUpdated}\n`
-              updateEntry += `  - Digest: \`${update.latestDigest}\`\n`
-            }
-            
-            updateEntry += `\n**Changes:**\n`
-            updateEntry += `- Updated base images to latest versions\n`
-            updateEntry += `- Security patches and bug fixes from upstream\n`
-            updateEntry += `- Improved compatibility and performance\n\n`
-            updateEntry += `**Impact:** Patch release - DevContainers will be rebuilt with updated base images\n\n`
-            updateEntry += `---\n\n`
-            
-            // Insert at the beginning of the Latest Updates section
-            const latestUpdatesIndex = versionsContent.indexOf('## Latest Updates')
-            if (latestUpdatesIndex !== -1) {
-              const insertIndex = versionsContent.indexOf('\n\n', latestUpdatesIndex) + 2
-              versionsContent = versionsContent.slice(0, insertIndex) + updateEntry + versionsContent.slice(insertIndex)
-            } else {
-              versionsContent += updateEntry
-            }
-            
-            writeFileSync('VERSIONS.md', versionsContent)
-            console.log('✅ VERSIONS.md updated with base image changes')
-            
-            // Also create a summary for the commit message
-            const summary = updatedImages.map(u => u.containerName).join(', ')
-            writeFileSync('update_summary.txt', summary)
-          }
-
-          generateUpdateNotes().catch(console.error)
-          EOF
-
-          # Run the update notes generator
-          bun run generate_update_notes.ts
+          echo "✅ Documentation updated with base image changes"
 
       - name: Commit base image updates
         if: steps.check_updates.outputs.has_updates == 'true'
+        env:
+          AFFECTED_CONTAINERS: ${{ steps.check_updates.outputs.affected_containers }}
         run: |
-          # Configure git
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          echo "📝 Committing base image updates..."
 
-          # Read the summary of updated images
-          UPDATED_IMAGES=$(cat update_summary.txt 2>/dev/null || echo "base images")
+          # Configure git with repository owner
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
 
-          # Add the updated VERSIONS.md file
-          git add VERSIONS.md
+          # Add updated documentation files
+          git add VERSIONS.md README.md base/*/README.md CHANGELOG.md || true
 
-          # Create commit with conventional commit format to trigger patch release
-          git commit -m "fix: update base images for ${UPDATED_IMAGES}" -m "- Updated base images to latest versions" -m "- Security patches and bug fixes from upstream" -m "- Improved compatibility and performance" -m "" -m "This commit triggers an automated patch release to rebuild DevContainers with updated base images."
+          # Check if there are any changes to commit
+          if git diff --staged --quiet; then
+            echo "ℹ️  No documentation changes to commit"
+          else
+            # Create commit with conventional commit format to trigger patch release
+            git commit -m "fix: update base images for $AFFECTED_CONTAINERS" \
+                      -m "- Updated base images to latest versions with security patches" \
+                      -m "- Improved compatibility and performance from upstream updates" \
+                      -m "- Documentation updated with latest base image information" \
+                      -m "" \
+                      -m "This commit triggers an automated patch release to rebuild DevContainers with updated base images."
 
-          # Push the changes
-          git push
+            # Push the changes
+            git push origin main
 
-          echo "✅ Base image updates committed successfully"
-          echo "🚀 This will trigger a patch release via semantic-release"
+            echo "✅ Base image updates committed and pushed"
+            echo "🚀 This will trigger the release workflow to rebuild containers"
+          fi
 
-      - name: Clean up temporary files
-        if: always()
+      - name: Trigger release workflow
+        if: steps.check_updates.outputs.has_updates == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          rm -f update_check.log generate_update_notes.ts update_summary.txt
+          echo "🚀 Triggering release workflow for base image updates..."
+
+          # Wait a moment for the commit to be processed
+          sleep 10
+
+          # Trigger the release workflow via workflow_dispatch
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/releases.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"trigger_reason":"Base image updates detected"}}'
+
+          if [ $? -eq 0 ]; then
+            echo "✅ Release workflow triggered successfully"
+          else
+            echo "⚠️  Failed to trigger release workflow, but changes are committed"
+            echo "ℹ️  The release workflow should still trigger automatically due to the commit"
+          fi
+
+      - name: No updates needed
+        if: steps.check_updates.outputs.has_updates != 'true'
+        run: |
+          echo "ℹ️  No base image updates needed - all images are current"
+          echo "📊 Check completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "🔄 Next automatic check: $(date -d 'next sunday 06:00' -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "✅ Base image check workflow completed successfully"
+
+      - name: Cleanup on failure
+        if: failure()
+        run: |
+          echo "❌ Base image check workflow failed"
+          echo "🔍 Checking git status..."
+          git status || true
+          echo "📋 Checking recent logs..."
+          tail -50 /tmp/*.log 2>/dev/null || echo "No log files found"

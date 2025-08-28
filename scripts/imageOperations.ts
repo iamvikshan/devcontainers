@@ -118,30 +118,43 @@ export class ImageOperations {
       this.log(`🔍 Checking ${containerName} (base: ${baseImage})`)
 
       try {
+        // Get the latest digest from the base image registry
+        const latestDigest = await this.getLatestBaseImageDigest(baseImage)
         const tags = await registryClient.getDockerHubTags(baseImage)
         const latestTag = tags.find(t => t.name === 'latest')
 
-        if (latestTag) {
-          // For now, we'll assume updates are available if the base image was updated recently
+        if (latestDigest && latestTag) {
+          // With daily checks, we can be more responsive - check for updates in last 1 day
           const baseImageDate = new Date(latestTag.last_updated)
           const daysSinceUpdate =
             (Date.now() - baseImageDate.getTime()) / (1000 * 60 * 60 * 24)
+          const hasUpdate = daysSinceUpdate < 1 // Updated in last 1 day
 
           updates.push({
             containerName,
             baseImage: `${baseImage}:latest`,
-            hasUpdate: daysSinceUpdate < 7, // Consider it an update if base image was updated in last 7 days
-            currentDigest: latestTag.digest?.substring(0, 12) || '',
-            latestDigest: latestTag.digest?.substring(0, 12) || '',
+            hasUpdate,
+            currentDigest: 'auto-check',
+            latestDigest: latestDigest.substring(0, 12),
             lastUpdated: latestTag.last_updated
           })
+
+          if (hasUpdate) {
+            this.log(
+              `  🔄 Update available - base image updated ${Math.floor(daysSinceUpdate * 24)} hours ago`
+            )
+          } else {
+            this.log(
+              `  ✅ Up to date - last updated ${Math.floor(daysSinceUpdate)} days ago`
+            )
+          }
 
           this.log(
             `  📊 Base image last updated: ${baseImageDate.toLocaleDateString()}`
           )
-          this.log(
-            `  ${daysSinceUpdate < 7 ? '🔄 Update available' : '✅ Up to date'}`
-          )
+          this.log(`  🔗 Digest: ${latestDigest.substring(0, 12)}`)
+        } else {
+          this.logError(`Could not get digest for ${baseImage}`)
         }
       } catch (error) {
         this.logError(`Error checking ${containerName}: ${error.message}`)
@@ -149,6 +162,20 @@ export class ImageOperations {
     }
 
     return updates
+  }
+
+  // Get latest digest for a base image
+  private async getLatestBaseImageDigest(
+    baseImage: string
+  ): Promise<string | null> {
+    try {
+      const tags = await registryClient.getDockerHubTags(baseImage)
+      const latestTag = tags.find(t => t.name === 'latest')
+      return latestTag?.digest || null
+    } catch (error) {
+      this.logError(`Error getting digest for ${baseImage}: ${error.message}`)
+      return null
+    }
   }
 
   // Update README files with current sizes
