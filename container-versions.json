@@ -1,0 +1,26 @@
+{
+  "bun": {
+    "name": "bun",
+    "version": "2.0.0",
+    "lastUpdated": "2025-08-28T02:24:57.065Z",
+    "baseImage": "oven/bun"
+  },
+  "bun-node": {
+    "name": "bun-node",
+    "version": "2.0.0",
+    "lastUpdated": "2025-08-28T02:24:57.065Z",
+    "baseImage": "oven/bun"
+  },
+  "ubuntu-bun": {
+    "name": "ubuntu-bun",
+    "version": "2.0.0",
+    "lastUpdated": "2025-08-28T02:24:57.065Z",
+    "baseImage": "library/ubuntu"
+  },
+  "ubuntu-bun-node": {
+    "name": "ubuntu-bun-node",
+    "version": "2.0.0",
+    "lastUpdated": "2025-08-28T02:24:57.065Z",
+    "baseImage": "library/ubuntu"
+  }
+}
