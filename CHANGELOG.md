@@ -1,5 +1,15 @@
 # [v1.1.4](https://github.com/iamvikshan/devcontainers/compare/v1.1.3...v1.1.4) (2025-08-27)
 
+## [1.1.0] - 2025-09-06
+
+## Container Updates
+- **gitpod-bun-node**: 1.0.0 → 1.1.0 (feat)
+- **gitpod-bun**: 1.0.0 → 1.1.0 (feat)
+- **gitpod-ubuntu-bun-node**: 1.0.0 → 1.1.0 (feat)
+- **gitpod-ubuntu-bun**: 1.0.0 → 1.1.0 (feat)
+## Features
+- feat: Add Gitpod-specific DevContainer images for Bun and Node.js (3a7c300)
+
 ## [2.0.0] - 2025-08-28
 
 ## Container Updates
