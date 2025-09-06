@@ -78,3 +78,32 @@ runs:
               "$dir"
           fi
         done
+
+    - name: Build and push Gitpod containers
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        GITHUB_REGISTRY: ${{ inputs.github-registry }}
+        GITLAB_REGISTRY: ${{ inputs.gitlab-registry }}
+        GITLAB_PROJECT_PATH: ${{ inputs.gitlab-project-path }}
+        GL_USERNAME: ${{ inputs.dockerhub-username }}
+      run: |
+        for dir in gitpod/*/; do
+          devcontainer_name=$(basename "$dir")
+          if [ -f "$dir/Dockerfile" ]; then
+            # Build and push to all registries with single build
+            docker buildx build \
+              --file "$dir/Dockerfile" \
+              --push \
+              --platform linux/amd64 \
+              --provenance=false \
+              --output type=registry \
+              --tag "${GITHUB_REGISTRY}/${{ github.repository }}/gitpod-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITHUB_REGISTRY}/${{ github.repository }}/gitpod-${devcontainer_name}:latest" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/gitpod-${devcontainer_name}:v${VERSION}" \
+              --tag "${GITLAB_REGISTRY}/${GITLAB_PROJECT_PATH}/gitpod-${devcontainer_name}:latest" \
+              --tag "${GL_USERNAME}/gitpod-${devcontainer_name}:v${VERSION}" \
+              --tag "${GL_USERNAME}/gitpod-${devcontainer_name}:latest" \
+              "$dir"
+          fi
+        done

@@ -15,10 +15,44 @@ async function main() {
   const getCommitMessages = args.includes('--get-commit-messages')
   const comprehensive = args.includes('--comprehensive')
   const outputJson = args.includes('--output-json')
+  const jsonOnly = args.includes('--json-only')
   const generateUpdateNotes = args.includes('--generate-update-notes')
+  const help = args.includes('--help') || args.includes('-h')
   const containersArg = args
     .find(arg => arg.startsWith('--containers='))
     ?.split('=')[1]
+
+  if (help) {
+    console.log(`
+🔍 DevContainer Base Image Update Checker
+
+Usage: bun scripts/checkImages.ts [options]
+
+Options:
+  --help, -h                 Show this help message
+  --check-only              Return true/false for workflow usage (exit code based)
+  --comprehensive           Run comprehensive check with detailed output
+  --output-json             Output results as JSON (legacy, use with --comprehensive)
+  --json-only               Output only JSON to stdout (recommended for workflows)
+  --get-commit-messages     Include commit messages in output
+  --generate-update-notes   Generate documentation updates
+  --containers=name1,name2  Filter by specific containers
+
+Examples:
+  # Interactive check with detailed output
+  bun scripts/checkImages.ts
+
+  # For GitHub Actions workflow (recommended)
+  bun scripts/checkImages.ts --comprehensive --json-only
+
+  # Quick check for scripts
+  bun scripts/checkImages.ts --check-only
+
+  # Generate documentation updates
+  bun scripts/checkImages.ts --generate-update-notes --containers=ubuntu-bun,bun-node
+`)
+    return
+  }
 
   if (checkOnly) {
     // Just return true/false for workflow usage
@@ -33,9 +67,9 @@ async function main() {
     return
   }
 
-  if (comprehensive && outputJson) {
+  if (comprehensive && (outputJson || jsonOnly)) {
     // Comprehensive check with JSON output for workflow
-    await comprehensiveCheck()
+    await comprehensiveCheck(true) // Always silent for JSON output
     return
   }
 
@@ -143,8 +177,12 @@ async function getBaseImageCommitInfo(
 }
 
 // Comprehensive check with JSON output for workflow
-async function comprehensiveCheck(): Promise<void> {
+async function comprehensiveCheck(silent: boolean = false): Promise<void> {
   try {
+    if (silent) {
+      imageOperations.setSilent(true)
+    }
+
     const updates = await imageOperations.checkBaseImageUpdates()
     const hasUpdates = updates.some(u => u.hasUpdate)
     const updatedContainers = updates.filter(u => u.hasUpdate)
@@ -159,24 +197,31 @@ async function comprehensiveCheck(): Promise<void> {
         lastUpdated: u.lastUpdated,
         currentDigest: u.currentDigest,
         latestDigest: u.latestDigest
-      }))
+      })),
+      timestamp: new Date().toISOString(),
+      success: true
     }
 
+    // Always output JSON to stdout for workflow consumption
     console.log(JSON.stringify(result))
   } catch (error) {
-    console.log(
-      JSON.stringify({
-        hasUpdates: false,
-        updateCount: 0,
-        affectedContainers: [],
-        updates: [],
-        error: error.message
-      })
-    )
-  }
-}
+    const errorResult = {
+      hasUpdates: false,
+      updateCount: 0,
+      affectedContainers: [],
+      updates: [],
+      error: error.message,
+      timestamp: new Date().toISOString(),
+      success: false
+    }
 
-// Generate documentation updates for base image changes
+    // Output error result as JSON to stdout
+    console.log(JSON.stringify(errorResult))
+
+    // Exit with error code to indicate failure
+    process.exit(1)
+  }
+} // Generate documentation updates for base image changes
 async function generateDocumentationUpdates(
   containers: string[]
 ): Promise<void> {

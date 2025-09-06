@@ -151,6 +151,12 @@ jobs:
             if [[ "$container" == ubuntu-* ]]; then
               dockerfile_path="base/ubuntu/${container#ubuntu-}/Dockerfile"
               context_dir="base/ubuntu/${container#ubuntu-}"
+            elif [[ "$container" == gitpod-ubuntu-* ]]; then
+              dockerfile_path="gitpod/${container#gitpod-}/Dockerfile"
+              context_dir="gitpod/${container#gitpod-}"
+            elif [[ "$container" == gitpod-* ]]; then
+              dockerfile_path="gitpod/${container#gitpod-}/Dockerfile"
+              context_dir="gitpod/${container#gitpod-}"
             else
               dockerfile_path="base/$container/.devcontainer/Dockerfile"
               context_dir="base/$container/.devcontainer"

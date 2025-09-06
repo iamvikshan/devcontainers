@@ -111,57 +111,135 @@ export class ImageOperations {
   public async checkBaseImageUpdates(): Promise<BaseImageUpdate[]> {
     const updates: BaseImageUpdate[] = []
 
+    this.log(
+      `🔍 Starting base image update check for ${IMAGE_DEFINITIONS.names.length} containers...`
+    )
+
     for (const containerName of IMAGE_DEFINITIONS.names) {
       const baseImage = RegistryClient.getBaseImageForContainer(containerName)
-      if (!baseImage) continue
+      if (!baseImage) {
+        this.logError(`⚠️  No base image found for ${containerName}`)
+        continue
+      }
 
       this.log(`🔍 Checking ${containerName} (base: ${baseImage})`)
 
       try {
-        // Get the latest digest from the base image registry
-        const latestDigest = await this.getLatestBaseImageDigest(baseImage)
-        const tags = await registryClient.getDockerHubTags(baseImage)
-        const latestTag = tags.find(t => t.name === 'latest')
-
-        if (latestDigest && latestTag) {
-          // With daily checks, we can be more responsive - check for updates in last 1 day
-          const baseImageDate = new Date(latestTag.last_updated)
-          const daysSinceUpdate =
-            (Date.now() - baseImageDate.getTime()) / (1000 * 60 * 60 * 24)
-          const hasUpdate = daysSinceUpdate < 1 // Updated in last 1 day
-
-          updates.push({
-            containerName,
-            baseImage: `${baseImage}:latest`,
-            hasUpdate,
-            currentDigest: 'auto-check',
-            latestDigest: latestDigest.substring(0, 12),
-            lastUpdated: latestTag.last_updated
-          })
-
-          if (hasUpdate) {
-            this.log(
-              `  🔄 Update available - base image updated ${Math.floor(daysSinceUpdate * 24)} hours ago`
-            )
-          } else {
-            this.log(
-              `  ✅ Up to date - last updated ${Math.floor(daysSinceUpdate)} days ago`
-            )
-          }
-
-          this.log(
-            `  📊 Base image last updated: ${baseImageDate.toLocaleDateString()}`
-          )
-          this.log(`  🔗 Digest: ${latestDigest.substring(0, 12)}`)
-        } else {
-          this.logError(`Could not get digest for ${baseImage}`)
+        // Add timeout and retry logic
+        const result = await this.checkSingleImageWithRetry(
+          containerName,
+          baseImage
+        )
+        if (result) {
+          updates.push(result)
         }
       } catch (error) {
-        this.logError(`Error checking ${containerName}: ${error.message}`)
+        this.logError(`❌ Error checking ${containerName}: ${error.message}`)
+        // Add a failed check entry to maintain consistency
+        updates.push({
+          containerName,
+          baseImage: `${baseImage}:latest`,
+          hasUpdate: false,
+          currentDigest: 'error',
+          latestDigest: 'error',
+          lastUpdated: new Date().toISOString()
+        })
       }
     }
 
+    this.log(
+      `✅ Completed base image check. Found ${updates.filter(u => u.hasUpdate).length} updates.`
+    )
     return updates
+  }
+
+  // Check a single image with retry logic
+  private async checkSingleImageWithRetry(
+    containerName: string,
+    baseImage: string,
+    maxRetries: number = 3
+  ): Promise<BaseImageUpdate | null> {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Add timeout wrapper
+        const result = await Promise.race([
+          this.checkSingleImage(containerName, baseImage),
+          this.timeoutPromise(30000) // 30 second timeout
+        ])
+
+        return result
+      } catch (error) {
+        this.logError(
+          `Attempt ${attempt}/${maxRetries} failed for ${containerName}: ${error.message}`
+        )
+
+        if (attempt === maxRetries) {
+          throw error
+        }
+
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+      }
+    }
+
+    return null
+  }
+
+  // Timeout promise helper
+  private timeoutPromise(ms: number): Promise<never> {
+    return new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error(`Operation timed out after ${ms}ms`)),
+        ms
+      )
+    })
+  }
+
+  // Check a single image (extracted from original logic)
+  private async checkSingleImage(
+    containerName: string,
+    baseImage: string
+  ): Promise<BaseImageUpdate> {
+    // Get the latest digest from the base image registry
+    const latestDigest = await this.getLatestBaseImageDigest(baseImage)
+    const tags = await registryClient.getDockerHubTags(baseImage)
+    const latestTag = tags.find(t => t.name === 'latest')
+
+    if (!latestDigest || !latestTag) {
+      throw new Error(`Could not get digest or tags for ${baseImage}`)
+    }
+
+    // With daily checks, we can be more responsive - check for updates in last 1 day
+    const baseImageDate = new Date(latestTag.last_updated)
+    const daysSinceUpdate =
+      (Date.now() - baseImageDate.getTime()) / (1000 * 60 * 60 * 24)
+    const hasUpdate = daysSinceUpdate < 1 // Updated in last 1 day
+
+    const result: BaseImageUpdate = {
+      containerName,
+      baseImage: `${baseImage}:latest`,
+      hasUpdate,
+      currentDigest: 'auto-check',
+      latestDigest: latestDigest.substring(0, 12),
+      lastUpdated: latestTag.last_updated
+    }
+
+    if (hasUpdate) {
+      this.log(
+        `  🔄 Update available - base image updated ${Math.floor(daysSinceUpdate * 24)} hours ago`
+      )
+    } else {
+      this.log(
+        `  ✅ Up to date - last updated ${Math.floor(daysSinceUpdate)} days ago`
+      )
+    }
+
+    this.log(
+      `  📊 Base image last updated: ${baseImageDate.toLocaleDateString()}`
+    )
+    this.log(`  🔗 Digest: ${latestDigest.substring(0, 12)}`)
+
+    return result
   }
 
   // Get latest digest for a base image
@@ -195,7 +273,11 @@ export class ImageOperations {
       'docs/IMAGE_VARIANTS.md',
       'base/bun/README.md',
       'base/bun-node/README.md',
-      'base/ubuntu/README.md'
+      'base/ubuntu/README.md',
+      'gitpod/bun/README.md',
+      'gitpod/bun-node/README.md',
+      'gitpod/ubuntu-bun/README.md',
+      'gitpod/ubuntu-bun-node/README.md'
     ]
 
     for (const readmePath of readmeFiles) {

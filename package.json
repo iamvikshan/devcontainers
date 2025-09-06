@@ -7,12 +7,18 @@
     "rs": "bun f && git push -f",
     "check-updates": "bun scripts/checkImages.ts",
     "check-base-images": "bun scripts/checkImages.ts",
+    "check-base-images-json": "bun scripts/checkImages.ts --comprehensive --json-only",
+    "validate-check-images": "node scripts/validateCheckImages.js",
     "analyze-sizes": "bun scripts/imageOperations.ts --analyze-sizes",
     "build-all": "./scripts/build-all-images.sh",
     "build-bun": "docker build -f base/bun/.devcontainer/Dockerfile -t devcontainers/bun:test base/bun/.devcontainer",
     "build-bun-node": "docker build -f base/bun-node/.devcontainer/Dockerfile -t devcontainers/bun-node:test base/bun-node/.devcontainer",
     "build-ubuntu-bun": "docker build -f base/ubuntu/bun/Dockerfile -t devcontainers/ubuntu-bun:test base/ubuntu/bun",
     "build-ubuntu-bun-node": "docker build -f base/ubuntu/bun-node/Dockerfile -t devcontainers/ubuntu-bun-node:test base/ubuntu/bun-node",
+    "build-gitpod-bun": "docker build -f gitpod/bun/Dockerfile -t devcontainers/gitpod-bun:test gitpod/bun",
+    "build-gitpod-bun-node": "docker build -f gitpod/bun-node/Dockerfile -t devcontainers/gitpod-bun-node:test gitpod/bun-node",
+    "build-gitpod-ubuntu-bun": "docker build -f gitpod/ubuntu-bun/Dockerfile -t devcontainers/gitpod-ubuntu-bun:test gitpod/ubuntu-bun",
+    "build-gitpod-ubuntu-bun-node": "docker build -f gitpod/ubuntu-bun-node/Dockerfile -t devcontainers/gitpod-ubuntu-bun-node:test gitpod/ubuntu-bun-node",
     "verify-docker": "./scripts/verify-docker-setup.sh",
     "test-workflows": "bun scripts/test-workflow-steps.ts",
     "test-workflow-logic": "bun scripts/test-workflow-logic.ts",
@@ -24,18 +30,9 @@
     "analyze-changes": "bun scripts/changeDetector.ts"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^11.0.4",
-    "@semantic-release/release-notes-generator": "^14.0.3",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.3.1",
     "axios": "^1.11.0",
-    "conventional-changelog-conventionalcommits": "^9.1.0",
-    "conventional-changelog-gitmoji": "^0.2.5",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.6.2",
-    "semantic-release": "^24.2.7",
-    "semantic-release-gitmoji": "^1.6.8"
+    "prettier": "^3.6.2"
   }
 }

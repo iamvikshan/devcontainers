@@ -149,6 +149,16 @@ export class VersionManager {
               affectedContainers.add(fullName)
             }
           }
+
+          // Check for gitpod containers
+          const gitpodMatch = file.match(/^gitpod\/([^\/]+)/)
+          if (gitpodMatch) {
+            const subContainer = gitpodMatch[1]
+            const fullName = `gitpod-${subContainer}`
+            if (IMAGE_DEFINITIONS.names.includes(fullName)) {
+              affectedContainers.add(fullName)
+            }
+          }
         })
 
         if (affectedContainers.size > 0) {
@@ -172,6 +182,14 @@ export class VersionManager {
     isBreaking: boolean
   ): { newVersion: string; bumpType: 'major' | 'minor' | 'patch' } {
     const [major, minor, patch] = currentVersion.split('.').map(Number)
+
+    // Special case: Initial release from 0.0.0
+    if (major === 0 && minor === 0 && patch === 0) {
+      return {
+        newVersion: '1.0.0',
+        bumpType: 'major'
+      }
+    }
 
     if (isBreaking) {
       return {

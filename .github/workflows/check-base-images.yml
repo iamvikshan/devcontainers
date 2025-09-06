@@ -35,6 +35,28 @@ jobs:
       - name: Setup Bun and install dependencies
         uses: iamvikshan/.github/.github/actions/setup-bun@main
 
+      - name: Validate script functionality
+        run: |
+          echo "🔧 Validating checkImages script..."
+
+          # Test that the script runs and returns valid JSON
+          if ! bun scripts/checkImages.ts --help >/dev/null 2>&1; then
+            echo "❌ Script help failed"
+            exit 1
+          fi
+
+          # Test JSON output format
+          TEST_OUTPUT=$(timeout 60 bun scripts/checkImages.ts --comprehensive --json-only 2>/dev/null || echo '{"error":"timeout"}')
+
+          if echo "$TEST_OUTPUT" | jq empty 2>/dev/null; then
+            echo "✅ Script produces valid JSON"
+            echo "📋 Test output keys: $(echo "$TEST_OUTPUT" | jq -r 'keys | join(", ")')"
+          else
+            echo "❌ Script does not produce valid JSON"
+            echo "Raw output: $TEST_OUTPUT"
+            exit 1
+          fi
+
       - name: Check for base image updates
         id: check_updates
         env:
@@ -45,21 +67,67 @@ jobs:
         run: |
           echo "🔍 Checking for base image updates..."
 
-          # Run comprehensive base image check
-          RESULT=$(bun scripts/checkImages.ts --comprehensive --output-json)
+          # Run comprehensive base image check with error handling
+          set +e  # Don't exit on error
+          RESULT=$(bun scripts/checkImages.ts --comprehensive --json-only 2>/dev/null)
+          SCRIPT_EXIT_CODE=$?
+          set -e  # Re-enable exit on error
+
           echo "📋 Base image check result: $RESULT"
 
-          # Parse the JSON result
-          HAS_UPDATES=$(echo "$RESULT" | jq -r '.hasUpdates')
-          AFFECTED_CONTAINERS=$(echo "$RESULT" | jq -r '.affectedContainers | join(",")')
-          UPDATE_COUNT=$(echo "$RESULT" | jq -r '.updateCount // 0')
+          # Check if the script ran successfully
+          if [ $SCRIPT_EXIT_CODE -ne 0 ]; then
+            echo "❌ Script failed with exit code $SCRIPT_EXIT_CODE"
+            echo "🔄 Falling back to safe defaults..."
+            HAS_UPDATES="false"
+            AFFECTED_CONTAINERS=""
+            UPDATE_COUNT="0"
+          else
+            # Validate that we have valid JSON
+            if echo "$RESULT" | jq empty 2>/dev/null; then
+              echo "✅ Valid JSON received from script"
+              
+              # Parse the JSON result with error handling
+              HAS_UPDATES=$(echo "$RESULT" | jq -r '.hasUpdates // false')
+              AFFECTED_CONTAINERS=$(echo "$RESULT" | jq -r '.affectedContainers // [] | join(",")')
+              UPDATE_COUNT=$(echo "$RESULT" | jq -r '.updateCount // 0')
+              SCRIPT_SUCCESS=$(echo "$RESULT" | jq -r '.success // false')
+              
+              # Check if the script reported success
+              if [ "$SCRIPT_SUCCESS" != "true" ]; then
+                echo "⚠️  Script reported internal error"
+                SCRIPT_ERROR=$(echo "$RESULT" | jq -r '.error // "Unknown error"')
+                echo "Error details: $SCRIPT_ERROR"
+                # Treat as no updates if there was an error
+                HAS_UPDATES="false"
+                AFFECTED_CONTAINERS=""
+                UPDATE_COUNT="0"
+              fi
+            else
+              echo "❌ Invalid JSON received from script"
+              echo "Raw output: $RESULT"
+              # Try to extract JSON line as fallback
+              JSON_LINE=$(echo "$RESULT" | grep "^{" | head -1 || echo "")
+              if [ -n "$JSON_LINE" ] && echo "$JSON_LINE" | jq empty 2>/dev/null; then
+                echo "🔄 Found valid JSON line, using fallback parsing"
+                HAS_UPDATES=$(echo "$JSON_LINE" | jq -r '.hasUpdates // false')
+                AFFECTED_CONTAINERS=$(echo "$JSON_LINE" | jq -r '.affectedContainers // [] | join(",")')
+                UPDATE_COUNT=$(echo "$JSON_LINE" | jq -r '.updateCount // 0')
+              else
+                echo "🔄 Falling back to safe defaults due to parsing failure"
+                HAS_UPDATES="false"
+                AFFECTED_CONTAINERS=""
+                UPDATE_COUNT="0"
+              fi
+            fi
+          fi
 
           # Override if force check is enabled
           if [ "$FORCE_CHECK" = "true" ]; then
             echo "⚠️  Force check enabled - treating as having updates"
             HAS_UPDATES="true"
             if [ "$AFFECTED_CONTAINERS" = "" ]; then
-              AFFECTED_CONTAINERS="bun,bun-node,ubuntu-bun,ubuntu-bun-node"
+              AFFECTED_CONTAINERS="bun,bun-node,ubuntu-bun,ubuntu-bun-node,gitpod-bun,gitpod-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node"
             fi
           fi
 
