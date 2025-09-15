@@ -1,60 +1,103 @@
 [
   {
-    "container": "gitpod-bun-node",
+    "container": "bun",
     "registry": "ghcr.io",
-    "tag": "v1.1.0",
+    "tag": "v1.0.0",
     "versions": {
-      "build_date": "2025-09-06T01:19:00Z",
-      "base_image": "oven/bun:latest",
-      "node_version": "v24.7.0",
-      "npm_version": "11.5.1",
-      "bun_version": "1.2.21",
+      "build_date": "2025-09-15T05:11:42Z",
+      "base_image": "oven/bun:",
+      "bun_version": "1.2.22",
+      "debian_version": "12.12",
       "git_version": "2.39.5",
       "curl_version": "7.88.1"
     },
-    "extractedAt": "2025-09-06T01:22:49.941Z"
+    "extractedAt": "2025-09-15T05:19:25.562Z"
+  },
+  {
+    "container": "bun-node",
+    "registry": "ghcr.io",
+    "tag": "v1.0.0",
+    "versions": {
+      "build_date": "2025-09-15T05:12:34Z",
+      "base_image": "oven/bun:",
+      "bun_version": "1.2.22",
+      "node_version": "v24.8.0",
+      "npm_version": "11.6.0",
+      "eslint_version": "v9.35.0",
+      "debian_version": "12.12",
+      "git_version": "2.39.5",
+      "curl_version": "7.88.1"
+    },
+    "extractedAt": "2025-09-15T05:19:34.335Z"
+  },
+  {
+    "container": "ubuntu-bun",
+    "registry": "ghcr.io",
+    "tag": "v1.0.0",
+    "versions": {
+      "build_date": "2025-09-15T05:13:38Z",
+      "base_image": "ubuntu:",
+      "ubuntu_version": "24.04",
+      "bun_version": "1.2.22",
+      "git_version": "2.43.0",
+      "curl_version": "8.5.0"
+    },
+    "extractedAt": "2025-09-15T05:19:38.752Z"
+  },
+  {
+    "container": "ubuntu-bun-node",
+    "registry": "ghcr.io",
+    "tag": "v1.0.0",
+    "versions": {
+      "build_date": "2025-09-15T05:14:43Z",
+      "base_image": "ubuntu:",
+      "ubuntu_version": "24.04",
+      "bun_version": "1.2.22",
+      "node_version": "v24.8.0",
+      "npm_version": "11.6.0",
+      "git_version": "2.43.0",
+      "curl_version": "8.5.0"
+    },
+    "extractedAt": "2025-09-15T05:19:46.777Z"
   },
   {
     "container": "gitpod-bun",
     "registry": "ghcr.io",
-    "tag": "v1.1.0",
+    "tag": "v1.0.0",
     "versions": {
-      "build_date": "2025-09-06T01:19:51Z",
-      "base_image": "oven/bun:latest",
-      "bun_version": "1.2.21",
-      "git_version": "2.39.5",
-      "curl_version": "7.88.1"
+      "build_date": "2025-09-15T05:19:52.731Z",
+      "extracted_manually": "true"
     },
-    "extractedAt": "2025-09-06T01:22:53.156Z"
+    "extractedAt": "2025-09-15T05:19:52.731Z"
   },
   {
-    "container": "gitpod-ubuntu-bun-node",
+    "container": "gitpod-bun-node",
     "registry": "ghcr.io",
-    "tag": "v1.1.0",
+    "tag": "v1.0.0",
     "versions": {
-      "build_date": "2025-09-06T01:20:52Z",
-      "base_image": "ubuntu:",
-      "ubuntu_version": "24.04",
-      "node_version": "v24.7.0",
-      "npm_version": "11.5.1",
-      "bun_version": "1.2.21",
-      "git_version": "2.43.0",
-      "curl_version": "8.5.0"
+      "build_date": "2025-09-15T05:19:57.660Z",
+      "extracted_manually": "true"
     },
-    "extractedAt": "2025-09-06T01:23:02.202Z"
+    "extractedAt": "2025-09-15T05:19:57.660Z"
   },
   {
     "container": "gitpod-ubuntu-bun",
     "registry": "ghcr.io",
-    "tag": "v1.1.0",
+    "tag": "v1.0.0",
     "versions": {
-      "build_date": "2025-09-06T01:21:44Z",
-      "base_image": "ubuntu:",
-      "ubuntu_version": "24.04",
-      "bun_version": "1.2.21",
-      "git_version": "2.43.0",
-      "curl_version": "8.5.0"
+      "build_date": "2025-09-15T05:20:03.903Z",
+      "extracted_manually": "true"
     },
-    "extractedAt": "2025-09-06T01:23:05.413Z"
+    "extractedAt": "2025-09-15T05:20:03.904Z"
+  },
+  {
+    "container": "gitpod-ubuntu-bun-node",
+    "registry": "ghcr.io",
+    "tag": "v1.0.0",
+    "versions": {
+      "build_date": "2025-09-15T05:20:10.045Z",
+      "extracted_manually": "true"
+    },
+    "extractedAt": "2025-09-15T05:20:10.045Z"
   }
 ]
