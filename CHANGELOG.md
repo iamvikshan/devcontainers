@@ -1,5 +1,19 @@
 # [v1.1.4](https://github.com/iamvikshan/devcontainers/compare/v1.1.3...v1.1.4) (2025-08-27)
 
+## [1.1.3] - 2025-09-16
+
+## Container Updates
+- **bun**: 1.0.1 → 1.0.2 (fix)
+- **bun-node**: 1.0.1 → 1.0.2 (fix)
+- **ubuntu-bun**: 1.0.1 → 1.0.2 (fix)
+- **ubuntu-bun-node**: 1.0.1 → 1.0.2 (fix)
+- **gitpod-bun**: 1.1.2 → 1.1.3 (fix)
+- **gitpod-bun-node**: 1.1.2 → 1.1.3 (fix)
+- **gitpod-ubuntu-bun**: 1.1.2 → 1.1.3 (fix)
+- **gitpod-ubuntu-bun-node**: 1.1.2 → 1.1.3 (fix)
+## Bug Fixes
+- fix: add remote pull before pushing documentation changes and tags to avoid conflicts (b0e3d4c)
+
 ## [1.1.2] - 2025-09-16
 
 ## Container Updates
