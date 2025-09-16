@@ -282,6 +282,21 @@ jobs:
             
             echo "✅ Documentation changes committed"
             
+            # Pull any remote changes before pushing
+            echo "🔄 Pulling remote changes to avoid conflicts..."
+            git pull --rebase origin main || {
+              echo "❌ Failed to pull remote changes. There may be conflicts that need manual resolution."
+              echo "🔍 Checking for conflicts..."
+              if git status --porcelain | grep -q "^UU\|^AA\|^DD"; then
+                echo "⚠️  Merge conflicts detected. Aborting rebase and using merge strategy instead."
+                git rebase --abort
+                git pull origin main --no-edit
+              else
+                echo "❌ Pull failed for unknown reason"
+                exit 1
+              fi
+            }
+            
             # Push the documentation commit
             git push origin main
             echo "✅ Documentation changes pushed to main branch"
@@ -312,6 +327,10 @@ jobs:
                                  -m "Released containers: $AFFECTED_CONTAINERS" \
                                  -m "Release type: $RELEASE_TYPE" \
                                  -m "Build date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          # Pull any remote changes before pushing the tag
+          echo "🔄 Ensuring we have latest changes before pushing tag..."
+          git pull origin main --no-edit || echo "⚠️  Pull failed, but proceeding with tag push"
 
           # Push the tag
           git push origin "$TAG_NAME"
