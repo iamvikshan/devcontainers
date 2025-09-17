@@ -1,5 +1,19 @@
 # [v1.1.4](https://github.com/iamvikshan/devcontainers/compare/v1.1.3...v1.1.4) (2025-08-27)
 
+## [1.1.4] - 2025-09-17
+
+## Container Updates
+- **bun**: 1.0.2 → 1.0.3 (fix)
+- **bun-node**: 1.0.2 → 1.0.3 (fix)
+- **ubuntu-bun**: 1.0.2 → 1.0.3 (fix)
+- **ubuntu-bun-node**: 1.0.2 → 1.0.3 (fix)
+- **gitpod-bun**: 1.1.3 → 1.1.4 (fix)
+- **gitpod-bun-node**: 1.1.3 → 1.1.4 (fix)
+- **gitpod-ubuntu-bun**: 1.1.3 → 1.1.4 (fix)
+- **gitpod-ubuntu-bun-node**: 1.1.3 → 1.1.4 (fix)
+## Bug Fixes
+- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (9296340)
+
 ## [1.1.3] - 2025-09-16
 
 ## Container Updates
