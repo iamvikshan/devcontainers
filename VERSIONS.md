@@ -80,6 +80,33 @@ This file tracks base image updates and releases for our DevContainer configurat
 
 ## Latest Updates
 
+### 2025-09-17 - Base Image Updates
+
+**Updated at:** 2025-09-17T05:10:16.926Z
+
+**Base images updated:**
+- **ubuntu-bun**: `library/ubuntu:latest`
+  - Base image last updated: 9/16/2025
+  - Digest: `sha256:35367`
+- **ubuntu-bun-node**: `library/ubuntu:latest`
+  - Base image last updated: 9/16/2025
+  - Digest: `sha256:35367`
+- **gitpod-ubuntu-bun**: `library/ubuntu:latest`
+  - Base image last updated: 9/16/2025
+  - Digest: `sha256:35367`
+- **gitpod-ubuntu-bun-node**: `library/ubuntu:latest`
+  - Base image last updated: 9/16/2025
+  - Digest: `sha256:35367`
+
+**Changes:**
+- Updated base images to latest versions
+- Security patches and bug fixes from upstream
+- Improved compatibility and performance
+
+**Impact:** Patch release - DevContainers will be rebuilt with updated base images
+
+---
+
 ### 2025-09-16 - Release 1.1.3
 
 **Changes:**
