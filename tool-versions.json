@@ -1,103 +1,72 @@
 [
   {
-    "container": "bun",
+    "container": "gitpod-ubuntu-bun-node",
     "registry": "ghcr.io",
-    "tag": "v1.0.3",
+    "tag": "v1.1.5",
     "versions": {
-      "build_date": "2025-09-17T05:11:20Z",
-      "base_image": "oven/bun:",
-      "bun_version": "1.2.22",
-      "debian_version": "12.12",
-      "git_version": "2.39.5",
-      "curl_version": "7.88.1"
-    },
-    "extractedAt": "2025-09-17T05:17:39.573Z"
-  },
-  {
-    "container": "bun-node",
-    "registry": "ghcr.io",
-    "tag": "v1.0.3",
-    "versions": {
-      "build_date": "2025-09-17T05:12:01Z",
-      "base_image": "oven/bun:",
-      "bun_version": "1.2.22",
-      "node_version": "v24.8.0",
-      "npm_version": "11.6.0",
-      "eslint_version": "v9.35.0",
-      "debian_version": "12.12",
-      "git_version": "2.39.5",
-      "curl_version": "7.88.1"
-    },
-    "extractedAt": "2025-09-17T05:17:47.379Z"
-  },
-  {
-    "container": "ubuntu-bun",
-    "registry": "ghcr.io",
-    "tag": "v1.0.3",
-    "versions": {
-      "build_date": "2025-09-17T05:12:52Z",
+      "build_date": "2025-09-24T15:16:43Z",
       "base_image": "ubuntu:",
       "ubuntu_version": "24.04",
+      "node_version": "v24.8.0",
+      "npm_version": "11.6.0",
       "bun_version": "1.2.22",
       "git_version": "2.43.0",
       "curl_version": "8.5.0"
     },
-    "extractedAt": "2025-09-17T05:17:51.560Z"
-  },
-  {
-    "container": "ubuntu-bun-node",
-    "registry": "ghcr.io",
-    "tag": "v1.0.3",
-    "versions": {
-      "build_date": "2025-09-17T05:13:43Z",
-      "base_image": "ubuntu:",
-      "ubuntu_version": "24.04",
-      "bun_version": "1.2.22",
-      "node_version": "v24.8.0",
-      "npm_version": "11.6.0",
-      "git_version": "2.43.0",
-      "curl_version": "8.5.0"
-    },
-    "extractedAt": "2025-09-17T05:17:58.486Z"
-  },
-  {
-    "container": "gitpod-bun",
-    "registry": "ghcr.io",
-    "tag": "v1.0.3",
-    "versions": {
-      "build_date": "2025-09-17T05:18:00.200Z",
-      "extracted_manually": "true"
-    },
-    "extractedAt": "2025-09-17T05:18:00.200Z"
-  },
-  {
-    "container": "gitpod-bun-node",
-    "registry": "ghcr.io",
-    "tag": "v1.0.3",
-    "versions": {
-      "build_date": "2025-09-17T05:18:01.666Z",
-      "extracted_manually": "true"
-    },
-    "extractedAt": "2025-09-17T05:18:01.666Z"
+    "extractedAt": "2025-09-24T15:24:26.785Z"
   },
   {
     "container": "gitpod-ubuntu-bun",
     "registry": "ghcr.io",
-    "tag": "v1.0.3",
+    "tag": "v1.1.5",
     "versions": {
-      "build_date": "2025-09-17T05:18:03.386Z",
-      "extracted_manually": "true"
+      "build_date": "2025-09-24T15:18:04Z",
+      "base_image": "ubuntu:",
+      "ubuntu_version": "24.04",
+      "bun_version": "1.2.22",
+      "git_version": "2.43.0",
+      "curl_version": "8.5.0"
     },
-    "extractedAt": "2025-09-17T05:18:03.386Z"
+    "extractedAt": "2025-09-24T15:24:35.643Z"
   },
   {
-    "container": "gitpod-ubuntu-bun-node",
+    "container": "bun-node",
     "registry": "ghcr.io",
-    "tag": "v1.0.3",
+    "tag": "v1.1.5",
     "versions": {
-      "build_date": "2025-09-17T05:18:05.163Z",
+      "build_date": "2025-09-24T15:24:45.524Z",
       "extracted_manually": "true"
     },
-    "extractedAt": "2025-09-17T05:18:05.163Z"
+    "extractedAt": "2025-09-24T15:24:45.524Z"
+  },
+  {
+    "container": "bun",
+    "registry": "ghcr.io",
+    "tag": "v1.1.5",
+    "versions": {
+      "build_date": "2025-09-24T15:24:58.390Z",
+      "extracted_manually": "true"
+    },
+    "extractedAt": "2025-09-24T15:24:58.390Z"
+  },
+  {
+    "container": "ubuntu-bun-node",
+    "registry": "ghcr.io",
+    "tag": "v1.1.5",
+    "versions": {
+      "build_date": "2025-09-24T15:25:05.529Z",
+      "extracted_manually": "true"
+    },
+    "extractedAt": "2025-09-24T15:25:05.529Z"
+  },
+  {
+    "container": "ubuntu-bun",
+    "registry": "ghcr.io",
+    "tag": "v1.1.5",
+    "versions": {
+      "build_date": "2025-09-24T15:25:15.766Z",
+      "extracted_manually": "true"
+    },
+    "extractedAt": "2025-09-24T15:25:15.766Z"
   }
 ]
