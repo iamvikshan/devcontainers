@@ -17,6 +17,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     openssh-client \
+    openssh-server \
+    && mkdir /var/run/sshd \
     # Install Node.js via NodeSource
     && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
     && apt-get install -y nodejs \
@@ -24,8 +26,11 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /tmp/* /var/tmp/*
 
-# Configure SSH server to allow TCP forwarding
-RUN echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config
+# Configure SSH
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config \
+    && echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config
 
 # Create the gitpod user with UID 33333 (required by Gitpod)
 RUN useradd -l -u 33333 -G sudo -md /home/gitpod -s /bin/bash -p gitpod gitpod \
@@ -87,8 +92,17 @@ RUN sudo chmod +x /usr/local/bin/setup.sh
 # Add setup script to bashrc.d for automatic sourcing
 RUN echo "source /usr/local/bin/setup.sh" >> /home/gitpod/.bashrc.d/999-setup
 
+# Create a startup script to handle SSH service
+RUN echo '#!/bin/bash\n\
+# Start SSH service\n\
+sudo service ssh start\n\
+\n\
+# Execute the original command\n\
+exec "$@"' > /usr/local/bin/start-services.sh && \
+    sudo chmod +x /usr/local/bin/start-services.sh
+
 # Set working directory to home
 WORKDIR /home/gitpod
 
-# Default command - ensure bash is used
-CMD ["bash"]
+# Default command - start services and ensure bash is used
+CMD ["/usr/local/bin/start-services.sh", "bash"]

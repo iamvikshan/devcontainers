@@ -8,17 +8,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     git \
     sudo \
-    openssh-client \
     curl \
+    openssh-server \
+    && mkdir /var/run/sshd \
     && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g eslint \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean \
     && rm -rf /tmp/* /var/tmp/*
-
-# Configure SSH server to allow TCP forwarding
-RUN echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config
 
 # Create the user if it doesn't exist (this step is not needed for root user)
 RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \
@@ -37,6 +35,11 @@ RUN if [ "${USERNAME}" != "root" ]; then \
 
 # Ensure necessary directories have the correct permissions
 RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var/lib/apt/lists
+
+# Configure SSH
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
 # Extract tool versions during build
 RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && \
@@ -66,8 +69,17 @@ RUN if [ "${USERNAME}" != "root" ]; then \
         echo "source /usr/local/bin/setup.sh" >> /root/.bashrc; \
     fi
 
+# Create a startup script to handle SSH service
+RUN echo '#!/bin/bash\n\
+# Start SSH service\n\
+service ssh start\n\
+\n\
+# Execute the original command\n\
+exec "$@"' > /usr/local/bin/start-services.sh && \
+    chmod +x /usr/local/bin/start-services.sh
+
 # Switch to the specified user
 USER ${USERNAME}
 
-# Set the default command to open a bash shell
-CMD ["bash"]
+# Set the default command to start services and open a bash shell
+CMD ["/usr/local/bin/start-services.sh", "bash"]
