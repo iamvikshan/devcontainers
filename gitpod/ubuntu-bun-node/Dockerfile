@@ -93,12 +93,7 @@ RUN sudo chmod +x /usr/local/bin/setup.sh
 RUN echo "source /usr/local/bin/setup.sh" >> /home/gitpod/.bashrc.d/999-setup
 
 # Create a startup script to handle SSH service
-RUN echo '#!/bin/bash\n\
-# Start SSH service\n\
-sudo service ssh start\n\
-\n\
-# Execute the original command\n\
-exec "$@"' > /usr/local/bin/start-services.sh && \
+RUN sudo sh -c 'echo "#!/bin/bash\n# Start SSH service\nsudo service ssh start\n\n# Execute the original command\nexec \"\$@\"" > /usr/local/bin/start-services.sh' && \
     sudo chmod +x /usr/local/bin/start-services.sh
 
 # Set working directory to home
