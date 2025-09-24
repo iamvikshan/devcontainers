@@ -161,21 +161,130 @@ This file tracks base image updates and releases for our DevContainer configurat
     sizes: any,
     baseImageDigests: Record<string, string>
   ): Promise<string> {
-    // This is a complex update that would need to parse and update each container section
-    // For now, we'll keep the existing container images section and just update sizes
-    // A full implementation would parse each container section and update the size information
+    // Load tool versions if available
+    const toolVersions = this.loadToolVersions()
+    
+    // Generate complete container images section
+    const containerImagesSection = await this.generateContainerImagesSection(
+      sizes,
+      baseImageDigests,
+      toolVersions
+    )
 
-    // Update sizes in the container sections
-    for (const imageName of IMAGE_DEFINITIONS.names) {
-      const imageSize = sizes[imageName]?.ghcr?.size_mb || 0
-      const sizeRegex = new RegExp(
-        `(### [^\\n]*${imageName}[^\\n]*\\n[\\s\\S]*?\\*\\*Size:\\*\\*) ~[0-9.]+( MB)`,
-        'i'
-      )
-      content = content.replace(sizeRegex, `$1 ~${imageSize.toFixed(2)}$2`)
+    // Replace the entire container images section
+    const containerImagesRegex = /(## Container Images\n\n)([\s\S]*?)(\n## Automation)/
+    if (containerImagesRegex.test(content)) {
+      content = content.replace(containerImagesRegex, `$1${containerImagesSection}$3`)
+    } else {
+      // If section doesn't exist, add it
+      const automationIndex = content.indexOf('## Automation')
+      if (automationIndex !== -1) {
+        content = content.slice(0, automationIndex) + 
+                 `## Container Images\n\n${containerImagesSection}\n` +
+                 content.slice(automationIndex)
+      }
     }
 
     return content
+  }
+
+  private async generateContainerImagesSection(
+    sizes: any,
+    baseImageDigests: Record<string, string>,
+    toolVersions: any[]
+  ): Promise<string> {
+    let section = ''
+
+    for (const imageName of IMAGE_DEFINITIONS.names) {
+      const imageSize = sizes[imageName]?.ghcr?.size_mb || 0
+      const baseImage = IMAGE_DEFINITIONS.baseImages[imageName] || 'unknown'
+      const digest = baseImageDigests[imageName] || 'unknown'
+      
+      // Get tool versions for this container
+      const containerToolVersions = toolVersions.find(tv => tv.container === imageName)
+      const tools = containerToolVersions?.versions || {}
+      
+      // Generate tools description
+      const toolsDesc = this.generateToolsDescription(imageName, tools)
+      
+      // Generate emoji based on container type
+      const emoji = this.getContainerEmoji(imageName)
+      
+      section += `### ${emoji} ${imageName}
+
+- **Base Image:** \`${baseImage}:latest\`
+- **Base Image Digest:** \`${digest}\`
+- **Tools:** ${toolsDesc}
+- **Size:** ~${imageSize.toFixed(2)} MB
+- **Registries:**
+  - GitHub: \`ghcr.io/iamvikshan/devcontainers/${imageName}:latest\`
+  - GitLab: \`registry.gitlab.com/vikshan/devcontainers/${imageName}:latest\`
+  - Docker Hub: \`docker.io/vikshan/${imageName}:latest\`
+
+`
+    }
+
+    return section
+  }
+
+  private generateToolsDescription(imageName: string, tools: any): string {
+    const toolsList = []
+    
+    if (tools.bun_version) {
+      toolsList.push(`Bun ${tools.bun_version}`)
+    }
+    
+    if (tools.node_version) {
+      toolsList.push(`Node.js ${tools.node_version}`)
+    }
+    
+    if (tools.npm_version) {
+      toolsList.push(`npm ${tools.npm_version}`)
+    }
+    
+    if (tools.eslint_version) {
+      toolsList.push(`ESLint ${tools.eslint_version}`)
+    } else if (imageName.includes('node') && !imageName.includes('gitpod')) {
+      toolsList.push('ESLint (global)')
+    }
+    
+    if (tools.git_version) {
+      toolsList.push(`Git ${tools.git_version}`)
+    }
+    
+    if (tools.curl_version) {
+      toolsList.push(`curl ${tools.curl_version}`)
+    }
+
+    // Add special notes for certain containers
+    if (imageName.includes('ubuntu') && imageName.includes('node') && !imageName.includes('gitpod')) {
+      toolsList.push('ESLint (non-root)')
+    }
+
+    return toolsList.length > 0 ? toolsList.join(', ') : 'Basic development tools'
+  }
+
+  private getContainerEmoji(imageName: string): string {
+    if (imageName.includes('gitpod')) {
+      return '🟠' // Gitpod orange
+    } else if (imageName.includes('ubuntu')) {
+      return '🐧' // Ubuntu penguin
+    } else {
+      return '🚀' // Default rocket
+    }
+  }
+
+  private loadToolVersions(): any[] {
+    try {
+      const toolVersionsPath = join(process.cwd(), 'tool-versions.json')
+      if (existsSync(toolVersionsPath)) {
+        const content = readFileSync(toolVersionsPath, 'utf-8')
+        return JSON.parse(content)
+      }
+    } catch (error) {
+      console.log('⚠️  Could not load tool versions, using defaults')
+    }
+    return []
   }
 
   private updateNextRelease(content: string): string {

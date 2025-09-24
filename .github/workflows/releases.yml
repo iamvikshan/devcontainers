@@ -163,20 +163,62 @@ jobs:
             fi
 
             if [ -f "$dockerfile_path" ]; then
-              # Build and push to all registries
+              echo "🔨 Building $container:$version locally first..."
+              
+              # Build image locally first (no push) with optimizations
               docker buildx build \
                 --file "$dockerfile_path" \
-                --push \
+                --load \
                 --platform linux/amd64 \
                 --provenance=false \
-                --output type=registry \
-                --tag "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}" \
-                --tag "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:latest" \
-                --tag "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}" \
-                --tag "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:latest" \
-                --tag "${{ env.GL_USERNAME }}/${container}:v${version}" \
-                --tag "${{ env.GL_USERNAME }}/${container}:latest" \
+                --compress \
+                --tag "local-${container}:${version}" \
                 "$context_dir"
+              
+              # Tag for all registries first
+              echo "🏷️  Tagging image for all registries..."
+              docker tag "local-${container}:${version}" "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}"
+              docker tag "local-${container}:${version}" "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:latest"
+              docker tag "local-${container}:${version}" "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}"
+              docker tag "local-${container}:${version}" "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:latest"
+              docker tag "local-${container}:${version}" "${{ env.GL_USERNAME }}/${container}:v${version}"
+              docker tag "local-${container}:${version}" "${{ env.GL_USERNAME }}/${container}:latest"
+              
+              # Push to all registries in parallel for faster deployment
+              echo "📦 Pushing to all registries in parallel..."
+              (
+                echo "📦 Pushing to GitHub Container Registry..."
+                docker push "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}" && \
+                docker push "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:latest" && \
+                echo "✅ GitHub Container Registry push completed"
+              ) &
+              
+              (
+                echo "📦 Pushing to GitLab Container Registry..."
+                docker push "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}" && \
+                docker push "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:latest" && \
+                echo "✅ GitLab Container Registry push completed"
+              ) &
+              
+              (
+                echo "📦 Pushing to Docker Hub..."
+                docker push "${{ env.GL_USERNAME }}/${container}:v${version}" && \
+                docker push "${{ env.GL_USERNAME }}/${container}:latest" && \
+                echo "✅ Docker Hub push completed"
+              ) &
+              
+              # Wait for all pushes to complete
+              wait
+              
+              # Clean up local image and unused tags
+              echo "🧹 Cleaning up local images..."
+              docker rmi "local-${container}:${version}" \
+                         "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}" \
+                         "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:latest" \
+                         "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}" \
+                         "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:latest" \
+                         "${{ env.GL_USERNAME }}/${container}:v${version}" \
+                         "${{ env.GL_USERNAME }}/${container}:latest" || true
 
               echo "✅ Built and pushed $container:$version"
 
@@ -211,6 +253,42 @@ jobs:
             exit 1
           fi
 
+      - name: Clean up untagged images
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          AFFECTED_CONTAINERS: ${{ steps.release_analysis.outputs.affected_containers }}
+        run: |
+          echo "🧹 Cleaning up any untagged images..."
+
+          if [ "$AFFECTED_CONTAINERS" != "" ]; then
+            IFS=',' read -ra CONTAINERS <<< "$AFFECTED_CONTAINERS"
+            
+            for container in "${CONTAINERS[@]}"; do
+              container=$(echo "$container" | xargs) # trim whitespace
+              
+              echo "🔍 Checking for untagged images for $container..."
+              
+              # Clean up untagged images in GitHub Container Registry
+              # Note: This uses GitHub API to delete untagged package versions
+              curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+                   -H "Accept: application/vnd.github.v3+json" \
+                   "https://api.github.com/user/packages/container/${{ github.event.repository.name }}%2F${container}/versions" | \
+              jq -r '.[] | select(.metadata.container.tags | length == 0) | .id' | \
+              while read version_id; do
+                if [ -n "$version_id" ]; then
+                  echo "🗑️  Deleting untagged version $version_id for $container"
+                  curl -s -X DELETE \
+                       -H "Authorization: Bearer $GITHUB_TOKEN" \
+                       -H "Accept: application/vnd.github.v3+json" \
+                       "https://api.github.com/user/packages/container/${{ github.event.repository.name }}%2F${container}/versions/$version_id" || true
+                fi
+              done
+            done
+          fi
+
+          echo "✅ Cleanup completed"
+
       - name: Extract tool versions
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
         env:
@@ -225,16 +303,50 @@ jobs:
 
           echo "🔍 Extracting tool versions from built containers..."
 
-          # Extract tool versions from the newly built containers using registry images
+          # Extract tool versions from each container individually with its specific version
           if [ "$AFFECTED_CONTAINERS" != "" ]; then
-            # Use the actual version from version map for the first container to determine the tag
-            FIRST_CONTAINER=$(echo "$AFFECTED_CONTAINERS" | cut -d',' -f1 | xargs)
-            VERSION_TAG=$(echo "$VERSION_MAP" | jq -r ".[\"$FIRST_CONTAINER\"] // \"latest\"")
-            
-            echo "📋 Using version tag: v$VERSION_TAG"
             echo "🔍 Extracting from GitHub Container Registry images..."
             
-            bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="$AFFECTED_CONTAINERS" --version="v$VERSION_TAG" --output="tool-versions.json" --silent
+            # Create a script to extract tool versions for each container with its specific version
+            cat > extract_tool_versions.sh << 'EOF'
+            #!/bin/bash
+            set -e
+            
+            VERSION_MAP='${{ steps.release_analysis.outputs.version_map }}'
+            AFFECTED_CONTAINERS='${{ steps.release_analysis.outputs.affected_containers }}'
+            
+            # Initialize empty results array
+            echo "[]" > tool-versions.json
+            
+            IFS=',' read -ra CONTAINERS <<< "$AFFECTED_CONTAINERS"
+            
+            for container in "${CONTAINERS[@]}"; do
+              container=$(echo "$container" | xargs) # trim whitespace
+              version=$(echo "$VERSION_MAP" | jq -r ".[\"$container\"] // \"latest\"")
+              
+              echo "📋 Extracting tool versions from $container:v$version..."
+              
+              # Extract tool versions for this specific container and version
+              if bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="$container" --version="v$version" --output="temp-$container.json" --silent; then
+                echo "✅ Successfully extracted tool versions from $container:v$version"
+                
+                # Merge the results into the main tool-versions.json file
+                if [ -f "temp-$container.json" ]; then
+                  # Merge the new results with existing results
+                  jq -s 'add' tool-versions.json "temp-$container.json" > merged-tool-versions.json
+                  mv merged-tool-versions.json tool-versions.json
+                  rm "temp-$container.json"
+                fi
+              else
+                echo "⚠️  Failed to extract tool versions from $container:v$version, continuing with other containers..."
+              fi
+            done
+            
+            echo "📊 Extracted tool versions from $(jq length tool-versions.json) containers"
+            EOF
+            
+            chmod +x extract_tool_versions.sh
+            ./extract_tool_versions.sh
           fi
 
       - name: Update documentation with real-time data
@@ -251,7 +363,7 @@ jobs:
           bun scripts/versionsManager.ts --version-map="$VERSION_MAP" --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
 
           echo "📋 Staging documentation files..."
-          git add VERSIONS.md README.md base/*/README.md CHANGELOG.md container-versions.json tool-versions.json || true
+          git add VERSIONS.md README.md base/*/README.md CHANGELOG.md || true
 
       - name: Commit documentation changes
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
@@ -275,10 +387,9 @@ jobs:
             
             # Commit the documentation changes
             git commit -m "docs: update documentation for release v$HIGHEST_VERSION" \
-                      -m "- Updated VERSIONS.md with new container versions" \
+                      -m "- Updated VERSIONS.md with container versions and tool information" \
                       -m "- Updated README files with latest image sizes" \
-                      -m "- Updated CHANGELOG.md with release notes" \
-                      -m "- Updated tool version information"
+                      -m "- Updated CHANGELOG.md with release notes"
             
             echo "✅ Documentation changes committed"
             

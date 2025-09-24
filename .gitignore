@@ -3,3 +3,7 @@ bun.lockb
 .env
 package-lock.json
 bun.lock
+
+# Generated files (integrated into VERSIONS.md)
+container-versions.json
+tool-versions.json
