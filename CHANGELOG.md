@@ -3,14 +3,18 @@
 ## [1.1.5] - 2025-09-24
 
 ## Container Updates
+
 - **gitpod-ubuntu-bun-node**: 1.1.4 → 1.1.5 (fix)
 - **gitpod-ubuntu-bun**: 1.1.4 → 1.1.5 (fix)
 - **bun-node**: 1.0.3 → 1.0.4 (fix)
 - **bun**: 1.0.3 → 1.0.4 (fix)
 - **ubuntu-bun-node**: 1.0.3 → 1.0.4 (fix)
 - **ubuntu-bun**: 1.0.3 → 1.0.4 (fix)
+
 ## Bug Fixes
-- fix: update advanced-git-sync action version and improve SSH startup script in gitpod Dockerfiles (6b33e3f)
+
+- fix: update advanced-git-sync action version and improve SSH startup script in gitpod Dockerfiles
+  (6b33e3f)
 - fix: update Dockerfiles to include SSH server and configure settings for improved access (ea95c30)
 
 ## [1.1.4] - 2025-09-17

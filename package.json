@@ -1,9 +1,9 @@
 {
   "scripts": {
     "f": "prettier --write \"**/*.*\"",
-    "s": "bun scripts/versionsManager.ts --sync-only",
-    "sync-sizes": "bun scripts/versionsManager.ts --sync-only",
-    "update-versions": "bun scripts/versionsManager.ts",
+    "s": "bun scripts/changelogManager.ts --sync-only",
+    "sync-sizes": "bun scripts/changelogManager.ts --sync-only",
+    "update-versions": "bun scripts/changelogManager.ts",
     "rs": "bun f && git push -f",
     "check-updates": "bun scripts/checkImages.ts",
     "check-base-images": "bun scripts/checkImages.ts",
@@ -30,7 +30,7 @@
     "analyze-changes": "bun scripts/changeDetector.ts"
   },
   "devDependencies": {
-    "@types/node": "^24.5.2",
+    "@types/node": "^24.6.0",
     "axios": "^1.12.2",
     "node-fetch": "^3.3.2",
     "prettier": "^3.6.2"

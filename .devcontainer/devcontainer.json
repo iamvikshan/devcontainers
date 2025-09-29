@@ -28,7 +28,7 @@
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bun install && docker --version",
+  "postCreateCommand": "bun update && docker --version",
 
   // Set `remoteUser` to `root` to connect as root.
   "remoteUser": "root",

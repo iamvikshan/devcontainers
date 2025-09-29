@@ -175,9 +175,18 @@ export class PreReleaseChecker {
     this.log('📝 Creating force release commit...')
 
     try {
-      // Configure git
-      execSync('git config --local user.email "action@github.com"')
-      execSync('git config --local user.name "GitHub Action"')
+      // Configure git with environment variables or fallback
+      const gitEmail =
+        process.env.GIT_AUTHOR_EMAIL ||
+        process.env.GIT_COMMITTER_EMAIL ||
+        'action@github.com'
+      const gitName =
+        process.env.GIT_AUTHOR_NAME ||
+        process.env.GIT_COMMITTER_NAME ||
+        'GitHub Action'
+
+      execSync(`git config --global user.email "${gitEmail}"`)
+      execSync(`git config --global user.name "${gitName}"`)
 
       // Create the commit message file
       const fullCommitMessage = [commitMessage, '', ...commitBody].join('\n')
