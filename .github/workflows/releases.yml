@@ -304,45 +304,45 @@ jobs:
             
             # Create a script to extract tool versions for each container with its specific version
             cat > extract_tool_versions.sh << EOF
-#!/bin/bash
-set -e
-
-VERSION_MAP='$VERSION_MAP'
-AFFECTED_CONTAINERS='$AFFECTED_CONTAINERS'
-
-# Initialize empty results array
-echo "[]" > tool-versions.json
-
-IFS=',' read -ra CONTAINERS <<< "\$AFFECTED_CONTAINERS"
-
-for container in "\${CONTAINERS[@]}"; do
-  container=\$(echo "\$container" | xargs) # trim whitespace
-  version=\$(echo "\$VERSION_MAP" | jq -r ".[\"\\$container\"] // \"latest\"")
-  
-  echo "📋 Extracting tool versions from \$container:v\$version..."
-  
-  # Extract tool versions for this specific container and version
-  if bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="\$container" --version="v\$version" --output="temp-\$container.json" --silent; then
-    echo "✅ Successfully extracted tool versions from \$container:v\$version"
-    
-    # Merge the results into the main tool-versions.json file
-    if [ -f "temp-\$container.json" ]; then
-      # Merge the new results with existing results
-      jq -s 'add' tool-versions.json "temp-\$container.json" > merged-tool-versions.json
-      mv merged-tool-versions.json tool-versions.json
-      rm "temp-\$container.json"
-    fi
-  else
-    echo "⚠️  Failed to extract tool versions from \$container:v\$version, continuing with other containers..."
-  fi
-done
-
-echo "📊 Extracted tool versions from \$(jq length tool-versions.json) containers"
-EOF
+            #!/bin/bash
+            set -e
             
-            chmod +x extract_tool_versions.sh
-            ./extract_tool_versions.sh
-          fi
+            VERSION_MAP='$VERSION_MAP'
+            AFFECTED_CONTAINERS='$AFFECTED_CONTAINERS'
+            
+            # Initialize empty results array
+            echo "[]" > tool-versions.json
+            
+            IFS=',' read -ra CONTAINERS <<< "\$AFFECTED_CONTAINERS"
+            
+            for container in "\${CONTAINERS[@]}"; do
+              container=\$(echo "\$container" | xargs) # trim whitespace
+              version=\$(echo "\$VERSION_MAP" | jq -r ".[\"\\$container\"] // \"latest\"")
+              
+              echo "📋 Extracting tool versions from \$container:v\$version..."
+              
+              # Extract tool versions for this specific container and version
+              if bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="\$container" --version="v\$version" --output="temp-\$container.json" --silent; then
+                echo "✅ Successfully extracted tool versions from \$container:v\$version"
+                
+                # Merge the results into the main tool-versions.json file
+                if [ -f "temp-\$container.json" ]; then
+                  # Merge the new results with existing results
+                  jq -s 'add' tool-versions.json "temp-\$container.json" > merged-tool-versions.json
+                  mv merged-tool-versions.json tool-versions.json
+                  rm "temp-\$container.json"
+                fi
+              else
+                echo "⚠️  Failed to extract tool versions from \$container:v\$version, continuing with other containers..."
+              fi
+            done
+            
+            echo "📊 Extracted tool versions from \$(jq length tool-versions.json) containers"
+            EOF
+                        
+                        chmod +x extract_tool_versions.sh
+                        ./extract_tool_versions.sh
+                      fi
 
       - name: Update documentation with real-time data
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
