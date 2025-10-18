@@ -93,7 +93,7 @@ All images force the use of `bash` instead of `sh`:
 ```bash
 # Override sh preference in Gitpod
 if [ -z "$SHELL" ] || [ "$SHELL" = "/bin/sh" ]; then
-    export SHELL="/bin/bash"
+  export SHELL="/bin/bash"
 fi
 ```
 

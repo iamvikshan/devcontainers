@@ -1,0 +1,24 @@
+name: "Extract Tool Versions"
+description: "Extracts tool versions from built container images"
+
+inputs:
+  version-map:
+    description: "JSON map of container names to versions"
+    required: true
+  affected-containers:
+    description: "Comma-separated list of affected containers"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Extract tool versions
+      shell: bash
+      env:
+        VERSION_MAP: ${{ inputs.version-map }}
+        AFFECTED_CONTAINERS: ${{ inputs.affected-containers }}
+      run: |
+        echo "🔍 Extracting tool versions from built containers..."
+
+        chmod +x scripts/extract-tool-versions.sh
+        ./scripts/extract-tool-versions.sh || echo "⚠️  Tool version extraction failed, but continuing..."

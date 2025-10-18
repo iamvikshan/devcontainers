@@ -1,0 +1,28 @@
+name: "Cleanup Untagged Images"
+description: "Cleans up untagged container images from registries"
+
+inputs:
+  affected-containers:
+    description: "Comma-separated list of affected containers"
+    required: true
+  github-token:
+    description: "GitHub token for API access"
+    required: true
+  repository-name:
+    description: "Repository name"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cleanup untagged images
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        AFFECTED_CONTAINERS: ${{ inputs.affected-containers }}
+        REPOSITORY_NAME: ${{ inputs.repository-name }}
+      run: |
+        echo "🧹 Cleaning up untagged images..."
+
+        chmod +x scripts/cleanup-untagged-images.sh
+        ./scripts/cleanup-untagged-images.sh || echo "⚠️  Image cleanup failed, but continuing..."

@@ -1,5 +1,8 @@
 node_modules/
-*.sh
 *ignore*
 *.nix
-bun.lock
+*lock*
+
+# Exclude setup.sh files with complex bash arithmetic that prettier-plugin-sh can't parse
+base/**/setup.sh
+gitpod/**/setup.sh

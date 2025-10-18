@@ -208,19 +208,19 @@ docker build --no-cache -t devcontainers/bun:test base/bun/.devcontainer
 
    ```dockerfile
    RUN apt-get update && apt-get install -y \
-       package1 \
-       package2 \
-       && rm -rf /var/lib/apt/lists/* \
-       && apt-get clean
+     package1 \
+     package2 \
+     && rm -rf /var/lib/apt/lists/* \
+     && apt-get clean
    ```
 
 2. **Clean up in the same layer**:
 
    ```dockerfile
    RUN install-something \
-       && rm -rf /var/lib/apt/lists/* \
-       && apt-get clean \
-       && rm -rf /tmp/* /var/tmp/*
+     && rm -rf /var/lib/apt/lists/* \
+     && apt-get clean \
+     && rm -rf /tmp/* /var/tmp/*
    ```
 
 3. **Use .dockerignore** to exclude unnecessary files from build context
@@ -231,7 +231,7 @@ docker build --no-cache -t devcontainers/bun:test base/bun/.devcontainer
    # Check current sizes across all registries
    bun run sync-sizes
    # or bun run s
-
+   
    # Analyze detailed size information
    bun run analyze-sizes
    ```

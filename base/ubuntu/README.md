@@ -46,8 +46,8 @@ need Node.js.
 Copy the `.devcontainer` directory to your project:
 
 ```bash
-    curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/ubuntu/bun/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
-    curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/ubuntu/bun/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
+curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/ubuntu/bun/.devcontainer/devcontainer.json -o .devcontainer/devcontainer.json
+curl -fsSL https://raw.githubusercontent.com/iamvikshan/devcontainers/main/base/ubuntu/bun/.devcontainer/Dockerfile -o .devcontainer/Dockerfile
 ```
 
 ### 2. Container Registry

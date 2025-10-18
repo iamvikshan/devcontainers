@@ -75,9 +75,6 @@ jobs:
             echo "release_needed=true" >> $GITHUB_OUTPUT
             echo "🚀 Release needed: $RELEASE_TYPE"
             echo "📦 Affected containers: $AFFECTED_CONTAINERS"
-
-            # Extract individual container versions for build process
-            echo "$VERSION_MAP" | jq -r 'to_entries[] | "\(.key)_version=\(.value)"' >> $GITHUB_OUTPUT
           else
             echo "release_needed=false" >> $GITHUB_OUTPUT
             if [ "$SUCCESS" = "false" ]; then
@@ -86,22 +83,6 @@ jobs:
             else
               echo "ℹ️  No release needed"
             fi
-          fi
-
-      - name: Create base image update commit
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.release_analysis.outputs.release_type == 'patch'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          echo "📝 Creating base image update commit..."
-
-          # Configure git
-          git config --global user.email "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
-
-          # Create commit for base image updates if needed
-          if echo "${{ steps.release_analysis.outputs.version_map }}" | jq -e '. | length > 0' > /dev/null; then
-            echo "✅ Base image update commit will be handled by release process"
           fi
 
       - name: Configure registries
@@ -116,260 +97,49 @@ jobs:
           dockerhub-username: ${{ env.GL_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build containers
+      - name: Build and push containers
         if: steps.release_analysis.outputs.release_needed == 'true'
         id: build_containers
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
-          AFFECTED_CONTAINERS: ${{ steps.release_analysis.outputs.affected_containers }}
-        run: |
-          echo "🔨 Building containers..."
-          echo "📦 Version map: $VERSION_MAP"
-          echo "📋 Affected containers: $AFFECTED_CONTAINERS"
+        uses: ./.github/actions/build-and-push
+        with:
+          version-map: ${{ steps.release_analysis.outputs.version_map }}
+          affected-containers: ${{ steps.release_analysis.outputs.affected_containers }}
+          github-registry: ${{ env.GITHUB_REGISTRY }}
+          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
+          dockerhub-username: ${{ env.GL_USERNAME }}
+          repository-name: ${{ github.event.repository.name }}
 
-          # Create a custom build script that handles individual container versioning
-          cat > build_containers.sh << 'EOF'
-          #!/bin/bash
-          set -e
-
-          VERSION_MAP='${{ steps.release_analysis.outputs.version_map }}'
-          AFFECTED_CONTAINERS='${{ steps.release_analysis.outputs.affected_containers }}'
-
-          if [ "$AFFECTED_CONTAINERS" = "" ]; then
-            echo "ℹ️  No containers to build"
-            exit 0
-          fi
-
-          IFS=',' read -ra CONTAINERS <<< "$AFFECTED_CONTAINERS"
-
-          for container in "${CONTAINERS[@]}"; do
-            container=$(echo "$container" | xargs) # trim whitespace
-            version=$(echo "$VERSION_MAP" | jq -r ".[\"$container\"] // \"latest\"")
-
-            echo "🔨 Building $container:$version..."
-
-            # Determine dockerfile path
-            if [[ "$container" == ubuntu-* ]]; then
-              dockerfile_path="base/ubuntu/${container#ubuntu-}/Dockerfile"
-              context_dir="base/ubuntu/${container#ubuntu-}"
-            elif [[ "$container" == gitpod-ubuntu-* ]]; then
-              dockerfile_path="gitpod/${container#gitpod-}/Dockerfile"
-              context_dir="gitpod/${container#gitpod-}"
-            elif [[ "$container" == gitpod-* ]]; then
-              dockerfile_path="gitpod/${container#gitpod-}/Dockerfile"
-              context_dir="gitpod/${container#gitpod-}"
-            else
-              dockerfile_path="base/$container/.devcontainer/Dockerfile"
-              context_dir="base/$container/.devcontainer"
-            fi
-
-            if [ -f "$dockerfile_path" ]; then
-              echo "🔨 Building $container:$version locally first..."
-              
-              # Build image locally first (no push) with optimizations
-              docker buildx build \
-                --file "$dockerfile_path" \
-                --load \
-                --platform linux/amd64 \
-                --provenance=false \
-                --compress \
-                --tag "local-${container}:${version}" \
-                "$context_dir"
-              
-              # Tag for all registries first
-              echo "🏷️  Tagging image for all registries..."
-              docker tag "local-${container}:${version}" "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}"
-              docker tag "local-${container}:${version}" "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}"
-              docker tag "local-${container}:${version}" "${{ env.GL_USERNAME }}/${container}:v${version}"
-              
-              # Push to all registries in parallel for faster deployment
-              echo "📦 Pushing to all registries in parallel..."
-              (
-                echo "📦 Pushing to GitHub Container Registry..."
-                docker push "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}" && \
-                echo "✅ GitHub Container Registry push completed"
-              ) &
-              
-              (
-                echo "📦 Pushing to GitLab Container Registry..."
-                docker push "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}" && \
-                echo "✅ GitLab Container Registry push completed"
-              ) &
-              
-              (
-                echo "📦 Pushing to Docker Hub..."
-                docker push "${{ env.GL_USERNAME }}/${container}:v${version}" && \
-                echo "✅ Docker Hub push completed"
-              ) &
-              
-              # Wait for all pushes to complete
-              wait
-              
-              # Clean up local image and unused tags
-              echo "🧹 Cleaning up local images..."
-              docker rmi "local-${container}:${version}" \
-                         "${{ env.GITHUB_REGISTRY }}/${{ github.repository }}/${container}:v${version}" \
-                         "${{ env.GITLAB_REGISTRY }}/${{ env.GL_USERNAME }}/${{ github.event.repository.name }}/${container}:v${version}" \
-                         "${{ env.GL_USERNAME }}/${container}:v${version}" || true
-
-              echo "✅ Built and pushed $container:$version"
-
-              # Close any existing build failure issues
-              bun scripts/issueManager.ts --close-success --container="$container" --version="$version" --silent || true
-            else
-              echo "❌ Dockerfile not found: $dockerfile_path"
-
-              # Create build failure issue
-              bun scripts/issueManager.ts \
-                --container="$container" \
-                --version="$version" \
-                --error="Dockerfile not found: $dockerfile_path" \
-                --workflow="${{ github.workflow }}" \
-                --run-id="${{ github.run_id }}" \
-                --silent || true
-
-              exit 1
-            fi
-          done
-          EOF
-
-          chmod +x build_containers.sh
-
-          # Execute the build script with error handling
-          if ./build_containers.sh; then
-            echo "build_success=true" >> $GITHUB_OUTPUT
-            echo "✅ All containers built successfully"
-          else
-            echo "build_success=false" >> $GITHUB_OUTPUT
-            echo "❌ Container build failed"
-            exit 1
-          fi
-
-      - name: Clean up untagged images
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          AFFECTED_CONTAINERS: ${{ steps.release_analysis.outputs.affected_containers }}
-        run: |
-          echo "🧹 Cleaning up any untagged images..."
-
-          if [ "$AFFECTED_CONTAINERS" != "" ]; then
-            IFS=',' read -ra CONTAINERS <<< "$AFFECTED_CONTAINERS"
-            
-            for container in "${CONTAINERS[@]}"; do
-              container=$(echo "$container" | xargs) # trim whitespace
-              
-              echo "🔍 Checking for untagged images for $container..."
-              
-              # Clean up untagged images in GitHub Container Registry
-              # Note: This uses GitHub API to delete untagged package versions
-              curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-                   -H "Accept: application/vnd.github.v3+json" \
-                   "https://api.github.com/user/packages/container/${{ github.event.repository.name }}%2F${container}/versions" | \
-              jq -r '.[] | select(.metadata.container.tags | length == 0) | .id' | \
-              while read version_id; do
-                if [ -n "$version_id" ]; then
-                  echo "🗑️  Deleting untagged version $version_id for $container"
-                  curl -s -X DELETE \
-                       -H "Authorization: Bearer $GITHUB_TOKEN" \
-                       -H "Accept: application/vnd.github.v3+json" \
-                       "https://api.github.com/user/packages/container/${{ github.event.repository.name }}%2F${container}/versions/$version_id" || true
-                fi
-              done
-            done
-          fi
-
-          echo "✅ Cleanup completed"
+      - name: Cleanup untagged images
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+        continue-on-error: true
+        uses: ./.github/actions/cleanup-images
+        with:
+          affected-containers: ${{ steps.release_analysis.outputs.affected_containers }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          repository-name: ${{ github.event.repository.name }}
 
       - name: Extract tool versions
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          AFFECTED_CONTAINERS: ${{ steps.release_analysis.outputs.affected_containers }}
-          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
-        run: |
-          echo "⏳ Waiting for images to be available across all registries..."
-          sleep 30
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+        continue-on-error: true
+        uses: ./.github/actions/extract-versions
+        with:
+          version-map: ${{ steps.release_analysis.outputs.version_map }}
+          affected-containers: ${{ steps.release_analysis.outputs.affected_containers }}
 
-          echo "🔍 Extracting tool versions from built containers..."
+      - name: Update documentation
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+        continue-on-error: true
+        uses: ./.github/actions/update-docs
+        with:
+          version-map: ${{ steps.release_analysis.outputs.version_map }}
+          github-token: ${{ secrets.GH_TOKEN }}
 
-          # Extract tool versions from each container individually with its specific version
-          if [ "$AFFECTED_CONTAINERS" != "" ]; then
-            echo "🔍 Extracting from GitHub Container Registry images..."
-            
-            # Create a script to extract tool versions for each container with its specific version
-            cat > extract_tool_versions.sh << EOF
-            #!/bin/bash
-            set -e
-            
-            VERSION_MAP='$VERSION_MAP'
-            AFFECTED_CONTAINERS='$AFFECTED_CONTAINERS'
-            
-            # Initialize empty results array
-            echo "[]" > tool-versions.json
-            
-            IFS=',' read -ra CONTAINERS <<< "\$AFFECTED_CONTAINERS"
-            
-            for container in "\${CONTAINERS[@]}"; do
-              container=\$(echo "\$container" | xargs) # trim whitespace
-              version=\$(echo "\$VERSION_MAP" | jq -r ".[\"\\$container\"] // \"latest\"")
-              
-              echo "📋 Extracting tool versions from \$container:v\$version..."
-              
-              # Extract tool versions for this specific container and version
-              if bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="\$container" --version="v\$version" --output="temp-\$container.json" --silent; then
-                echo "✅ Successfully extracted tool versions from \$container:v\$version"
-                
-                # Merge the results into the main tool-versions.json file
-                if [ -f "temp-\$container.json" ]; then
-                  # Merge the new results with existing results
-                  jq -s 'add' tool-versions.json "temp-\$container.json" > merged-tool-versions.json
-                  mv merged-tool-versions.json tool-versions.json
-                  rm "temp-\$container.json"
-                fi
-              else
-                echo "⚠️  Failed to extract tool versions from \$container:v\$version, continuing with other containers..."
-              fi
-            done
-            
-            echo "📊 Extracted tool versions from \$(jq length tool-versions.json) containers"
-            EOF
-                        
-                        chmod +x extract_tool_versions.sh
-                        ./extract_tool_versions.sh
-                      fi
-
-      - name: Update documentation with real-time data
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
-          GIT_AUTHOR_EMAIL: "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          GIT_AUTHOR_NAME: "${{ github.actor }}"
-          GIT_COMMITTER_EMAIL: "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          GIT_COMMITTER_NAME: "${{ github.actor }}"
-        run: |
-          echo "📝 Updating CHANGELOG.md with real-time data..."
-
-          # Update CHANGELOG.md with new version information
-          bun scripts/changelogManager.ts --version-map="$VERSION_MAP" --notes="Automated release with latest base images,Security patches and updates,Documentation improvements"
-
-          echo "📋 Staging documentation files..."
-          git add CHANGELOG.md README.md base/*/README.md || true
-
-      - name: Commit documentation changes
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
+      - name: Commit and push documentation
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
-          RELEASE_TYPE: ${{ steps.release_analysis.outputs.release_type }}
         run: |
           echo "📝 Committing documentation changes..."
 
@@ -394,16 +164,9 @@ jobs:
             # Pull any remote changes before pushing
             echo "🔄 Pulling remote changes to avoid conflicts..."
             git pull --rebase origin main || {
-              echo "❌ Failed to pull remote changes. There may be conflicts that need manual resolution."
-              echo "🔍 Checking for conflicts..."
-              if git status --porcelain | grep -q "^UU\|^AA\|^DD"; then
-                echo "⚠️  Merge conflicts detected. Aborting rebase and using merge strategy instead."
-                git rebase --abort
-                git pull origin main --no-edit
-              else
-                echo "❌ Pull failed for unknown reason"
-                exit 1
-              fi
+              echo "⚠️  Merge conflicts detected. Using merge strategy instead."
+              git rebase --abort
+              git pull origin main --no-edit
             }
             
             # Push the documentation commit
@@ -411,44 +174,16 @@ jobs:
             echo "✅ Documentation changes pushed to main branch"
           fi
 
-      - name: Create Git Tag
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build_success == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
-          RELEASE_TYPE: ${{ steps.release_analysis.outputs.release_type }}
-        run: |
-          echo "🏷️  Creating git tag for Docker image release..."
-
-          # Configure git
-          git config --global user.email "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
-
-          # Get the highest version for the tag
-          HIGHEST_VERSION=$(echo "$VERSION_MAP" | jq -r 'to_entries | max_by(.value | split(".") | map(tonumber)) | .value')
-          TAG_NAME="v$HIGHEST_VERSION"
-
-          echo "📋 Creating tag: $TAG_NAME"
-
-          # Create annotated tag with release information
-          AFFECTED_CONTAINERS=$(echo "$VERSION_MAP" | jq -r 'keys | join(", ")')
-          git tag -a "$TAG_NAME" -m "Docker Images Release $TAG_NAME" \
-                                 -m "Released containers: $AFFECTED_CONTAINERS" \
-                                 -m "Release type: $RELEASE_TYPE" \
-                                 -m "Build date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-
-          # Pull any remote changes before pushing the tag
-          echo "🔄 Ensuring we have latest changes before pushing tag..."
-          git pull origin main --no-edit || echo "⚠️  Pull failed, but proceeding with tag push"
-
-          # Push the tag
-          git push origin "$TAG_NAME"
-
-          echo "✅ Git tag $TAG_NAME created and pushed"
-          echo "🐳 Docker images are available in registries with version $TAG_NAME"
+      - name: Create Git tag
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+        uses: ./.github/actions/create-tag
+        with:
+          version-map: ${{ steps.release_analysis.outputs.version_map }}
+          release-type: ${{ steps.release_analysis.outputs.release_type }}
+          github-token: ${{ secrets.GH_TOKEN }}
 
       - name: No release needed
         if: steps.release_analysis.outputs.release_needed != 'true'
         run: |
-          echo "ℹ️  No Docker image release needed - all images are up to date and no code changes require new image versions"
+          echo "ℹ️  No Docker image release needed - all images are up to date"
           echo "✅ Workflow completed successfully"
