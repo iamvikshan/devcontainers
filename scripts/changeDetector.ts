@@ -25,6 +25,22 @@ export class ChangeDetector {
     const commits = versionManager.getCommitsSinceLastRelease()
     const versionBumps = versionManager.processCommits(commits)
 
+    // Check for manual release override
+    const manualReleaseCommit = commits.find(
+      c => c.type === 'release' && c.manualVersion
+    )
+    let manualOverride: ReleaseContext['manualOverride'] = undefined
+
+    if (manualReleaseCommit && manualReleaseCommit.manualVersion) {
+      manualOverride = {
+        version: manualReleaseCommit.manualVersion,
+        commitHash: manualReleaseCommit.hash
+      }
+      this.log(
+        `🎯 Manual release override detected: v${manualReleaseCommit.manualVersion}`
+      )
+    }
+
     // Get unique affected containers
     const affectedContainers = Array.from(
       new Set(commits.flatMap(c => c.affectedContainers))
@@ -67,7 +83,9 @@ export class ChangeDetector {
           })
         }
       } catch (error) {
-        this.log(`⚠️  Error checking base image updates: ${error.message}`)
+        this.log(
+          `⚠️  Error checking base image updates: ${error instanceof Error ? error.message : String(error)}`
+        )
       }
     }
 
@@ -76,14 +94,16 @@ export class ChangeDetector {
       affectedContainers,
       versionBumps,
       commits,
-      baseImageUpdates
+      baseImageUpdates,
+      manualOverride
     }
   }
 
   // Check if any containers need to be released
   shouldRelease(context: ReleaseContext): boolean {
     return (
-      context.versionBumps.length > 0 || context.baseImageUpdates?.length > 0
+      context.versionBumps.length > 0 ||
+      (context.baseImageUpdates?.length ?? 0) > 0
     )
   }
 
@@ -96,6 +116,9 @@ export class ChangeDetector {
   getOverallReleaseType(
     context: ReleaseContext
   ): 'major' | 'minor' | 'patch' | 'none' {
+    // Manual override always returns major (since it can be any version)
+    if (context.manualOverride) return 'major'
+
     if (context.versionBumps.length === 0) return 'none'
 
     const priorities = { major: 3, minor: 2, patch: 1 }
@@ -147,7 +170,9 @@ export class ChangeDetector {
         notes.push('## Features')
         features.forEach(commit => {
           const shortHash = commit.hash.substring(0, 7)
-          notes.push(`- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`)
+          notes.push(
+            `- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`
+          )
         })
       }
 
@@ -155,7 +180,9 @@ export class ChangeDetector {
         notes.push('## Bug Fixes')
         fixes.forEach(commit => {
           const shortHash = commit.hash.substring(0, 7)
-          notes.push(`- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`)
+          notes.push(
+            `- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`
+          )
         })
       }
 
@@ -163,7 +190,9 @@ export class ChangeDetector {
         notes.push('## Other Changes')
         others.forEach(commit => {
           const shortHash = commit.hash.substring(0, 7)
-          notes.push(`- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`)
+          notes.push(
+            `- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`
+          )
         })
       }
     }
@@ -196,7 +225,9 @@ export class ChangeDetector {
       const commits = versionManager.getCommitsSinceLastRelease()
       return commits.length > 0
     } catch (error) {
-      this.log(`⚠️  Error checking for changes: ${error.message}`)
+      this.log(
+        `⚠️  Error checking for changes: ${error instanceof Error ? error.message : String(error)}`
+      )
       return false
     }
   }
@@ -219,7 +250,9 @@ export class ChangeDetector {
       const output = execSync(gitCommand, { encoding: 'utf-8' }).trim()
       return output ? output.split('\n').filter(Boolean) : []
     } catch (error) {
-      this.log(`⚠️  Error getting changed files: ${error.message}`)
+      this.log(
+        `⚠️  Error getting changed files: ${error instanceof Error ? error.message : String(error)}`
+      )
       return []
     }
   }

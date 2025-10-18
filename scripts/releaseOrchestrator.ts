@@ -125,15 +125,19 @@ export class ReleaseOrchestrator {
         execSync(releaseCommand, { stdio: 'inherit' })
         this.log(`✅ GitHub release ${tagName} created successfully`)
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error)
         this.log(
-          `⚠️  Could not create GitHub release via gh CLI: ${error.message}`
+          `⚠️  Could not create GitHub release via gh CLI: ${errorMessage}`
         )
         this.log(
           'ℹ️  Tag was created and pushed - release can be created manually'
         )
       }
     } catch (error) {
-      throw new Error(`Failed to create GitHub release: ${error.message}`)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to create GitHub release: ${errorMessage}`)
     }
   }
 
@@ -181,8 +185,10 @@ export class ReleaseOrchestrator {
 
       this.log('✅ Base image update commit created')
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
       throw new Error(
-        `Failed to create base image update commit: ${error.message}`
+        `Failed to create base image update commit: ${errorMessage}`
       )
     }
   }
@@ -232,7 +238,9 @@ export class ReleaseOrchestrator {
       writeFileSync('CHANGELOG.md', changelog)
       this.log('✅ CHANGELOG.md updated')
     } catch (error) {
-      this.log(`⚠️  Error updating CHANGELOG.md: ${error.message}`)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Error updating CHANGELOG.md: ${errorMessage}`)
     }
   }
 
@@ -292,6 +300,8 @@ export class ReleaseOrchestrator {
         outputs
       }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
       return {
         success: false,
         outputs: {
@@ -300,7 +310,7 @@ export class ReleaseOrchestrator {
           affected_containers: '',
           version_map: '{}'
         },
-        error: error.message
+        error: errorMessage
       }
     }
   }
@@ -334,7 +344,8 @@ async function main() {
 
     process.exit(result.success ? 0 : 1)
   } catch (error) {
-    console.error('❌ Release orchestration failed:', error.message)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('❌ Release orchestration failed:', errorMessage)
     process.exit(1)
   }
 }

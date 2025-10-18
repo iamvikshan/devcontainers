@@ -83,9 +83,11 @@ export interface CommitAnalysis {
     | 'ci'
     | 'perf'
     | 'revert'
+    | 'release' // Manual release override
   scope?: string
   breaking: boolean
   affectedContainers: string[]
+  manualVersion?: string // Version specified in rel/release commits
 }
 
 export interface ReleaseContext {
@@ -94,4 +96,8 @@ export interface ReleaseContext {
   versionBumps: VersionBump[]
   commits: CommitAnalysis[]
   baseImageUpdates?: any[]
+  manualOverride?: {
+    version: string
+    commitHash: string
+  }
 }

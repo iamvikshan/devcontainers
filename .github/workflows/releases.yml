@@ -183,14 +183,6 @@ jobs:
             echo "✅ Documentation changes pushed to main branch"
           fi
 
-      - name: Create Git tag
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
-        uses: ./.github/actions/create-tag
-        with:
-          version-map: ${{ steps.release_analysis.outputs.version_map }}
-          release-type: ${{ steps.release_analysis.outputs.release_type }}
-          github-token: ${{ secrets.GH_TOKEN }}
-
       - name: No release needed
         if: steps.release_analysis.outputs.release_needed != 'true'
         run: |

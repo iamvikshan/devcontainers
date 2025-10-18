@@ -180,6 +180,24 @@ export class VersionManager {
 
   // Parse semantic commit message
   parseCommit(commitMessage: string, commitHash: string): CommitAnalysis {
+    // Check for manual release override first: rel: vX.Y.Z or release: vX.Y.Z
+    const manualReleaseRegex =
+      /^(?:rel|release):\s*v?(\d+\.\d+\.\d+)\s*-?\s*(.+)?/i
+    const manualMatch = commitMessage.match(manualReleaseRegex)
+
+    if (manualMatch) {
+      const [, version, description] = manualMatch
+      this.log(`🎯 Manual release override detected: v${version}`)
+      return {
+        hash: commitHash,
+        message: commitMessage,
+        type: 'release',
+        breaking: false,
+        affectedContainers: IMAGE_DEFINITIONS.names, // All containers
+        manualVersion: version
+      }
+    }
+
     const conventionalCommitRegex =
       /^(feat|fix|chore|docs|style|refactor|test|build|ci|perf|revert)(\([^)]+\))?(!)?: (.+)/
     const match = commitMessage.match(conventionalCommitRegex)
@@ -331,6 +349,32 @@ export class VersionManager {
   processCommits(commits: CommitAnalysis[]): VersionBump[] {
     const versions = this.loadVersions()
     const versionBumps: VersionBump[] = []
+
+    // Check for manual release override first
+    const manualReleaseCommit = commits.find(
+      c => c.type === 'release' && c.manualVersion
+    )
+
+    if (manualReleaseCommit && manualReleaseCommit.manualVersion) {
+      this.log(
+        `🎯 Manual release override: v${manualReleaseCommit.manualVersion} for ALL containers`
+      )
+
+      // Apply the manual version to ALL containers
+      IMAGE_DEFINITIONS.names.forEach(container => {
+        const currentVersion = versions[container]?.version || '1.0.0'
+        versionBumps.push({
+          container,
+          currentVersion,
+          newVersion: manualReleaseCommit.manualVersion!,
+          bumpType: 'major', // Manual releases can be any type, we use major as default
+          reason: 'manual release override'
+        })
+      })
+
+      return versionBumps
+    }
+
     const containerBumps: Record<
       string,
       { type: CommitAnalysis['type']; breaking: boolean }
@@ -386,10 +430,15 @@ export class VersionManager {
     currentType: CommitAnalysis['type'],
     currentBreaking: boolean
   ): boolean {
+    // Manual release always has highest priority
+    if (newType === 'release') return true
+    if (currentType === 'release') return false
+
     if (newBreaking && !currentBreaking) return true
     if (!newBreaking && currentBreaking) return false
 
-    const priority = {
+    const priority: Record<CommitAnalysis['type'], number> = {
+      release: 10, // Highest priority
       feat: 2,
       fix: 1,
       perf: 1,
