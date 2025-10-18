@@ -166,7 +166,7 @@ main() {
 
   # Build bun image
   echo "==================== BUN IMAGE ===================="
-  if build_image "base/bun/.devcontainer/Dockerfile" "bun" "base/bun/.devcontainer"; then
+  if build_image "images/bun/Dockerfile" "bun" "images/bun"; then
     if test_image "bun"; then
       successful_builds+=("bun")
     else
@@ -179,7 +179,7 @@ main() {
 
   # Build bun-node image
   echo "================== BUN-NODE IMAGE =================="
-  if build_image "base/bun-node/.devcontainer/Dockerfile" "bun-node" "base/bun-node/.devcontainer"; then
+  if build_image "images/bun-node/Dockerfile" "bun-node" "images/bun-node"; then
     if test_image "bun-node"; then
       successful_builds+=("bun-node")
     else
@@ -192,7 +192,7 @@ main() {
 
   # Build ubuntu-bun image
   echo "================= UBUNTU-BUN IMAGE ================="
-  if build_image "base/ubuntu/bun/Dockerfile" "ubuntu-bun" "base/ubuntu/bun"; then
+  if build_image "images/ubuntu-bun/Dockerfile" "ubuntu-bun" "images/ubuntu-bun"; then
     if test_image "ubuntu-bun"; then
       successful_builds+=("ubuntu-bun")
     else
@@ -205,7 +205,7 @@ main() {
 
   # Build ubuntu-bun-node image
   echo "============== UBUNTU-BUN-NODE IMAGE ==============="
-  if build_image "base/ubuntu/bun-node/Dockerfile" "ubuntu-bun-node" "base/ubuntu/bun-node"; then
+  if build_image "images/ubuntu-bun-node/Dockerfile" "ubuntu-bun-node" "images/ubuntu-bun-node"; then
     if test_image "ubuntu-bun-node"; then
       successful_builds+=("ubuntu-bun-node")
     else
@@ -218,7 +218,7 @@ main() {
 
   # Build gitpod-bun image
   echo "================ GITPOD-BUN IMAGE =================="
-  if build_image "gitpod/bun/Dockerfile" "gitpod-bun" "gitpod/bun"; then
+  if build_image "images/gitpod-bun/Dockerfile" "gitpod-bun" "images/gitpod-bun"; then
     if test_image "gitpod-bun"; then
       successful_builds+=("gitpod-bun")
     else
@@ -231,7 +231,7 @@ main() {
 
   # Build gitpod-bun-node image
   echo "============ GITPOD-BUN-NODE IMAGE ================="
-  if build_image "gitpod/bun-node/Dockerfile" "gitpod-bun-node" "gitpod/bun-node"; then
+  if build_image "images/gitpod-bun-node/Dockerfile" "gitpod-bun-node" "images/gitpod-bun-node"; then
     if test_image "gitpod-bun-node"; then
       successful_builds+=("gitpod-bun-node")
     else
@@ -244,7 +244,7 @@ main() {
 
   # Build gitpod-ubuntu-bun image
   echo "============ GITPOD-UBUNTU-BUN IMAGE ==============="
-  if build_image "gitpod/ubuntu-bun/Dockerfile" "gitpod-ubuntu-bun" "gitpod/ubuntu-bun"; then
+  if build_image "images/gitpod-ubuntu-bun/Dockerfile" "gitpod-ubuntu-bun" "images/gitpod-ubuntu-bun"; then
     if test_image "gitpod-ubuntu-bun"; then
       successful_builds+=("gitpod-ubuntu-bun")
     else
@@ -257,7 +257,7 @@ main() {
 
   # Build gitpod-ubuntu-bun-node image
   echo "======== GITPOD-UBUNTU-BUN-NODE IMAGE =============="
-  if build_image "gitpod/ubuntu-bun-node/Dockerfile" "gitpod-ubuntu-bun-node" "gitpod/ubuntu-bun-node"; then
+  if build_image "images/gitpod-ubuntu-bun-node/Dockerfile" "gitpod-ubuntu-bun-node" "images/gitpod-ubuntu-bun-node"; then
     if test_image "gitpod-ubuntu-bun-node"; then
       successful_builds+=("gitpod-ubuntu-bun-node")
     else

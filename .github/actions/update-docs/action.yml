@@ -4,19 +4,13 @@ description: "Updates README files with image sizes and syncs changes"
 inputs:
   gitlab-token:
     description: "GitLab token"
-    required: true
-  ref-name:
-    description: "Git reference name"
-    required: true
+    required: false
   github-token:
     description: "GitHub token"
     required: true
-  version:
-    description: "Release version"
-    required: true
   dockerhub-token:
-    description: "Dockerhub token"
-    required: true
+    description: "DockerHub token"
+    required: false
 
 runs:
   using: "composite"
@@ -29,12 +23,9 @@ runs:
         echo "DOCKERHUB_TOKEN=${{ inputs.dockerhub-token }}" >> .env
         bun run s && bun run f
 
-    - name: Commit documentation changes
+    - name: Stage documentation changes
       shell: bash
       run: |
         git config --global user.email "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
         git config --global user.name "${{ github.actor }}"
-        git remote set-url origin https://${{ inputs.github-token }}@github.com/${GITHUB_REPOSITORY}.git
-        git add README.md base/*/README.md
-        git commit -m "docs: update image sizes for version ${{ inputs.version }}"
-        git push origin HEAD:${{ inputs.ref-name }}
+        git add README.md CHANGELOG.md docs/IMAGE_VARIANTS.md 2>/dev/null || true

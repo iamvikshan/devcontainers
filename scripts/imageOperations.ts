@@ -3,7 +3,7 @@ import {
   IMAGE_DEFINITIONS,
   RegistryClient
 } from './registryClient'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync } from 'fs'
 
 export interface ImageSizeInfo {
   name: string
@@ -134,7 +134,9 @@ export class ImageOperations {
           updates.push(result)
         }
       } catch (error) {
-        this.logError(`❌ Error checking ${containerName}: ${error.message}`)
+        this.logError(
+          `❌ Error checking ${containerName}: ${error instanceof Error ? error.message : String(error)}`
+        )
         // Add a failed check entry to maintain consistency
         updates.push({
           containerName,
@@ -170,7 +172,7 @@ export class ImageOperations {
         return result
       } catch (error) {
         this.logError(
-          `Attempt ${attempt}/${maxRetries} failed for ${containerName}: ${error.message}`
+          `Attempt ${attempt}/${maxRetries} failed for ${containerName}: ${error instanceof Error ? error.message : String(error)}`
         )
 
         if (attempt === maxRetries) {
@@ -251,7 +253,9 @@ export class ImageOperations {
       const latestTag = tags.find(t => t.name === 'latest')
       return latestTag?.digest || null
     } catch (error) {
-      this.logError(`Error getting digest for ${baseImage}: ${error.message}`)
+      this.logError(
+        `Error getting digest for ${baseImage}: ${error instanceof Error ? error.message : String(error)}`
+      )
       return null
     }
   }
@@ -270,14 +274,9 @@ export class ImageOperations {
 
     const readmeFiles = [
       'README.md',
-      'docs/IMAGE_VARIANTS.md',
-      'base/bun/README.md',
-      'base/bun-node/README.md',
-      'base/ubuntu/README.md',
-      'gitpod/bun/README.md',
-      'gitpod/bun-node/README.md',
-      'gitpod/ubuntu-bun/README.md',
-      'gitpod/ubuntu-bun-node/README.md'
+      'docs/IMAGE_VARIANTS.md'
+      // Note: Individual image directories don't have README files
+      // All documentation is consolidated in the main README.md and docs/
     ]
 
     for (const readmePath of readmeFiles) {
@@ -285,7 +284,9 @@ export class ImageOperations {
         await this.updateSingleReadme(readmePath, sizeMap)
         this.log(`✅ Updated ${readmePath}`)
       } catch (error) {
-        this.logError(`❌ Error updating ${readmePath}: ${error.message}`)
+        this.logError(
+          `❌ Error updating ${readmePath}: ${error instanceof Error ? error.message : String(error)}`
+        )
       }
     }
   }
@@ -294,6 +295,11 @@ export class ImageOperations {
     readmePath: string,
     sizeMap: Map<string, Map<string, number>>
   ): Promise<void> {
+    // Check if the file exists before attempting to read it
+    if (!existsSync(readmePath)) {
+      throw new Error(`ENOENT: no such file or directory, open '${readmePath}'`)
+    }
+
     const content = readFileSync(readmePath, 'utf8')
     let updatedContent = content
 
@@ -477,7 +483,10 @@ async function main() {
     try {
       await imageOperations.analyzeImageSizes()
     } catch (error) {
-      console.error('❌ Error analyzing image sizes:', error.message)
+      console.error(
+        '❌ Error analyzing image sizes:',
+        error instanceof Error ? error.message : String(error)
+      )
       process.exit(1)
     }
   } else if (args.includes('--sync-sizes')) {
@@ -487,7 +496,10 @@ async function main() {
       await imageOperations.updateReadmeFiles(sizes)
       console.log('✅ README sizes synced successfully!')
     } catch (error) {
-      console.error('❌ Error syncing sizes:', error.message)
+      console.error(
+        '❌ Error syncing sizes:',
+        error instanceof Error ? error.message : String(error)
+      )
       process.exit(1)
     }
   } else {

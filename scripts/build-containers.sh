@@ -25,20 +25,9 @@ for container in "${CONTAINERS[@]}"; do
 
   echo "🔨 Building $container:$version..."
 
-  # Determine dockerfile path
-  if [[ "$container" == ubuntu-* ]]; then
-    dockerfile_path="base/ubuntu/${container#ubuntu-}/Dockerfile"
-    context_dir="base/ubuntu/${container#ubuntu-}"
-  elif [[ "$container" == gitpod-ubuntu-* ]]; then
-    dockerfile_path="gitpod/${container#gitpod-}/Dockerfile"
-    context_dir="gitpod/${container#gitpod-}"
-  elif [[ "$container" == gitpod-* ]]; then
-    dockerfile_path="gitpod/${container#gitpod-}/Dockerfile"
-    context_dir="gitpod/${container#gitpod-}"
-  else
-    dockerfile_path="base/$container/.devcontainer/Dockerfile"
-    context_dir="base/$container/.devcontainer"
-  fi
+  # Determine dockerfile path - all images are now in images/ directory
+  dockerfile_path="images/$container/Dockerfile"
+  context_dir="images/$container"
 
   if [ -f "$dockerfile_path" ]; then
     echo "🔨 Building $container:$version locally first..."
@@ -59,23 +48,31 @@ for container in "${CONTAINERS[@]}"; do
     docker tag "local-${container}:${version}" "${GITLAB_REGISTRY}/${GL_USERNAME}/${REPOSITORY_NAME}/${container}:v${version}"
     docker tag "local-${container}:${version}" "${GL_USERNAME}/${container}:v${version}"
 
+    # Also tag as latest
+    docker tag "local-${container}:${version}" "${GITHUB_REGISTRY}/${GITHUB_REPOSITORY}/${container}:latest"
+    docker tag "local-${container}:${version}" "${GITLAB_REGISTRY}/${GL_USERNAME}/${REPOSITORY_NAME}/${container}:latest"
+    docker tag "local-${container}:${version}" "${GL_USERNAME}/${container}:latest"
+
     # Push to all registries in parallel for faster deployment
     echo "📦 Pushing to all registries in parallel..."
     (
       echo "📦 Pushing to GitHub Container Registry..."
       docker push "${GITHUB_REGISTRY}/${GITHUB_REPOSITORY}/${container}:v${version}" \
+        && docker push "${GITHUB_REGISTRY}/${GITHUB_REPOSITORY}/${container}:latest" \
         && echo "✅ GitHub Container Registry push completed"
     ) &
 
     (
       echo "📦 Pushing to GitLab Container Registry..."
       docker push "${GITLAB_REGISTRY}/${GL_USERNAME}/${REPOSITORY_NAME}/${container}:v${version}" \
+        && docker push "${GITLAB_REGISTRY}/${GL_USERNAME}/${REPOSITORY_NAME}/${container}:latest" \
         && echo "✅ GitLab Container Registry push completed"
     ) &
 
     (
       echo "📦 Pushing to Docker Hub..."
       docker push "${GL_USERNAME}/${container}:v${version}" \
+        && docker push "${GL_USERNAME}/${container}:latest" \
         && echo "✅ Docker Hub push completed"
     ) &
 
@@ -86,8 +83,11 @@ for container in "${CONTAINERS[@]}"; do
     echo "🧹 Cleaning up local images..."
     docker rmi "local-${container}:${version}" \
       "${GITHUB_REGISTRY}/${GITHUB_REPOSITORY}/${container}:v${version}" \
+      "${GITHUB_REGISTRY}/${GITHUB_REPOSITORY}/${container}:latest" \
       "${GITLAB_REGISTRY}/${GL_USERNAME}/${REPOSITORY_NAME}/${container}:v${version}" \
-      "${GL_USERNAME}/${container}:v${version}" || true
+      "${GITLAB_REGISTRY}/${GL_USERNAME}/${REPOSITORY_NAME}/${container}:latest" \
+      "${GL_USERNAME}/${container}:v${version}" \
+      "${GL_USERNAME}/${container}:latest" || true
 
     echo "✅ Built and pushed $container:$version"
 

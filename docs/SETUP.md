@@ -241,7 +241,7 @@ Images are automatically updated:
 - **Base image updates** trigger new builds
 - **Security patches** applied automatically
 
-Check the [versions file](../VERSIONS.md) for current versions and changelog.
+Check the [CHANGELOG](../CHANGELOG.md#released-versions) for current versions and release history.
 
 ## 📚 Additional Resources
 

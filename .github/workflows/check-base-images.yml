@@ -172,7 +172,7 @@ jobs:
           git config --global user.name "${{ github.actor }}"
 
           # Add updated documentation files
-          git add VERSIONS.md README.md base/*/README.md CHANGELOG.md || true
+          git add CHANGELOG.md README.md docs/IMAGE_VARIANTS.md || true
 
           # Check if there are any changes to commit
           if git diff --staged --quiet; then

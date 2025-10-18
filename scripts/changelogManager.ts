@@ -163,36 +163,56 @@ ${releaseNotes.map(note => `- ${note}`).join('\n')}
 
 `
 
-    // Insert after the first heading or at the beginning if no existing releases
-    const unreleasedIndex = content.indexOf('## [Unreleased]')
-    if (unreleasedIndex !== -1) {
-      // Insert after the Unreleased section
-      const nextSectionIndex = content.indexOf('\n## [', unreleasedIndex + 1)
-      if (nextSectionIndex !== -1) {
-        content =
-          content.slice(0, nextSectionIndex + 1) +
-          releaseEntry +
-          content.slice(nextSectionIndex + 1)
-      } else {
-        // No other releases, add before the end
-        const endIndex = content.lastIndexOf('---')
-        if (endIndex !== -1) {
+    // IMPORTANT: Insert AFTER the Released Versions table to keep it at the top
+    // Look for the --- separator after the Released Versions table
+    const releasedVersionsTableEnd = content.match(
+      /## Released Versions[\s\S]*?\n---\n/
+    )
+
+    if (releasedVersionsTableEnd) {
+      // Insert right after the --- separator that ends the Released Versions table
+      const insertPosition =
+        content.indexOf(releasedVersionsTableEnd[0]) +
+        releasedVersionsTableEnd[0].length
+      content =
+        content.slice(0, insertPosition) +
+        '\n' +
+        releaseEntry +
+        content.slice(insertPosition)
+    } else {
+      // Fallback: Use old logic if Released Versions table not found
+      const unreleasedIndex = content.indexOf('## [Unreleased]')
+      if (unreleasedIndex !== -1) {
+        // Insert after the Unreleased section
+        const nextSectionIndex = content.indexOf('\n## [', unreleasedIndex + 1)
+        if (nextSectionIndex !== -1) {
           content =
-            content.slice(0, endIndex) + releaseEntry + content.slice(endIndex)
+            content.slice(0, nextSectionIndex + 1) +
+            releaseEntry +
+            content.slice(nextSectionIndex + 1)
+        } else {
+          // No other releases, add before the end
+          const endIndex = content.lastIndexOf('---')
+          if (endIndex !== -1) {
+            content =
+              content.slice(0, endIndex) +
+              releaseEntry +
+              content.slice(endIndex)
+          } else {
+            content += '\n' + releaseEntry
+          }
+        }
+      } else {
+        // No Unreleased section, add at the top after title
+        const firstHeadingIndex = content.indexOf('\n\n')
+        if (firstHeadingIndex !== -1) {
+          content =
+            content.slice(0, firstHeadingIndex + 2) +
+            releaseEntry +
+            content.slice(firstHeadingIndex + 2)
         } else {
           content += '\n' + releaseEntry
         }
-      }
-    } else {
-      // No Unreleased section, add at the top after title
-      const firstHeadingIndex = content.indexOf('\n\n')
-      if (firstHeadingIndex !== -1) {
-        content =
-          content.slice(0, firstHeadingIndex + 2) +
-          releaseEntry +
-          content.slice(firstHeadingIndex + 2)
-      } else {
-        content += '\n' + releaseEntry
       }
     }
 

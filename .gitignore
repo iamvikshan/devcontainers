@@ -4,6 +4,6 @@ bun.lockb
 package-lock.json
 bun.lock
 
-# Generated files (integrated into VERSIONS.md)
+# Generated files (version tracking managed via CHANGELOG.md)
 container-versions.json
 tool-versions.json

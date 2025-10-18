@@ -29,16 +29,124 @@ export class VersionManager {
 
   // Load current container versions
   loadVersions(): Record<string, ContainerVersion> {
-    if (!existsSync(this.versionsFile)) {
-      return this.initializeVersions()
+    // First try to load from CHANGELOG.md (source of truth)
+    const versionsFromChangelog = this.loadVersionsFromChangelog()
+    if (
+      versionsFromChangelog &&
+      Object.keys(versionsFromChangelog).length > 0
+    ) {
+      this.log('📋 Loaded versions from CHANGELOG.md')
+      // Save to JSON for this run
+      this.saveVersions(versionsFromChangelog)
+      return versionsFromChangelog
+    }
+
+    // Fallback to JSON file if it exists
+    if (existsSync(this.versionsFile)) {
+      try {
+        const content = readFileSync(this.versionsFile, 'utf-8')
+        const versions = JSON.parse(content)
+        this.log('📋 Loaded versions from container-versions.json')
+        return versions
+      } catch (error: any) {
+        this.log(`⚠️  Error reading versions file: ${error.message}`)
+      }
+    }
+
+    // Last resort: initialize with defaults
+    return this.initializeVersions()
+  }
+
+  // Load versions from CHANGELOG.md (source of truth)
+  // Optimized: Only reads until the end of the Released Versions table
+  private loadVersionsFromChangelog(): Record<string, ContainerVersion> | null {
+    const changelogPath = join(process.cwd(), 'CHANGELOG.md')
+
+    if (!existsSync(changelogPath)) {
+      return null
     }
 
     try {
-      const content = readFileSync(this.versionsFile, 'utf-8')
-      return JSON.parse(content)
+      const content = readFileSync(changelogPath, 'utf-8')
+      const versions: Record<string, ContainerVersion> = {}
+
+      // Look for the "Released Versions" section
+      const releasedVersionsMatch = content.match(
+        /## Released Versions\s+([\s\S]*?)(?=\n---)/i
+      )
+
+      if (!releasedVersionsMatch) {
+        this.log('⚠️  Released Versions table not found in CHANGELOG.md')
+        return null
+      }
+
+      // Only parse the table content (stops at ---), not the entire file
+      const tableContent = releasedVersionsMatch[1]
+      const rows = tableContent
+        .split('\n')
+        .filter(line => line.trim().startsWith('|'))
+
+      for (const row of rows) {
+        // Skip header and separator rows
+        if (row.includes('Container') || row.includes('---')) continue
+
+        const cells = row
+          .split('|')
+          .map(cell => cell.trim())
+          .filter(Boolean)
+        if (cells.length >= 2) {
+          const containerName = cells[0]
+          const versionCell = cells[1]
+
+          // Extract version (remove "latest" marker and "v" prefix)
+          const versionMatch = versionCell.match(/v?([\d.]+)/)
+          if (versionMatch && IMAGE_DEFINITIONS.names.includes(containerName)) {
+            versions[containerName] = {
+              name: containerName,
+              version: versionMatch[1],
+              lastUpdated: new Date().toISOString(),
+              baseImage:
+                (IMAGE_DEFINITIONS.baseImages as any)[containerName] ||
+                'unknown'
+            }
+          }
+        }
+      }
+
+      // If no versions found in table, try to extract from latest git tag
+      if (Object.keys(versions).length === 0) {
+        const latestVersion = this.getLatestGitTagVersion()
+        const now = new Date().toISOString()
+
+        IMAGE_DEFINITIONS.names.forEach(name => {
+          versions[name] = {
+            name,
+            version: latestVersion,
+            lastUpdated: now,
+            baseImage: (IMAGE_DEFINITIONS.baseImages as any)[name] || 'unknown'
+          }
+        })
+      }
+
+      return Object.keys(versions).length > 0 ? versions : null
+    } catch (error: any) {
+      this.log(`⚠️  Error parsing CHANGELOG.md: ${error.message}`)
+      return null
+    }
+  }
+
+  // Get latest version from git tags
+  private getLatestGitTagVersion(): string {
+    try {
+      const latestTag = execSync('git describe --tags --abbrev=0 2>/dev/null', {
+        encoding: 'utf-8'
+      }).trim()
+
+      // Remove 'v' prefix if present
+      return latestTag.startsWith('v') ? latestTag.slice(1) : latestTag
     } catch (error) {
-      this.log(`⚠️  Error reading versions file: ${error.message}`)
-      return this.initializeVersions()
+      // No tags found or git command failed
+      return '1.0.1' // Use v1.0.1 as base since you kept this tag
     }
   }
 
@@ -46,13 +154,14 @@ export class VersionManager {
   private initializeVersions(): Record<string, ContainerVersion> {
     const versions: Record<string, ContainerVersion> = {}
     const now = new Date().toISOString()
+    const baseVersion = this.getLatestGitTagVersion()
 
     IMAGE_DEFINITIONS.names.forEach(name => {
       versions[name] = {
         name,
-        version: '1.0.0',
+        version: baseVersion,
         lastUpdated: now,
-        baseImage: IMAGE_DEFINITIONS.baseImages[name] || 'unknown'
+        baseImage: (IMAGE_DEFINITIONS.baseImages as any)[name] || 'unknown'
       }
     })
 
@@ -64,7 +173,7 @@ export class VersionManager {
   saveVersions(versions: Record<string, ContainerVersion>): void {
     try {
       writeFileSync(this.versionsFile, JSON.stringify(versions, null, 2))
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to save versions: ${error.message}`)
     }
   }
@@ -164,7 +273,7 @@ export class VersionManager {
         if (affectedContainers.size > 0) {
           return Array.from(affectedContainers)
         }
-      } catch (error) {
+      } catch (error: any) {
         this.log(
           `⚠️  Could not determine changed files for ${commitHash}: ${error.message}`
         )
@@ -349,7 +458,7 @@ export class VersionManager {
       }
 
       return commits
-    } catch (error) {
+    } catch (error: any) {
       this.log(`⚠️  Error getting commits: ${error.message}`)
       return []
     }

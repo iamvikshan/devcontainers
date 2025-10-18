@@ -113,7 +113,8 @@ Examples:
 
     return hasUpdates
   } catch (error) {
-    console.error('❌ Error checking base images:', error.message)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('❌ Error checking base images:', errorMessage)
     process.exit(1)
   }
 }
@@ -123,7 +124,8 @@ async function checkForUpdates(): Promise<boolean> {
     const updates = await imageOperations.checkBaseImageUpdates()
     return updates.some(u => u.hasUpdate)
   } catch (error) {
-    console.error('❌ Error checking for updates:', error.message)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('❌ Error checking for updates:', errorMessage)
     return false
   }
 }
@@ -147,9 +149,10 @@ async function getBaseImageCommitMessage(
       return `Updated ${imageName} base image with latest changes`
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
     console.error(
       `Error getting commit message for ${baseImage}:`,
-      error.message
+      errorMessage
     )
     return null
   }
@@ -205,12 +208,13 @@ async function comprehensiveCheck(silent: boolean = false): Promise<void> {
     // Always output JSON to stdout for workflow consumption
     console.log(JSON.stringify(result))
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
     const errorResult = {
       hasUpdates: false,
       updateCount: 0,
       affectedContainers: [],
       updates: [],
-      error: error.message,
+      error: errorMessage,
       timestamp: new Date().toISOString(),
       success: false
     }
@@ -241,32 +245,33 @@ async function generateDocumentationUpdates(
       return
     }
 
-    // Update VERSIONS.md
-    await updateVersionsWithBaseImages(relevantUpdates)
+    // Update CHANGELOG.md
+    await updateChangelogWithBaseImages(relevantUpdates)
 
     // Update README files if needed
     await updateReadmeFiles(relevantUpdates)
 
     console.log('✅ Documentation updated successfully')
   } catch (error) {
-    console.error('❌ Error generating documentation updates:', error.message)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('❌ Error generating documentation updates:', errorMessage)
     throw error
   }
 }
 
-// Update VERSIONS.md with base image changes
-async function updateVersionsWithBaseImages(updates: any[]): Promise<void> {
+// Update CHANGELOG.md with base image changes
+async function updateChangelogWithBaseImages(updates: any[]): Promise<void> {
   const { readFileSync, writeFileSync, existsSync } = await import('fs')
   const { join } = await import('path')
 
-  const versionsPath = join(process.cwd(), 'VERSIONS.md')
+  const changelogPath = join(process.cwd(), 'CHANGELOG.md')
 
-  let content = ''
-  if (existsSync(versionsPath)) {
-    content = readFileSync(versionsPath, 'utf-8')
-  } else {
-    content = `# DevContainer Versions\n\nThis file tracks base image updates and releases for our DevContainer configurations.\n\n## Latest Updates\n\n`
+  if (!existsSync(changelogPath)) {
+    console.log('⚠️  CHANGELOG.md not found, skipping update')
+    return
   }
+
+  let content = readFileSync(changelogPath, 'utf-8')
 
   const now = new Date()
   const dateStr = now.toISOString().split('T')[0]
@@ -291,18 +296,21 @@ async function updateVersionsWithBaseImages(updates: any[]): Promise<void> {
   updateEntry += `**Impact:** Patch release - DevContainers will be rebuilt with updated base images\n\n`
   updateEntry += `---\n\n`
 
-  // Insert at the beginning of the Latest Updates section
-  const latestUpdatesIndex = content.indexOf('## Latest Updates')
-  if (latestUpdatesIndex !== -1) {
-    const insertIndex = content.indexOf('\n\n', latestUpdatesIndex) + 2
+  // Insert after the Released Versions table (after the first ---)
+  const firstDividerIndex = content.indexOf('---\n')
+  if (firstDividerIndex !== -1) {
+    const insertIndex = firstDividerIndex + 4 // After "---\n"
     content =
-      content.slice(0, insertIndex) + updateEntry + content.slice(insertIndex)
+      content.slice(0, insertIndex) +
+      '\n' +
+      updateEntry +
+      content.slice(insertIndex)
   } else {
     content += updateEntry
   }
 
-  writeFileSync(versionsPath, content)
-  console.log('✅ VERSIONS.md updated with base image changes')
+  writeFileSync(changelogPath, content)
+  console.log('✅ CHANGELOG.md updated with base image changes')
 }
 
 // Update README files with base image information

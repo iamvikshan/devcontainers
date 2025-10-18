@@ -126,13 +126,22 @@ jobs:
           version-map: ${{ steps.release_analysis.outputs.version_map }}
           affected-containers: ${{ steps.release_analysis.outputs.affected_containers }}
 
+      - name: Update CHANGELOG.md with release info
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+        env:
+          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
+        run: |
+          echo "📝 Updating CHANGELOG.md with new release versions..."
+          bun scripts/updateVersionsTable.ts --version-map="$VERSION_MAP" || echo "⚠️ Failed to update CHANGELOG.md, continuing..."
+
       - name: Update documentation
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
         continue-on-error: true
         uses: ./.github/actions/update-docs
         with:
-          version-map: ${{ steps.release_analysis.outputs.version_map }}
+          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
           github-token: ${{ secrets.GH_TOKEN }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Commit and push documentation
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
@@ -148,7 +157,7 @@ jobs:
           git config --global user.name "${{ github.actor }}"
 
           # Check if there are any changes to commit
-          if git diff --staged --quiet; then
+          if git diff --quiet && git diff --staged --quiet; then
             echo "ℹ️  No documentation changes to commit"
           else
             # Get the highest version for the commit message
