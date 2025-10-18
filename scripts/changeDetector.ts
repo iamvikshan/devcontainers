@@ -140,24 +140,30 @@ export class ChangeDetector {
         c => !['feat', 'fix'].includes(c.type)
       )
 
+      // GitHub repository info (adjust if needed)
+      const repoUrl = 'https://github.com/iamvikshan/devcontainers'
+
       if (features.length > 0) {
         notes.push('## Features')
         features.forEach(commit => {
-          notes.push(`- ${commit.message} (${commit.hash.substring(0, 7)})`)
+          const shortHash = commit.hash.substring(0, 7)
+          notes.push(`- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`)
         })
       }
 
       if (fixes.length > 0) {
         notes.push('## Bug Fixes')
         fixes.forEach(commit => {
-          notes.push(`- ${commit.message} (${commit.hash.substring(0, 7)})`)
+          const shortHash = commit.hash.substring(0, 7)
+          notes.push(`- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`)
         })
       }
 
       if (others.length > 0) {
         notes.push('## Other Changes')
         others.forEach(commit => {
-          notes.push(`- ${commit.message} (${commit.hash.substring(0, 7)})`)
+          const shortHash = commit.hash.substring(0, 7)
+          notes.push(`- ${commit.message} ([${shortHash}](${repoUrl}/commit/${commit.hash}))`)
         })
       }
     }

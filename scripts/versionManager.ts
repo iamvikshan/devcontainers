@@ -435,9 +435,11 @@ export class VersionManager {
           encoding: 'utf-8'
         }).trim()
         gitCommand += ` ${lastTag}..HEAD`
+        this.log(`🏷️  Analyzing commits since ${lastTag}`)
       } catch {
-        // No tags found, get all commits
-        this.log('ℹ️  No previous tags found, analyzing all commits')
+        // No tags found - only analyze recent commits (last 10) to avoid breaking changes from ancient history
+        this.log('ℹ️  No previous tags found, analyzing last 10 commits only')
+        gitCommand += ' -10'
       }
 
       const output = execSync(gitCommand, { encoding: 'utf-8' }).trim()

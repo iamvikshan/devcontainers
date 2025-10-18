@@ -164,7 +164,7 @@ jobs:
             HIGHEST_VERSION=$(echo "$VERSION_MAP" | jq -r 'to_entries | max_by(.value | split(".") | map(tonumber)) | .value')
             
             # Commit the documentation changes
-            git commit -m "docs: update documentation for release v$HIGHEST_VERSION" \
+            git commit -m "docs: update documentation for release v$HIGHEST_VERSION [skip ci]" \
                       -m "- Updated CHANGELOG.md with container versions and tool information" \
                       -m "- Updated README files with latest image sizes"
             
