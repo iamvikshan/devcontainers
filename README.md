@@ -19,9 +19,9 @@ environments.
 | Image               | Size    | Base   | Bun | Node.js | Best For                  |
 | ------------------- | ------- | ------ | --- | ------- | ------------------------- |
 | **bun**             | ~135 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
-| **bun-node**        | ~229 MB | Alpine | ✅  | ✅      | Full-stack development    |
-| **ubuntu-bun**      | ~95 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
-| **ubuntu-bun-node** | ~168 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
+| **bun-node**        | ~228 MB | Alpine | ✅  | ✅      | Full-stack development    |
+| **ubuntu-bun**      | ~96 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
+| **ubuntu-bun-node** | ~167 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
 
 ### Gitpod-Optimized Images
 
@@ -32,7 +32,7 @@ setup (UID 33333) and bash shell configuration.
 | -------------------------- | ------- | ------------ | --- | ------- | ------------------------ |
 | **gitpod-bun**             | ~135 MB | Gitpod Base  | ✅  | ❌      | Gitpod Bun projects      |
 | **gitpod-bun-node**        | ~250 MB | Gitpod Base  | ✅  | ✅      | Gitpod full-stack        |
-| **gitpod-ubuntu-bun**      | ~142 MB | Ubuntu Jammy | ✅  | ❌      | Gitpod Ubuntu Bun        |
+| **gitpod-ubuntu-bun**      | ~143 MB | Ubuntu Jammy | ✅  | ❌      | Gitpod Ubuntu Bun        |
 | **gitpod-ubuntu-bun-node** | ~230 MB | Ubuntu Jammy | ✅  | ✅      | Gitpod Ubuntu full-stack |
 
 ### 🎯 Choose Your Image

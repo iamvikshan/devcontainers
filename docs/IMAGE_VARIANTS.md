@@ -89,7 +89,7 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
 }
 ```
 
-### 2. bun-node (~229 MB)
+### 2. bun-node (~228 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
 
@@ -135,7 +135,7 @@ that need Bun's performance with Node.js ecosystem compatibility.
 }
 ```
 
-### 3. ubuntu-bun (~95 MB)
+### 3. ubuntu-bun (~96 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
 
@@ -180,7 +180,7 @@ and tooling. The smallest image in our collection!
 }
 ```
 
-### 4. ubuntu-bun-node (~168 MB)
+### 4. ubuntu-bun-node (~167 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
 
@@ -296,7 +296,7 @@ and all major package managers.
 
 **Perfect For:** Gitpod full-stack development with maximum compatibility
 
-### 7. gitpod-ubuntu-bun (~142 MB)
+### 7. gitpod-ubuntu-bun (~143 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun:latest`
 

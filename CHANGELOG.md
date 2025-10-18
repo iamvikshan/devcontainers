@@ -2,18 +2,182 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2025-10-18
+
+## Container Updates
+
+- **bun-node**: 1.0.1 → 2.0.0 (feat (breaking))
+- **bun**: 1.0.1 → 2.0.0 (feat (breaking))
+- **gitpod-bun-node**: 1.0.1 → 1.1.0 (feat)
+- **gitpod-bun**: 1.0.1 → 1.1.0 (feat)
+- **gitpod-ubuntu-bun-node**: 1.0.1 → 1.1.0 (feat)
+- **gitpod-ubuntu-bun**: 1.0.1 → 1.1.0 (feat)
+- **ubuntu-bun**: 1.0.1 → 2.0.0 (feat (breaking))
+- **ubuntu-bun-node**: 1.0.1 → 2.0.0 (feat (breaking))
+
+## Features
+
+- feat: Add Gitpod-specific DevContainer images for Bun and Node.js (3a7c300)
+- feat: Implement release orchestration and version management scripts (41016db)
+- feat!: Implement centralized registry client for Docker Hub, GHCR, and GitLab (0b833d5)
+- feat: let's start over, shall we? update release workflows to prevent redundant triggers and
+  enhance sync operations (5aba3ef)
+
+## Bug Fixes
+
+- fix: consolidate version tracking and optimize release workflow (fd3d8bc)
+- fix: setup script for improved readability and consistency; update package.json dependencies;
+  enhance build-all-images script with better error handling and logging; add GitHub Actions for
+  building, cleaning up, and tagging container images; implement scripts for extracting tool
+  versions and cleaning untagged images; ensure Docker setup verification is robust and
+  user-friendly. (700d7a6)
+- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+  (798074f)
+- fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node (e28d899)
+- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+  (52a2747)
+- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+  (f1c0de4)
+- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+  (bd9078a)
+- fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node (e127627)
+- fix: resolve untagged images and missing Gitpod containers in documentation (e9fe715)
+- fix: update advanced-git-sync action version and improve SSH startup script in gitpod Dockerfiles
+  (6b33e3f)
+- fix: update Dockerfiles to include SSH server and configure settings for improved access (ea95c30)
+- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+  (9296340)
+- fix: add remote pull before pushing documentation changes and tags to avoid conflicts (b0e3d4c)
+- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+  (a717021)
+- fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node (65d85bb)
+- fix: Enhance base image check and release workflows (02baa52)
+- fix: update base images for bun, bun-node (f19798f)
+- fix: update base images for bun, bun-node (55537b6)
+- fix: update base images for ubuntu-bun, ubuntu-bun-node (6cfd75e)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (ab3155f)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (5bb948e)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (0b5bffa)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (2bf890e)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (e375dd4)
+- fix: update base images for bun, bun-node (abe2d81)
+- fix: update image sizes in documentation and streamline action configurations (3f29d11)
+- fix: update documentation commit message and streamline push process for versioning (5a90d62)
+- fix: update README and action configurations to include Docker Hub support and streamline
+  container registry authentication (3163fbb)
+- fix: streamline Docker image build process by combining build and push steps for GitHub and GitLab
+  registries (0b8c065)
+- fix: update GitHub Actions for documentation updates and remove GitLab integration (ba02651)
+- fix: update README files with new image sizes and enhance GitHub Actions for documentation updates
+  (f47e47b)
+- fix: update sync configuration and enhance release workflow steps (687909c)
+- fix: implement image size updater script and update README files with new sizes (e6c2811)
+- fix: update advanced-git-sync action version to v1.1.5 in sync workflow (18dda27)
+- fix: update GitHub Actions workflow and dependencies; upgrade checkout action and sync action
+  version. Uprade bun to v1.1.38 (10bc7cd)
+
+## Other Changes
+
+- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#36) (07af88f)
+- chore: streamline tool version extraction script in release workflow (df3ef63)
+- chore: Refactor version management to changelog management (f874a69)
+- docs: update documentation for release v1.1.5 (3e9edd4)
+- docs: update documentation for release v1.1.4 (05ccce1)
+- docs: update documentation for release v1.1.3 (a13f5e6)
+- docs: update documentation for release v1.1.2 (ea89dd8)
+- docs: update documentation for release v1.1.1 (3ebedf3)
+- docs: update documentation for release v1.1.0 (e6ea0d8)
+- docs: update documentation for release v2.0.0 (1e4f542)
+- chore(release): 1.1.4 [skip ci] (fc9ab4d)
+- chore(release): 1.1.3 [skip ci] (efd4322)
+- chore: enhance logging functionality and add silent mode support (18fefed)
+- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#32) (b2e4933)
+- chore(release): 1.1.2 [skip ci] (14dcf85)
+- chore(release): 1.1.2 [skip ci] (d9ab672)
+- chore: update advanced-git-sync action to version 1.4.2 (8908b95)
+- chore: update setup actions to use Bun and upgrade advanced-git-sync version (67dee93)
+- chore: improve pre-release check and version prediction scripts for better workflow integration
+  (44920b5)
+- chore: enhance release workflow with pre-release checks and version prediction (6217251)
+- Release 1.1.2 [skip ci] (fd9ceca)
+- Release 1.1.2 [skip ci] (58779bc)
+- Release 1.1.2 [skip ci] (6454123)
+- Release 1.1.2 [skip ci] (4e439b1)
+- Release 1.1.2 [skip ci] (10bfd3c)
+- chore: enable token persistence for checkout and improve git push handling (e39c2f9)
+- Release 1.1.2 [skip ci] (d9ef26f)
+- Release 1.1.2 [skip ci] (ebd0db8)
+- chore: bump actions/checkout (#28) (3dcb12d)
+- chore: update versions and sizes for release 1.1.2 [skip-sync] (cfa1d84)
+- chore: update versions and sizes for release 1.1.2 [skip-sync] (608fdbb)
+- chore: update versions and sizes for release 1.1.2 [skip-sync] (20ec840)
+- chore: update versions and sizes for release 1.1.1 [skip-sync] (2ff0898)
+- chore: update versions and sizes for release 1.1.1 [skip-sync] (2ba6fdd)
+- chore: update versions and sizes for release 1.1.1 [skip-sync] (b17f58b)
+- Release 1.1.1 [skip ci] (367a195)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (584a5af)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (860a358)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (925f1cc)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (6cabd5f)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (6e9e897)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (09c96ad)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (f4ec70a)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (4e575ce)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (f2142c6)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (e882991)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (1fc368a)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (8a63d41)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (c4de125)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (0728fcc)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (3f877b5)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (3a5687f)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (f9a043a)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (8efdb63)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (cf479f3)
+- chore: migrate from versions.json to VERSIONS.md for version management (1767e05)
+- chore: update workflows to trigger release with reason input and log trigger details (1d29a02)
+- chore: update sync configuration and GitHub Actions workflow for improved syncing and permissions
+  (7d621a6)
+- chore: update Docker update schedule to daily and upgrade sync action version (445ac4d)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (e52540f)
+- chore: update versions and sizes for release 1.1.0 [skip-sync] (a3822ca)
+- Release 1.1.0 [skip ci] (98bc36f)
+- ✨ feat: fix GitHub Actions token issues and optimize version management (a2be3a8)
+- Release 1.0.4 [skip ci] (f5cd167)
+- chore(deps-dev): bump @types/node from 22.16.5 to 24.1.0 (#22) (9609880)
+- Merge pull request #18 from
+  iamvikshan/dependabot/npm_and_yarn/conventional-changelog-conventionalcommits-9.1.0 (8570805)
+- Release 1.0.3 [skip ci] (f700fbe)
+- Release 1.0.3 [skip ci] (2df4456)
+- Release 1.0.2 [skip ci] (6325b60)
+- Release 1.0.1 [skip ci] (3441835)
+- Release 1.0.0 [skip ci] (ac0d4e4)
+- Release 1.0.0 [skip ci] (56ecffd)
+- Update and rename gl-sync.yml to sync.yml (4c40196)
+- Update gl-sync.yml (8b8267b)
+- chore: update GitHub Actions workflows and sync configuration; enhance release process and improve
+  README badges (8ad8372)
+- Release 1.0.0 [skip ci] (b1d0dc1)
+- chore: update CLA workflow to use consistent GitHub token; refine release workflow triggers and
+  update changelog (e4ab6ad)
+- Release 1.0.0 [skip ci] (89fcea2)
+- Release 1.0.0 [skip ci] (4b88988)
+- chore: update container images and README with accurate sizes; adjust GitHub Actions for token
+  consistency (e078146)
+- Release 1.0.0 [skip ci] (7166661)
+
 ## Released Versions
 
 | Container              | Current Version | Last Updated | Registry Links                                                                                                                                                                                                                                       |
 | ---------------------- | --------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| bun                    | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/bun)                                                          |
-| bun-node               | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node)                                           |
-| ubuntu-bun             | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun)                                     |
-| ubuntu-bun-node        | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node)                      |
-| gitpod-bun             | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-bun)                                     |
-| gitpod-bun-node        | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-bun-node)                      |
-| gitpod-ubuntu-bun      | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-ubuntu-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-ubuntu-bun)                |
-| gitpod-ubuntu-bun-node | v1.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-ubuntu-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-ubuntu-bun-node) |
+| bun                    | v2.0.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/bun)                                                          |
+| bun-node               | v2.0.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node)                                           |
+| ubuntu-bun             | v2.0.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun)                                     |
+| ubuntu-bun-node        | v2.0.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node)                      |
+| gitpod-bun             | v1.1.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-bun)                                     |
+| gitpod-bun-node        | v1.1.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-bun-node)                      |
+| gitpod-ubuntu-bun      | v1.1.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-ubuntu-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-ubuntu-bun)                |
+| gitpod-ubuntu-bun-node | v1.1.0 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/gitpod-ubuntu-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/gitpod-ubuntu-bun-node) |
 
 > **Note:** The "(latest)" marker indicates the version currently tagged as `:latest` in all
 > registries.
