@@ -16,10 +16,10 @@ environments.
 
 | Image               | Size    | Base   | Bun | Node.js | Best For                  |
 | ------------------- | ------- | ------ | --- | ------- | ------------------------- |
-| **bun**             | ~133 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
-| **bun-node**        | ~227 MB | Alpine | ✅  | ✅      | Full-stack development    |
-| **ubuntu-bun**      | ~94 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
-| **ubuntu-bun-node** | ~166 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
+| **bun**             | ~135 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
+| **bun-node**        | ~229 MB | Alpine | ✅  | ✅      | Full-stack development    |
+| **ubuntu-bun**      | ~95 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
+| **ubuntu-bun-node** | ~168 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
 
 ### 🎯 Choose Your Image
 
