@@ -22,7 +22,11 @@ export class ChangeDetector {
   ): Promise<ReleaseContext> {
     this.log('🔍 Analyzing changes for release...')
 
-    const commits = versionManager.getCommitsSinceLastRelease()
+    const rawCommits = versionManager.getCommitsSinceLastRelease()
+    // Filter out commits that don't affect any containers
+    const commits = rawCommits.filter(
+      c => c.affectedContainers && c.affectedContainers.length > 0
+    )
     const versionBumps = versionManager.processCommits(commits)
 
     // Check for manual release override

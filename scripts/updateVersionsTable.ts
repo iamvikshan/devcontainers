@@ -57,19 +57,13 @@ function updateVersionsTable(versionMap: VersionMap): void {
     if (versionMap[containerName]) {
       const newVersion = versionMap[containerName]
 
-      // Update the version cell (second column)
-      cells[1] = `v${newVersion} (latest)`
+      // Update the version cell (second column) - NO "(latest)" marker
+      cells[1] = `v${newVersion}`
 
       // Update the date cell (third column)
       cells[2] = currentDate
 
       // Reconstruct the line
-      return `| ${cells.join(' | ')} |`
-    }
-
-    // If container wasn't updated, remove "(latest)" marker if present
-    if (cells[1].includes('(latest)')) {
-      cells[1] = cells[1].replace(' (latest)', '')
       return `| ${cells.join(' | ')} |`
     }
 

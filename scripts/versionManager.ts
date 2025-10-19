@@ -113,19 +113,9 @@ export class VersionManager {
         }
       }
 
-      // If no versions found in table, try to extract from latest git tag
+      // If no versions found in table, return null to trigger initializeVersions
       if (Object.keys(versions).length === 0) {
-        const latestVersion = this.getLatestGitTagVersion()
-        const now = new Date().toISOString()
-
-        IMAGE_DEFINITIONS.names.forEach(name => {
-          versions[name] = {
-            name,
-            version: latestVersion,
-            lastUpdated: now,
-            baseImage: (IMAGE_DEFINITIONS.baseImages as any)[name] || 'unknown'
-          }
-        })
+        return null
       }
 
       return Object.keys(versions).length > 0 ? versions : null
@@ -135,26 +125,16 @@ export class VersionManager {
     }
   }
 
-  // Get latest version from git tags
-  private getLatestGitTagVersion(): string {
-    try {
-      const latestTag = execSync('git describe --tags --abbrev=0 2>/dev/null', {
-        encoding: 'utf-8'
-      }).trim()
-
-      // Remove 'v' prefix if present
-      return latestTag.startsWith('v') ? latestTag.slice(1) : latestTag
-    } catch (error) {
-      // No tags found or git command failed
-      return '1.0.1' // Use v1.0.1 as base since you kept this tag
-    }
+  // Get default version when no versions found in changelog
+  private getDefaultVersion(): string {
+    return '1.0.0'
   }
 
   // Initialize versions for all containers
   private initializeVersions(): Record<string, ContainerVersion> {
     const versions: Record<string, ContainerVersion> = {}
     const now = new Date().toISOString()
-    const baseVersion = this.getLatestGitTagVersion()
+    const baseVersion = this.getDefaultVersion()
 
     IMAGE_DEFINITIONS.names.forEach(name => {
       versions[name] = {
@@ -208,7 +188,7 @@ export class VersionManager {
         message: commitMessage,
         type: 'chore',
         breaking: false,
-        affectedContainers: IMAGE_DEFINITIONS.names // Default to all containers
+        affectedContainers: [] // Default to no containers when we can't parse message
       }
     }
 
@@ -299,7 +279,7 @@ export class VersionManager {
     }
 
     // Default to all containers if we can't determine specific ones
-    return IMAGE_DEFINITIONS.names
+    return [] // Default to no containers if we can't determine specific ones
   }
 
   // Calculate version bump based on commit type
@@ -356,9 +336,44 @@ export class VersionManager {
     )
 
     if (manualReleaseCommit && manualReleaseCommit.manualVersion) {
-      this.log(
-        `🎯 Manual release override: v${manualReleaseCommit.manualVersion} for ALL containers`
-      )
+      const manualVersion = manualReleaseCommit.manualVersion
+
+      this.log(`3 Manual release override requested: v${manualVersion}`)
+
+      // Helper: compare semver strings 'MAJOR.MINOR.PATCH'
+      const compareSemver = (a: string, b: string): number => {
+        const [aM, aN, aP] = a.split('.').map(Number)
+        const [bM, bN, bP] = b.split('.').map(Number)
+        if (aM !== bM) return aM - bM
+        if (aN !== bN) return aN - bN
+        return aP - bP
+      }
+
+      // If manual version would downgrade any current version, skip override
+      const downgrades = IMAGE_DEFINITIONS.names.filter(name => {
+        const current = versions[name]?.version || '0.0.0'
+        return compareSemver(manualVersion!, current) < 0
+      })
+
+      if (downgrades.length > 0) {
+        this.log(
+          `\u26a0\ufe0f Manual override v${manualVersion} would downgrade: ${downgrades.join(', ')} - ignoring`
+        )
+        return []
+      }
+
+      // If manual version equals current versions for all containers, do nothing
+      const allEqual = IMAGE_DEFINITIONS.names.every(name => {
+        const current = versions[name]?.version || '0.0.0'
+        return compareSemver(manualVersion!, current) === 0
+      })
+
+      if (allEqual) {
+        this.log(
+          `\u2139\ufe0f Manual override v${manualVersion} matches current versions - nothing to do`
+        )
+        return []
+      }
 
       // Apply the manual version to ALL containers
       IMAGE_DEFINITIONS.names.forEach(container => {
@@ -366,7 +381,7 @@ export class VersionManager {
         versionBumps.push({
           container,
           currentVersion,
-          newVersion: manualReleaseCommit.manualVersion!,
+          newVersion: manualVersion!,
           bumpType: 'major', // Manual releases can be any type, we use major as default
           reason: 'manual release override'
         })
@@ -476,20 +491,14 @@ export class VersionManager {
   // Get commits since last release for specific containers
   getCommitsSinceLastRelease(containers?: string[]): CommitAnalysis[] {
     try {
-      // Get all commits since last tag or from beginning
-      let gitCommand = 'git log --oneline --format="%H|%s"'
+      // Analyze recent commits only (configurable via env var)
+      const commitLimit = parseInt(
+        process.env.COMMIT_ANALYSIS_LIMIT || '20',
+        10
+      )
+      const gitCommand = `git log --oneline --format="%H|%s" -${commitLimit}`
 
-      try {
-        const lastTag = execSync('git describe --tags --abbrev=0', {
-          encoding: 'utf-8'
-        }).trim()
-        gitCommand += ` ${lastTag}..HEAD`
-        this.log(`🏷️  Analyzing commits since ${lastTag}`)
-      } catch {
-        // No tags found - only analyze recent commits (last 10) to avoid breaking changes from ancient history
-        this.log('ℹ️  No previous tags found, analyzing last 10 commits only')
-        gitCommand += ' -10'
-      }
+      this.log(`ℹ️  Analyzing last ${commitLimit} commits`)
 
       const output = execSync(gitCommand, { encoding: 'utf-8' }).trim()
       if (!output) return []

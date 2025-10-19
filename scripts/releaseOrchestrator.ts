@@ -83,61 +83,24 @@ export class ReleaseOrchestrator {
     return versionMap
   }
 
-  // Create GitHub release
-  async createGitHubRelease(
+  // Generate release summary (no longer creates git tags - containers have different versions)
+  async generateReleaseSummary(
     context: ReleaseContext,
     versionMap: Record<string, string>
   ): Promise<void> {
-    this.log('🚀 Creating GitHub release...')
+    this.log('� Generating release summary...')
 
     try {
-      // Determine the overall release version (use the highest version from affected containers)
-      const versions = Object.values(versionMap)
-      const releaseVersion = this.getHighestVersion(versions)
-
       // Generate release notes
       const releaseNotes = changeDetector.generateReleaseNotes(context)
       const releaseBody = releaseNotes.join('\n')
 
-      // Create git tag
-      const tagName = `v${releaseVersion}`
-      execSync(`git tag -a ${tagName} -m "Release ${tagName}"`, {
-        stdio: 'inherit'
-      })
-
-      // Push tag
-      execSync(`git push origin ${tagName}`, { stdio: 'inherit' })
-
-      // Create GitHub release using gh CLI if available
-      try {
-        const releaseCommand = [
-          'gh',
-          'release',
-          'create',
-          tagName,
-          '--title',
-          `Release ${tagName}`,
-          '--notes',
-          `"${releaseBody}"`,
-          '--latest'
-        ].join(' ')
-
-        execSync(releaseCommand, { stdio: 'inherit' })
-        this.log(`✅ GitHub release ${tagName} created successfully`)
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error)
-        this.log(
-          `⚠️  Could not create GitHub release via gh CLI: ${errorMessage}`
-        )
-        this.log(
-          'ℹ️  Tag was created and pushed - release can be created manually'
-        )
-      }
+      this.log('✅ Release summary generated')
+      this.log('\n' + releaseBody)
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error)
-      throw new Error(`Failed to create GitHub release: ${errorMessage}`)
+      throw new Error(`Failed to generate release summary: ${errorMessage}`)
     }
   }
 
@@ -154,6 +117,24 @@ export class ReleaseOrchestrator {
       if (aMinor !== bMinor) return bMinor - aMinor
       return bPatch - aPatch
     })[0]
+  }
+
+  // Generate a Released Versions table for a specific release
+  private generateVersionTable(
+    versionMap: Record<string, string>,
+    releaseDate: string
+  ): string {
+    const rows = Object.entries(versionMap).map(([container, version]) => {
+      return `| ${container} | v${version} | ${releaseDate} |`
+    })
+
+    return [
+      '### Released Versions',
+      '',
+      '| Container | Version | Date |',
+      '| --------- | ------- | ---- |',
+      ...rows
+    ].join('\n')
   }
 
   // Create commit for base image updates
@@ -214,9 +195,14 @@ export class ReleaseOrchestrator {
           '# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n'
       }
 
+      // Generate Released Versions table for this release
+      const versionTable = this.generateVersionTable(versionMap, releaseDate)
+
       // Prepare new entry
       const newEntry = [
         `## [${releaseVersion}] - ${releaseDate}`,
+        '',
+        versionTable,
         '',
         ...releaseNotes,
         ''
