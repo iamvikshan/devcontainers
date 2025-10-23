@@ -92,6 +92,34 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### 2025-10-23 - Base Image Updates
+
+**Updated at:** 2025-10-23T05:10:06.095Z
+
+**Base images updated:**
+- **bun**: `oven/bun:latest`
+  - Base image last updated: 10/22/2025
+  - Digest: `sha256:9c5d3`
+- **bun-node**: `oven/bun:latest`
+  - Base image last updated: 10/22/2025
+  - Digest: `sha256:9c5d3`
+- **gitpod-bun**: `oven/bun:latest`
+  - Base image last updated: 10/22/2025
+  - Digest: `sha256:9c5d3`
+- **gitpod-bun-node**: `oven/bun:latest`
+  - Base image last updated: 10/22/2025
+  - Digest: `sha256:9c5d3`
+
+**Changes:**
+- Updated base images to latest versions
+- Security patches and bug fixes from upstream
+- Improved compatibility and performance
+
+**Impact:** Patch release - DevContainers will be rebuilt with updated base images
+
+---
+
+
 ## [2.0.0] - 2025-10-18
 
 ## Container Updates
