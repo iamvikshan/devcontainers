@@ -1,5 +1,5 @@
 name: "Update Documentation"
-description: "Updates README files with image sizes and syncs changes"
+description: "Updates README files with image sizes, commits, and pushes changes"
 
 inputs:
   gitlab-token:
@@ -11,21 +11,37 @@ inputs:
   dockerhub-token:
     description: "DockerHub token"
     required: false
+  version-map:
+    description: "JSON map of container versions for commit message"
+    required: false
+    default: "{}"
+  skip-commit:
+    description: "Skip commit and push steps (for testing)"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
   steps:
     - name: Update image sizes
       shell: bash
+      env:
+        GITLAB_TOKEN: ${{ inputs.gitlab-token }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        DOCKERHUB_TOKEN: ${{ inputs.dockerhub-token }}
       run: |
-        echo "GITLAB_TOKEN=${{ inputs.gitlab-token }}" > .env
-        echo "GH_TOKEN=${{ inputs.github-token }}" >> .env
-        echo "DOCKERHUB_TOKEN=${{ inputs.dockerhub-token }}" >> .env
         bun run s && bun run f
 
-    - name: Stage documentation changes
-      shell: bash
-      run: |
-        git config --global user.email "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-        git config --global user.name "${{ github.actor }}"
-        git add README.md CHANGELOG.md docs/IMAGE_VARIANTS.md 2>/dev/null || true
+    - name: Commit and push documentation changes
+      if: inputs.skip-commit != 'true'
+      uses: ./.github/actions/git-operations
+      with:
+        github-token: ${{ inputs.github-token }}
+        files-to-stage: "README.md CHANGELOG.md docs/IMAGE_VARIANTS.md"
+        version-map: ${{ inputs.version-map }}
+        commit-body: |-
+          - Updated CHANGELOG.md with container versions and tool information
+          - Updated README files with latest image sizes
+        skip-if-no-changes: "true"
+        auto-pull-before-push: "true"
+        branch: "main"

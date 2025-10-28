@@ -1,0 +1,128 @@
+name: "Git Operations"
+description: "Comprehensive git operations: configure, stage, commit, and push changes"
+
+inputs:
+  github-token:
+    description: "GitHub token for pushing changes"
+    required: false
+  files-to-stage:
+    description: "Space or newline-separated list of files to stage (e.g., 'README.md CHANGELOG.md')"
+    required: false
+    default: ""
+  commit-message:
+    description: "Primary commit message"
+    required: false
+    default: ""
+  commit-body:
+    description: "Additional commit message body (multi-line supported)"
+    required: false
+    default: ""
+  version-map:
+    description: "JSON map of container versions for auto-generating commit message"
+    required: false
+    default: "{}"
+  skip-if-no-changes:
+    description: "Skip commit if no changes detected"
+    required: false
+    default: "true"
+  auto-pull-before-push:
+    description: "Pull remote changes before pushing"
+    required: false
+    default: "true"
+  branch:
+    description: "Branch to push to"
+    required: false
+    default: "main"
+  config-only:
+    description: "Only configure git, skip stage/commit/push operations"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure Git user
+      shell: bash
+      run: |
+        git config --global user.email "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
+        git config --global user.name "${{ github.actor }}"
+
+    - name: Stage files
+      if: inputs.config-only != 'true' && inputs.files-to-stage != ''
+      shell: bash
+      run: |
+        echo "📋 Staging files..."
+        for file in ${{ inputs.files-to-stage }}; do
+          git add "$file" 2>/dev/null || true
+        done
+
+    - name: Commit and push changes
+      if: inputs.config-only != 'true' && inputs.commit-message != ''
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        VERSION_MAP: ${{ inputs.version-map }}
+        COMMIT_MSG: ${{ inputs.commit-message }}
+        COMMIT_BODY: ${{ inputs.commit-body }}
+        SKIP_IF_NO_CHANGES: ${{ inputs.skip-if-no-changes }}
+        AUTO_PULL: ${{ inputs.auto-pull-before-push }}
+        BRANCH: ${{ inputs.branch }}
+      run: |
+        echo "📝 Processing git commit..."
+
+        # Check if there are any changes to commit
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "ℹ️  No changes detected"
+          if [ "$SKIP_IF_NO_CHANGES" = "true" ]; then
+            echo "⏭️  Skipping commit (skip-if-no-changes=true)"
+            exit 0
+          fi
+        fi
+
+        # Prepare commit message
+        FINAL_COMMIT_MSG="$COMMIT_MSG"
+
+        # If commit message is empty but version-map is provided, generate message
+        if [ -z "$FINAL_COMMIT_MSG" ] && [ "$VERSION_MAP" != "{}" ]; then
+          HIGHEST_VERSION=$(echo "$VERSION_MAP" | jq -r 'to_entries | max_by(.value | split(".") | map(tonumber)) | .value' 2>/dev/null || echo "")
+          if [ -n "$HIGHEST_VERSION" ]; then
+            FINAL_COMMIT_MSG="docs: update documentation for release v$HIGHEST_VERSION [skip ci]"
+          else
+            FINAL_COMMIT_MSG="docs: update documentation [skip ci]"
+          fi
+        fi
+
+        # Commit changes
+        if [ -n "$COMMIT_BODY" ]; then
+          git commit -m "$FINAL_COMMIT_MSG" -m "$COMMIT_BODY"
+        else
+          git commit -m "$FINAL_COMMIT_MSG"
+        fi
+
+        echo "✅ Changes committed: $FINAL_COMMIT_MSG"
+
+        # Pull before push if enabled
+        if [ "$AUTO_PULL" = "true" ]; then
+          echo "🔄 Pulling remote changes to avoid conflicts..."
+          
+          # Stage any remaining changes before pulling
+          git add -A
+          if ! git diff --staged --quiet; then
+            echo "📝 Amending commit with additional changes..."
+            git commit --amend --no-edit
+          fi
+          
+          # Try rebase first, fallback to merge if it fails
+          if ! git pull --rebase origin "$BRANCH"; then
+            echo "⚠️  Pull with rebase failed. Trying merge strategy..."
+            # Check if rebase is in progress before aborting
+            if git status | grep -q "rebase in progress"; then
+              git rebase --abort
+            fi
+            git pull origin "$BRANCH" --no-edit
+          fi
+        fi
+
+        # Push changes
+        git push origin "$BRANCH"
+        echo "✅ Changes pushed to $BRANCH branch"

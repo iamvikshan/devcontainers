@@ -60,7 +60,7 @@ export class ChangelogManager {
       // Write updated content
       writeFileSync(this.changelogPath, content)
 
-  this.log('✅ CHANGELOG.md updated successfully')
+      this.log('✅ CHANGELOG.md updated successfully')
 
       if (versionMap) {
         const overallVersion = this.getHighestVersion(versionMap)
@@ -86,7 +86,7 @@ export class ChangelogManager {
       // Update CHANGELOG.md with new sizes
       await this.updateChangelogFile()
 
-  this.log('✅ All sizes synced successfully!')
+      this.log('✅ All sizes synced successfully!')
     } catch (error: any) {
       console.error('❌ Error syncing sizes:', error.message)
       throw error

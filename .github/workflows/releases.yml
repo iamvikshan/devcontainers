@@ -39,10 +39,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          GIT_AUTHOR_EMAIL: "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          GIT_AUTHOR_NAME: "${{ github.actor }}"
-          GIT_COMMITTER_EMAIL: "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          GIT_COMMITTER_NAME: "${{ github.actor }}"
         run: |
           echo "🔍 Analyzing changes for release..."
 
@@ -148,47 +144,7 @@ jobs:
           gitlab-token: ${{ secrets.GITLAB_TOKEN }}
           github-token: ${{ secrets.GH_TOKEN }}
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Commit and push documentation
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
-        run: |
-          echo "📝 Committing documentation changes..."
-
-          # Configure git
-          git config --global user.email "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
-
-          # Check if there are any changes to commit
-          if git diff --quiet && git diff --staged --quiet; then
-            echo "ℹ️  No documentation changes to commit"
-          else
-            # Get the highest version for the commit message
-            HIGHEST_VERSION=$(echo "$VERSION_MAP" | jq -r 'to_entries | max_by(.value | split(".") | map(tonumber)) | .value')
-            
-            # Format and Commit the documentation changes
-            bun f
-            git commit -m "docs: update documentation for release v$HIGHEST_VERSION [skip ci]" \
-                      -m "- Updated CHANGELOG.md with container versions and tool information" \
-                      -m "- Updated README files with latest image sizes"
-            
-            echo "✅ Documentation changes committed"
-            
-            # Pull any remote changes before pushing
-            echo "🔄 Pulling remote changes to avoid conflicts..."
-            git pull --rebase origin main || {
-              echo "⚠️  Merge conflicts detected. Using merge strategy instead."
-              git rebase --abort
-              git pull origin main --no-edit
-            }
-            
-            # Push the documentation commit
-            git push origin main
-            echo "✅ Documentation changes pushed to main branch"
-          fi
+          version-map: ${{ steps.release_analysis.outputs.version_map }}
 
       - name: No release needed
         if: steps.release_analysis.outputs.release_needed != 'true'
