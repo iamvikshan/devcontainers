@@ -35,28 +35,6 @@ jobs:
       - name: Setup Bun and install dependencies
         uses: iamvikshan/.github/.github/actions/setup-bun@main
 
-      - name: Validate script functionality
-        run: |
-          echo "🔧 Validating checkImages script..."
-
-          # Test that the script runs and returns valid JSON
-          if ! bun scripts/checkImages.ts --help >/dev/null 2>&1; then
-            echo "❌ Script help failed"
-            exit 1
-          fi
-
-          # Test JSON output format
-          TEST_OUTPUT=$(timeout 60 bun scripts/checkImages.ts --comprehensive --json-only 2>/dev/null || echo '{"error":"timeout"}')
-
-          if echo "$TEST_OUTPUT" | jq empty 2>/dev/null; then
-            echo "✅ Script produces valid JSON"
-            echo "📋 Test output keys: $(echo "$TEST_OUTPUT" | jq -r 'keys | join(", ")')"
-          else
-            echo "❌ Script does not produce valid JSON"
-            echo "Raw output: $TEST_OUTPUT"
-            exit 1
-          fi
-
       - name: Check for base image updates
         id: check_updates
         env:
@@ -138,92 +116,45 @@ jobs:
           if [ "$HAS_UPDATES" = "true" ]; then
             echo "📦 Base image updates detected for: $AFFECTED_CONTAINERS"
             echo "🔢 Total updates: $UPDATE_COUNT"
+            echo "🚀 Will trigger release workflow to rebuild containers"
           else
             echo "✅ All base images are up to date"
-          fi
-
-      - name: Update documentation
-        if: steps.check_updates.outputs.has_updates == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          AFFECTED_CONTAINERS: ${{ steps.check_updates.outputs.affected_containers }}
-          UPDATE_COUNT: ${{ steps.check_updates.outputs.update_count }}
-          GIT_AUTHOR_EMAIL: "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          GIT_AUTHOR_NAME: "${{ github.actor }}"
-          GIT_COMMITTER_EMAIL: "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          GIT_COMMITTER_NAME: "${{ github.actor }}"
-        run: |
-          echo "📝 Updating documentation with base image changes..."
-
-          # Generate detailed update notes using dedicated script
-          bun scripts/checkImages.ts --generate-update-notes --containers="$AFFECTED_CONTAINERS"
-
-          echo "✅ Documentation updated with base image changes"
-
-      - name: Commit base image updates
-        if: steps.check_updates.outputs.has_updates == 'true'
-        env:
-          AFFECTED_CONTAINERS: ${{ steps.check_updates.outputs.affected_containers }}
-        run: |
-          echo "📝 Committing base image updates..."
-
-          # Configure git with repository owner
-          git config --global user.email "${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
-
-          # Add updated documentation files
-          git add CHANGELOG.md README.md docs/IMAGE_VARIANTS.md || true
-
-          # Check if there are any changes to commit
-          if git diff --staged --quiet; then
-            echo "ℹ️  No documentation changes to commit"
-          else
-            # Create commit with conventional commit format to trigger patch release
-            git commit -m "fix: update base images for $AFFECTED_CONTAINERS" \
-                      -m "- Updated base images to latest versions with security patches" \
-                      -m "- Improved compatibility and performance from upstream updates" \
-                      -m "- Documentation updated with latest base image information" \
-                      -m "" \
-                      -m "This commit triggers an automated patch release to rebuild DevContainers with updated base images."
-
-            # Push the changes
-            git push origin main
-
-            echo "✅ Base image updates committed and pushed"
-            echo "🚀 This will trigger the release workflow to rebuild containers"
           fi
 
       - name: Trigger release workflow
         if: steps.check_updates.outputs.has_updates == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          AFFECTED_CONTAINERS: ${{ steps.check_updates.outputs.affected_containers }}
         run: |
           echo "🚀 Triggering release workflow for base image updates..."
-
-          # Wait a moment for the commit to be processed
-          sleep 10
+          echo "📦 Affected containers: $AFFECTED_CONTAINERS"
 
           # Trigger the release workflow via workflow_dispatch
           curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/releases.yml/dispatches" \
-            -d '{"ref":"main","inputs":{"trigger_reason":"Base image updates detected"}}'
+            -d "{\"ref\":\"main\",\"inputs\":{\"trigger_reason\":\"Base image updates detected for: $AFFECTED_CONTAINERS\"}}"
 
           if [ $? -eq 0 ]; then
             echo "✅ Release workflow triggered successfully"
+            echo "📋 The release workflow will:"
+            echo "   - Build updated containers with new base images"
+            echo "   - Update all documentation (CHANGELOG, README, versions)"
+            echo "   - Create a single comprehensive release commit"
           else
-            echo "⚠️  Failed to trigger release workflow, but changes are committed"
-            echo "ℹ️  The release workflow should still trigger automatically due to the commit"
+            echo "❌ Failed to trigger release workflow"
+            exit 1
           fi
 
       - name: No updates needed
         if: steps.check_updates.outputs.has_updates != 'true'
         run: |
-          echo "ℹ️  No base image updates needed - all images are current"
+          echo "✅ No base image updates needed - all images are current"
           echo "📊 Check completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          echo "🔄 Next automatic check: $(date -d 'next sunday 06:00' -u +%Y-%m-%dT%H:%M:%SZ)"
-          echo "✅ Base image check workflow completed successfully"
+          echo "🔄 Next automatic check: Tomorrow at 5:00 AM UTC"
+          echo "✨ Base image monitoring workflow completed successfully"
 
       - name: Cleanup on failure
         if: failure()

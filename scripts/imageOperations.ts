@@ -260,7 +260,7 @@ export class ImageOperations {
     }
   }
 
-  // Update README files with current sizes
+  // Update README files with current sizes and tool versions
   public async updateReadmeFiles(sizes: ImageSizeInfo[]): Promise<void> {
     const sizeMap = new Map<string, Map<string, number>>()
 
@@ -272,6 +272,9 @@ export class ImageOperations {
       sizeMap.get(size.name)!.set(size.registry, size.size)
     })
 
+    // Load tool versions from tool-versions.json if available
+    const toolVersions = this.loadToolVersions()
+
     const readmeFiles = [
       'README.md',
       'docs/IMAGE_VARIANTS.md'
@@ -281,7 +284,7 @@ export class ImageOperations {
 
     for (const readmePath of readmeFiles) {
       try {
-        await this.updateSingleReadme(readmePath, sizeMap)
+        await this.updateSingleReadme(readmePath, sizeMap, toolVersions)
         this.log(`✅ Updated ${readmePath}`)
       } catch (error) {
         this.logError(
@@ -291,9 +294,47 @@ export class ImageOperations {
     }
   }
 
+  // Load tool versions from tool-versions.json
+  private loadToolVersions(): Map<string, any> {
+    const toolVersionMap = new Map<string, any>()
+
+    try {
+      const { join } = require('path')
+      const toolVersionsPath = join(process.cwd(), 'tool-versions.json')
+
+      if (existsSync(toolVersionsPath)) {
+        const content = readFileSync(toolVersionsPath, 'utf-8')
+        const toolVersions = JSON.parse(content)
+
+        // Convert array to map for easier lookup
+        if (Array.isArray(toolVersions)) {
+          toolVersions.forEach((tv: any) => {
+            if (tv.container && tv.versions) {
+              toolVersionMap.set(tv.container, tv.versions)
+            }
+          })
+          this.log(
+            `📊 Loaded tool versions for ${toolVersionMap.size} containers`
+          )
+        }
+      } else {
+        this.log(
+          '⚠️  tool-versions.json not found, skipping tool version updates'
+        )
+      }
+    } catch (error) {
+      this.logError(
+        `⚠️  Error loading tool versions: ${error instanceof Error ? error.message : String(error)}`
+      )
+    }
+
+    return toolVersionMap
+  }
+
   private async updateSingleReadme(
     readmePath: string,
-    sizeMap: Map<string, Map<string, number>>
+    sizeMap: Map<string, Map<string, number>>,
+    toolVersions: Map<string, any> = new Map()
   ): Promise<void> {
     // Check if the file exists before attempting to read it
     if (!existsSync(readmePath)) {
@@ -305,7 +346,7 @@ export class ImageOperations {
 
     // Handle main README.md with new table format
     if (readmePath === 'README.md') {
-      // Update the image comparison table
+      // Update the image comparison table sizes
       const tablePattern = /(\| \*\*[^*]+\*\* +\| ~)\d+( MB)/g
 
       updatedContent = updatedContent.replace(
@@ -327,9 +368,202 @@ export class ImageOperations {
           return `${prefix}${sizeInMB}${suffix}`
         }
       )
+
+      // Update tool versions in README.md
+      if (toolVersions.size > 0) {
+        // Get Alpine-based image versions (from bun or bun-node)
+        let alpineVersions: any = null
+        for (const containerName of ['bun-node', 'bun']) {
+          if (toolVersions.has(containerName)) {
+            alpineVersions = toolVersions.get(containerName)
+            this.log(`📋 Using Alpine tool versions from '${containerName}'`)
+            break
+          }
+        }
+
+        // Get Ubuntu-based image versions (from ubuntu-bun or ubuntu-bun-node)
+        let ubuntuVersions: any = null
+        for (const containerName of ['ubuntu-bun-node', 'ubuntu-bun']) {
+          if (toolVersions.has(containerName)) {
+            ubuntuVersions = toolVersions.get(containerName)
+            this.log(`📋 Using Ubuntu tool versions from '${containerName}'`)
+            break
+          }
+        }
+
+        // Update Alpine-based Images section
+        if (alpineVersions) {
+          // Update Bun version for Alpine
+          if (alpineVersions.bun_version) {
+            updatedContent = updatedContent.replace(
+              /(#### Alpine-based Images[\s\S]*?- \*\*Bun\*\* )[0-9.]+( - Fast JavaScript runtime)/,
+              `$1${alpineVersions.bun_version}$2`
+            )
+            this.log(
+              `  ✅ Updated Alpine Bun version to ${alpineVersions.bun_version}`
+            )
+          }
+
+          // Update Node.js version for Alpine
+          if (alpineVersions.node_version) {
+            updatedContent = updatedContent.replace(
+              /(#### Alpine-based Images[\s\S]*?- \*\*Node\.js\*\* )v[0-9.]+( _\(bun-node only\)_)/,
+              `$1${alpineVersions.node_version}$2`
+            )
+            this.log(
+              `  ✅ Updated Alpine Node.js version to ${alpineVersions.node_version}`
+            )
+          }
+
+          // Update npm version for Alpine
+          if (alpineVersions.npm_version) {
+            updatedContent = updatedContent.replace(
+              /(#### Alpine-based Images[\s\S]*?- \*\*npm\*\* )[0-9.]+( _\(bun-node only\)_)/,
+              `$1${alpineVersions.npm_version}$2`
+            )
+            this.log(
+              `  ✅ Updated Alpine npm version to ${alpineVersions.npm_version}`
+            )
+          }
+        }
+
+        // Update Ubuntu-based Images section
+        if (ubuntuVersions) {
+          // Update Bun version for Ubuntu
+          if (ubuntuVersions.bun_version) {
+            updatedContent = updatedContent.replace(
+              /(#### Ubuntu-based Images[\s\S]*?- \*\*Bun\*\* )[0-9.]+( - Installed via script)/,
+              `$1${ubuntuVersions.bun_version}$2`
+            )
+            this.log(
+              `  ✅ Updated Ubuntu Bun version to ${ubuntuVersions.bun_version}`
+            )
+          }
+
+          // Update Node.js version for Ubuntu
+          if (ubuntuVersions.node_version) {
+            updatedContent = updatedContent.replace(
+              /(#### Ubuntu-based Images[\s\S]*?- \*\*Node\.js\*\* )v[0-9.]+( _\(ubuntu-bun-node only\)_)/,
+              `$1${ubuntuVersions.node_version}$2`
+            )
+            this.log(
+              `  ✅ Updated Ubuntu Node.js version to ${ubuntuVersions.node_version}`
+            )
+          }
+
+          // Update npm version for Ubuntu
+          if (ubuntuVersions.npm_version) {
+            updatedContent = updatedContent.replace(
+              /(#### Ubuntu-based Images[\s\S]*?- \*\*npm\*\* )[0-9.]+( _\(ubuntu-bun-node only\)_)/,
+              `$1${ubuntuVersions.npm_version}$2`
+            )
+            this.log(
+              `  ✅ Updated Ubuntu npm version to ${ubuntuVersions.npm_version}`
+            )
+          }
+        }
+      }
     } else if (readmePath === 'docs/IMAGE_VARIANTS.md') {
       // Update IMAGE_VARIANTS.md with new format
-      // Update the comparison table
+
+      // First, update tool versions in comparison tables if tool-versions.json is available
+      if (toolVersions.size > 0) {
+        // Get a representative container's tool versions for the tables
+        // Priority: bun-node > bun > ubuntu-bun-node > ubuntu-bun
+        let representativeVersions: any = null
+        for (const containerName of [
+          'bun-node',
+          'bun',
+          'ubuntu-bun-node',
+          'ubuntu-bun'
+        ]) {
+          if (toolVersions.has(containerName)) {
+            representativeVersions = toolVersions.get(containerName)
+            this.log(
+              `📋 Using tool versions from '${containerName}' for IMAGE_VARIANTS tables`
+            )
+            break
+          }
+        }
+
+        if (representativeVersions) {
+          // Update Bun Version rows in both tables
+          if (representativeVersions.bun_version) {
+            const bunVersion = representativeVersions.bun_version
+            // Match and replace each version number while preserving spacing
+            updatedContent = updatedContent.replace(
+              /(\| \*\*Bun Version\*\* \| )([0-9.]+)( +\| )([0-9.]+)( +\| )([0-9.]+)( +\| )([0-9.]+)( +\|)/g,
+              (match, p1, v1, p3, v2, p5, v3, p7, v4, p9) => {
+                // Calculate padding to maintain column width
+                const pad = (original: string, newVal: string) => {
+                  const diff = original.length - newVal.length
+                  return diff > 0 ? newVal + ' '.repeat(diff) : newVal
+                }
+                return `${p1}${pad(v1, bunVersion)}${p3}${pad(v2, bunVersion)}${p5}${pad(v3, bunVersion)}${p7}${pad(v4, bunVersion)}${p9}`
+              }
+            )
+            this.log(`  ✅ Updated Bun version to ${bunVersion} in tables`)
+          }
+
+          // Update Node.js versions in tables
+          if (representativeVersions.node_version) {
+            const nodeVersion = representativeVersions.node_version
+            updatedContent = updatedContent.replace(
+              /(\| \*\*Node\.js\*\* +\| ❌ +\| ✅ )v[0-9.]+/g,
+              `$1${nodeVersion}`
+            )
+            updatedContent = updatedContent.replace(
+              /(\| \*\*Node\.js\*\* +\| ❌ +\| ❌ +\| ✅ )v[0-9.]+/g,
+              `$1${nodeVersion}`
+            )
+            this.log(`  ✅ Updated Node.js version to ${nodeVersion}`)
+          }
+
+          // Update npm versions in tables
+          if (representativeVersions.npm_version) {
+            const npmVersion = representativeVersions.npm_version
+            updatedContent = updatedContent.replace(
+              /(\| \*\*npm\*\* +\| ❌ +\| ✅ )[0-9.]+/g,
+              `$1${npmVersion}`
+            )
+            updatedContent = updatedContent.replace(
+              /(\| \*\*npm\*\* +\| ❌ +\| ❌ +\| ✅ )[0-9.]+/g,
+              `$1${npmVersion}`
+            )
+            this.log(`  ✅ Updated npm version to ${npmVersion}`)
+          }
+
+          // Update individual tool version mentions in descriptions
+          // Pattern: "Bun X.X.X" anywhere in the document
+          if (representativeVersions.bun_version) {
+            const bunVersion = representativeVersions.bun_version
+            updatedContent = updatedContent.replace(
+              /Bun [0-9.]+/g,
+              `Bun ${bunVersion}`
+            )
+          }
+
+          // Pattern: "Node.js vX.X.X" anywhere in the document
+          if (representativeVersions.node_version) {
+            const nodeVersion = representativeVersions.node_version
+            updatedContent = updatedContent.replace(
+              /Node\.js v[0-9.]+/g,
+              `Node.js ${nodeVersion}`
+            )
+          }
+
+          // Pattern: "npm X.X.X" anywhere in the document
+          if (representativeVersions.npm_version) {
+            const npmVersion = representativeVersions.npm_version
+            updatedContent = updatedContent.replace(
+              /npm [0-9.]+/g,
+              `npm ${npmVersion}`
+            )
+          }
+        }
+      }
+
+      // Update the comparison table sizes
       const tablePattern = /(\| \*\*Size\*\* +\| ~)\d+( MB)/g
       updatedContent = updatedContent.replace(
         tablePattern,

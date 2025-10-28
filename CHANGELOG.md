@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [0.0.1] - 2025-10-19
 
 ## Container Updates
+
 - **bun**: 0.0.1 → 0.0.1 (manual release override)
 - **bun-node**: 0.0.1 → 0.0.1 (manual release override)
 - **ubuntu-bun**: 0.0.1 → 0.0.1 (manual release override)
@@ -13,12 +14,25 @@ All notable changes to this project will be documented in this file.
 - **gitpod-bun-node**: 0.0.1 → 0.0.1 (manual release override)
 - **gitpod-ubuntu-bun**: 0.0.1 → 0.0.1 (manual release override)
 - **gitpod-ubuntu-bun-node**: 0.0.1 → 0.0.1 (manual release override)
+
 ## Bug Fixes
-- fix: consolidate version tracking and optimize release workflow ([fd3d8bc](https://github.com/iamvikshan/devcontainers/commit/fd3d8bce896e733879d0852f72d06494b76fd7c8))
-- fix: setup script for improved readability and consistency; update package.json dependencies; enhance build-all-images script with better error handling and logging; add GitHub Actions for building, cleaning up, and tagging container images; implement scripts for extracting tool versions and cleaning untagged images; ensure Docker setup verification is robust and user-friendly. ([700d7a6](https://github.com/iamvikshan/devcontainers/commit/700d7a6c933475adbb5de52aa1b26a73eb294e91))
-- fix: resolve untagged images and missing Gitpod containers in documentation ([e9fe715](https://github.com/iamvikshan/devcontainers/commit/e9fe7155313c0123944aa9caf9e5393131d89682))
+
+- fix: consolidate version tracking and optimize release workflow
+  ([fd3d8bc](https://github.com/iamvikshan/devcontainers/commit/fd3d8bce896e733879d0852f72d06494b76fd7c8))
+- fix: setup script for improved readability and consistency; update package.json dependencies;
+  enhance build-all-images script with better error handling and logging; add GitHub Actions for
+  building, cleaning up, and tagging container images; implement scripts for extracting tool
+  versions and cleaning untagged images; ensure Docker setup verification is robust and
+  user-friendly.
+  ([700d7a6](https://github.com/iamvikshan/devcontainers/commit/700d7a6c933475adbb5de52aa1b26a73eb294e91))
+- fix: resolve untagged images and missing Gitpod containers in documentation
+  ([e9fe715](https://github.com/iamvikshan/devcontainers/commit/e9fe7155313c0123944aa9caf9e5393131d89682))
+
 ## Other Changes
-- release: 0.0.1 - roll back and implement manual release override functionality and update changelog format ([5d82204](https://github.com/iamvikshan/devcontainers/commit/5d82204a9158b2e21b7215be4ddd9fe05b400ccb))
+
+- release: 0.0.1 - roll back and implement manual release override functionality and update
+  changelog format
+  ([5d82204](https://github.com/iamvikshan/devcontainers/commit/5d82204a9158b2e21b7215be4ddd9fe05b400ccb))
 
 ## [0.0.1] - 2025-10-18
 
@@ -97,6 +111,7 @@ All notable changes to this project will be documented in this file.
 **Updated at:** 2025-10-23T05:10:06.095Z
 
 **Base images updated:**
+
 - **bun**: `oven/bun:latest`
   - Base image last updated: 10/22/2025
   - Digest: `sha256:9c5d3`
@@ -111,6 +126,7 @@ All notable changes to this project will be documented in this file.
   - Digest: `sha256:9c5d3`
 
 **Changes:**
+
 - Updated base images to latest versions
 - Security patches and bug fixes from upstream
 - Improved compatibility and performance
@@ -118,7 +134,6 @@ All notable changes to this project will be documented in this file.
 **Impact:** Patch release - DevContainers will be rebuilt with updated base images
 
 ---
-
 
 ## [2.0.0] - 2025-10-18
 

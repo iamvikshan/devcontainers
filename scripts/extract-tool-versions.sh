@@ -24,66 +24,96 @@ echo "[]" > tool-versions.json
 
 IFS=',' read -ra CONTAINERS <<< "$AFFECTED_CONTAINERS"
 
-# Select representative container with most complete toolset
-# Priority: 1) *-node containers, 2) ubuntu-* containers, 3) first container
-REPRESENTATIVE=""
-echo "🧠 Selecting representative container for tool extraction..."
+# Select TWO representative containers: one Alpine-based and one Ubuntu-based
+# This ensures we get accurate versions for both base image types
+ALPINE_REP=""
+UBUNTU_REP=""
+echo "🧠 Selecting representative containers for tool extraction..."
 
-# First pass: Look for *-node containers (have most tools)
+# Find Alpine-based representative (bun-node preferred, then bun)
 for container in "${CONTAINERS[@]}"; do
   container=$(echo "$container" | xargs) # trim whitespace
-  if [[ "$container" == *"-node" ]]; then
-    REPRESENTATIVE="$container"
-    echo "✅ Selected '$REPRESENTATIVE' (node-based container with full toolset)"
+  # Alpine images: bun, bun-node, gitpod-bun, gitpod-bun-node
+  if [[ "$container" =~ ^(bun-node|gitpod-bun-node)$ ]]; then
+    ALPINE_REP="$container"
+    echo "✅ Selected '$ALPINE_REP' for Alpine-based versions (node-enabled)"
     break
+  elif [[ "$container" =~ ^(bun|gitpod-bun)$ ]] && [ -z "$ALPINE_REP" ]; then
+    ALPINE_REP="$container"
   fi
 done
 
-# Second pass: If no node container, look for ubuntu-* containers
-if [ -z "$REPRESENTATIVE" ]; then
-  for container in "${CONTAINERS[@]}"; do
-    container=$(echo "$container" | xargs)
-    if [[ "$container" == ubuntu-* || "$container" == *-ubuntu-* ]]; then
-      REPRESENTATIVE="$container"
-      echo "✅ Selected '$REPRESENTATIVE' (Ubuntu-based container)"
-      break
-    fi
-  done
+if [ -n "$ALPINE_REP" ]; then
+  echo "✅ Selected '$ALPINE_REP' for Alpine-based versions"
 fi
 
-# Final fallback: Use first container
-if [ -z "$REPRESENTATIVE" ]; then
-  REPRESENTATIVE=$(echo "${CONTAINERS[0]}" | xargs)
-  echo "✅ Selected '$REPRESENTATIVE' (first available container)"
-fi
-
-echo "📦 Extracting tool versions from: $REPRESENTATIVE"
-echo "ℹ️  These versions will be used for all ${#CONTAINERS[@]} containers in this release"
-
-# Extract only from the representative container
-container="$REPRESENTATIVE"
-version=$(echo "$VERSION_MAP" | jq -r ".[\"$container\"] // \"latest\"")
-
-version=$(echo "$VERSION_MAP" | jq -r ".[\"$container\"] // \"latest\"")
-
-echo "📋 Extracting tool versions from $container:v$version (representative)..."
-
-# Extract tool versions for this specific container and version
-if bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="$container" --version="v$version" --output="temp-$container.json" --silent; then
-  echo "✅ Successfully extracted tool versions from representative container"
-  echo "📊 Tool versions will be applied to all containers in this release"
-
-  # Merge the results into the main tool-versions.json file
-  if [ -f "temp-$container.json" ]; then
-    # Merge the new results with existing results
-    jq -s 'add' tool-versions.json "temp-$container.json" > merged-tool-versions.json
-    mv merged-tool-versions.json tool-versions.json
-    rm "temp-$container.json"
+# Find Ubuntu-based representative (ubuntu-bun-node preferred, then ubuntu-bun)
+for container in "${CONTAINERS[@]}"; do
+  container=$(echo "$container" | xargs)
+  # Ubuntu images: ubuntu-bun, ubuntu-bun-node, gitpod-ubuntu-bun, gitpod-ubuntu-bun-node
+  if [[ "$container" =~ ^(ubuntu-bun-node|gitpod-ubuntu-bun-node)$ ]]; then
+    UBUNTU_REP="$container"
+    echo "✅ Selected '$UBUNTU_REP' for Ubuntu-based versions (node-enabled)"
+    break
+  elif [[ "$container" =~ ^(ubuntu-bun|gitpod-ubuntu-bun)$ ]] && [ -z "$UBUNTU_REP" ]; then
+    UBUNTU_REP="$container"
   fi
-else
-  echo "⚠️  Failed to extract tool versions from $container:v$version"
-  echo "ℹ️  Release will continue without tool version updates"
+done
+
+if [ -n "$UBUNTU_REP" ]; then
+  echo "✅ Selected '$UBUNTU_REP' for Ubuntu-based versions"
 fi
 
-echo "📊 Extracted tool versions from 1 representative container (instead of ${#CONTAINERS[@]})"
-echo "⚡ Time saved: ~$((${#CONTAINERS[@]} - 1)) container pulls"
+# Fallback: if we only have one type, use first container
+if [ -z "$ALPINE_REP" ] && [ -z "$UBUNTU_REP" ]; then
+  ALPINE_REP=$(echo "${CONTAINERS[0]}" | xargs)
+  echo "⚠️  Using '$ALPINE_REP' as fallback (first available container)"
+fi
+
+echo "📦 Extracting tool versions from representative containers:"
+[ -n "$ALPINE_REP" ] && echo "  - Alpine: $ALPINE_REP"
+[ -n "$UBUNTU_REP" ] && echo "  - Ubuntu: $UBUNTU_REP"
+
+# Extract from Alpine representative
+if [ -n "$ALPINE_REP" ]; then
+  container="$ALPINE_REP"
+  version=$(echo "$VERSION_MAP" | jq -r ".[\"$container\"] // \"latest\"")
+  
+  echo "📋 Extracting tool versions from $container:v$version (Alpine representative)..."
+  
+  if bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="$container" --version="v$version" --output="temp-$container.json" --silent; then
+    echo "✅ Successfully extracted Alpine-based tool versions"
+    
+    if [ -f "temp-$container.json" ]; then
+      jq -s 'add' tool-versions.json "temp-$container.json" > merged-tool-versions.json
+      mv merged-tool-versions.json tool-versions.json
+      rm "temp-$container.json"
+    fi
+  else
+    echo "⚠️  Failed to extract tool versions from Alpine container"
+  fi
+fi
+
+# Extract from Ubuntu representative
+if [ -n "$UBUNTU_REP" ]; then
+  container="$UBUNTU_REP"
+  version=$(echo "$VERSION_MAP" | jq -r ".[\"$container\"] // \"latest\"")
+  
+  echo "📋 Extracting tool versions from $container:v$version (Ubuntu representative)..."
+  
+  if bun scripts/toolVersionExtractor.ts --registry=ghcr --containers="$container" --version="v$version" --output="temp-$container.json" --silent; then
+    echo "✅ Successfully extracted Ubuntu-based tool versions"
+    
+    if [ -f "temp-$container.json" ]; then
+      jq -s 'add' tool-versions.json "temp-$container.json" > merged-tool-versions.json
+      mv merged-tool-versions.json tool-versions.json
+      rm "temp-$container.json"
+    fi
+  else
+    echo "⚠️  Failed to extract tool versions from Ubuntu container"
+  fi
+fi
+
+TOTAL_EXTRACTED=$(([ -n "$ALPINE_REP" ] && echo 1 || echo 0) + ([ -n "$UBUNTU_REP" ] && echo 1 || echo 0))
+echo "📊 Extracted tool versions from $TOTAL_EXTRACTED representative container(s)"
+echo "⚡ Versions will be applied to documentation based on base image type"

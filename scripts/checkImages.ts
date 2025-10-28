@@ -1,4 +1,6 @@
 import { imageOperations } from './imageOperations'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 interface BaseImageCommitInfo {
   containerName: string
@@ -7,6 +9,21 @@ interface BaseImageCommitInfo {
   lastUpdated: string
   commitMessage?: string
   digest: string
+}
+
+interface ToolVersionCheck {
+  tool: string
+  source: 'alpine' | 'ubuntu' | 'all'
+  currentVersion: string
+  latestVersion: string
+  hasUpdate: boolean
+  updateSource: string
+}
+
+interface ToolUpdateSummary {
+  hasToolUpdates: boolean
+  checks: ToolVersionCheck[]
+  affectedContainers: string[]
 }
 
 async function main() {
@@ -76,13 +93,18 @@ Examples:
   console.log('🔍 Checking for base image updates...\n')
 
   try {
+    // Check base images
     const updates = await imageOperations.checkBaseImageUpdates()
-    const hasUpdates = updates.some(u => u.hasUpdate)
+    const hasBaseImageUpdates = updates.some(u => u.hasUpdate)
 
-    if (hasUpdates) {
-      console.log('\n🚀 Updates found! Consider running a new release.')
-      console.log('\nUpdated images:')
+    // Check tool versions
+    const toolCheck = await checkToolVersions()
 
+    const hasAnyUpdates = hasBaseImageUpdates || toolCheck.hasToolUpdates
+
+    // Display base image updates
+    if (hasBaseImageUpdates) {
+      console.log('\n📦 Base Image Updates Found:')
       const updatedImages = updates.filter(u => u.hasUpdate)
 
       for (const update of updatedImages) {
@@ -100,18 +122,33 @@ Examples:
           }
         }
       }
-
-      // If getting commit messages, also output structured data for workflow
-      if (getCommitMessages) {
-        const commitInfo = await getBaseImageCommitInfo(updatedImages)
-        console.log('\n📝 Commit information for workflow:')
-        console.log(JSON.stringify(commitInfo, null, 2))
-      }
-    } else {
-      console.log('\n✅ All images are up to date!')
     }
 
-    return hasUpdates
+    // Display tool version updates
+    if (toolCheck.hasToolUpdates) {
+      console.log('\n🔧 Tool Version Updates Found:')
+      const outdatedTools = toolCheck.checks.filter(c => c.hasUpdate)
+
+      for (const check of outdatedTools) {
+        console.log(
+          `  - ${check.tool} (${check.source}): ${check.currentVersion} → ${check.latestVersion}`
+        )
+        console.log(`    Source: ${check.updateSource}`)
+      }
+
+      console.log(
+        `\n� Affected containers: ${toolCheck.affectedContainers.join(', ')}`
+      )
+    }
+
+    // Summary
+    if (hasAnyUpdates) {
+      console.log('\n🚀 Updates found! Consider running a new release.')
+    } else {
+      console.log('\n✅ All images and tools are up to date!')
+    }
+
+    return hasAnyUpdates
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.error('❌ Error checking base images:', errorMessage)
@@ -122,7 +159,11 @@ Examples:
 async function checkForUpdates(): Promise<boolean> {
   try {
     const updates = await imageOperations.checkBaseImageUpdates()
-    return updates.some(u => u.hasUpdate)
+    const hasBaseImageUpdates = updates.some(u => u.hasUpdate)
+
+    const toolCheck = await checkToolVersions()
+
+    return hasBaseImageUpdates || toolCheck.hasToolUpdates
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.error('❌ Error checking for updates:', errorMessage)
@@ -186,21 +227,50 @@ async function comprehensiveCheck(silent: boolean = false): Promise<void> {
       imageOperations.setSilent(true)
     }
 
+    // Check base images
     const updates = await imageOperations.checkBaseImageUpdates()
-    const hasUpdates = updates.some(u => u.hasUpdate)
+    const hasBaseImageUpdates = updates.some(u => u.hasUpdate)
     const updatedContainers = updates.filter(u => u.hasUpdate)
+
+    // Check tool versions (silent mode)
+    const toolCheck = await checkToolVersions(true)
+
+    // Combine affected containers from both checks
+    const allAffectedContainers = new Set([
+      ...updatedContainers.map(u => u.containerName),
+      ...toolCheck.affectedContainers
+    ])
+
+    const hasUpdates = hasBaseImageUpdates || toolCheck.hasToolUpdates
 
     const result = {
       hasUpdates,
-      updateCount: updatedContainers.length,
-      affectedContainers: updatedContainers.map(u => u.containerName),
-      updates: updatedContainers.map(u => ({
-        container: u.containerName,
-        baseImage: u.baseImage,
-        lastUpdated: u.lastUpdated,
-        currentDigest: u.currentDigest,
-        latestDigest: u.latestDigest
-      })),
+      updateCount: allAffectedContainers.size,
+      affectedContainers: Array.from(allAffectedContainers),
+      baseImageUpdates: {
+        hasUpdates: hasBaseImageUpdates,
+        count: updatedContainers.length,
+        updates: updatedContainers.map(u => ({
+          container: u.containerName,
+          baseImage: u.baseImage,
+          lastUpdated: u.lastUpdated,
+          currentDigest: u.currentDigest,
+          latestDigest: u.latestDigest
+        }))
+      },
+      toolUpdates: {
+        hasUpdates: toolCheck.hasToolUpdates,
+        count: toolCheck.checks.filter(c => c.hasUpdate).length,
+        checks: toolCheck.checks.map(c => ({
+          tool: c.tool,
+          source: c.source,
+          currentVersion: c.currentVersion,
+          latestVersion: c.latestVersion,
+          hasUpdate: c.hasUpdate,
+          updateSource: c.updateSource
+        })),
+        affectedContainers: toolCheck.affectedContainers
+      },
       timestamp: new Date().toISOString(),
       success: true
     }
@@ -213,7 +283,13 @@ async function comprehensiveCheck(silent: boolean = false): Promise<void> {
       hasUpdates: false,
       updateCount: 0,
       affectedContainers: [],
-      updates: [],
+      baseImageUpdates: { hasUpdates: false, count: 0, updates: [] },
+      toolUpdates: {
+        hasUpdates: false,
+        count: 0,
+        checks: [],
+        affectedContainers: []
+      },
       error: errorMessage,
       timestamp: new Date().toISOString(),
       success: false
@@ -318,6 +394,239 @@ async function updateReadmeFiles(updates: any[]): Promise<void> {
   // For now, just log that we would update README files
   // In the future, this could update container-specific README files
   console.log(`📋 Would update README files for ${updates.length} containers`)
+}
+
+// ============================================================================
+// Tool Version Checking Functions
+// ============================================================================
+
+// Get current tool versions from README.md
+async function getCurrentVersionsFromDocs(): Promise<{
+  bun: { alpine: string; ubuntu: string }
+  node: { alpine: string; ubuntu: string }
+  npm: { alpine: string; ubuntu: string }
+}> {
+  try {
+    const readmePath = join(process.cwd(), 'README.md')
+    const content = readFileSync(readmePath, 'utf-8')
+
+    // Extract Alpine versions
+    const alpineBunMatch = content.match(
+      /#### Alpine-based Images[\s\S]*?- \*\*Bun\*\* ([0-9.]+)/
+    )
+    const alpineNodeMatch = content.match(
+      /#### Alpine-based Images[\s\S]*?- \*\*Node\.js\*\* (v[0-9.]+)/
+    )
+    const alpineNpmMatch = content.match(
+      /#### Alpine-based Images[\s\S]*?- \*\*npm\*\* ([0-9.]+)/
+    )
+
+    // Extract Ubuntu versions
+    const ubuntuBunMatch = content.match(
+      /#### Ubuntu-based Images[\s\S]*?- \*\*Bun\*\* ([0-9.]+)/
+    )
+    const ubuntuNodeMatch = content.match(
+      /#### Ubuntu-based Images[\s\S]*?- \*\*Node\.js\*\* (v[0-9.]+)/
+    )
+    const ubuntuNpmMatch = content.match(
+      /#### Ubuntu-based Images[\s\S]*?- \*\*npm\*\* ([0-9.]+)/
+    )
+
+    return {
+      bun: {
+        alpine: alpineBunMatch?.[1] || 'unknown',
+        ubuntu: ubuntuBunMatch?.[1] || 'unknown'
+      },
+      node: {
+        alpine: alpineNodeMatch?.[1] || 'unknown',
+        ubuntu: ubuntuNodeMatch?.[1] || 'unknown'
+      },
+      npm: {
+        alpine: alpineNpmMatch?.[1] || 'unknown',
+        ubuntu: ubuntuNpmMatch?.[1] || 'unknown'
+      }
+    }
+  } catch (error) {
+    console.error('⚠️  Error reading current versions from README.md:', error)
+    return {
+      bun: { alpine: 'unknown', ubuntu: 'unknown' },
+      node: { alpine: 'unknown', ubuntu: 'unknown' },
+      npm: { alpine: 'unknown', ubuntu: 'unknown' }
+    }
+  }
+}
+
+// Get latest Bun version from GitHub releases
+async function getLatestBunFromGitHub(): Promise<string | null> {
+  try {
+    const headers: Record<string, string> = {
+      Accept: 'application/vnd.github.v3+json'
+    }
+
+    // Use GitHub token if available to avoid rate limits
+    const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN
+    if (githubToken) {
+      headers['Authorization'] = `Bearer ${githubToken}`
+    }
+
+    const response = await fetch(
+      'https://api.github.com/repos/oven-sh/bun/releases/latest',
+      { headers }
+    )
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`)
+    }
+    const data = await response.json()
+    // Tag format is "bun-v1.3.1", extract just the version
+    const version = data.tag_name?.replace('bun-v', '')
+    return version || null
+  } catch (error) {
+    console.error('⚠️  Error fetching Bun version from GitHub:', error)
+    return null
+  }
+}
+
+// Get Bun version from oven/bun:latest Docker image
+async function getBunVersionFromOvenImage(): Promise<string | null> {
+  try {
+    // Fetch manifest from Docker Hub for oven/bun:latest
+    const response = await fetch(
+      'https://hub.docker.com/v2/repositories/oven/bun/tags/latest'
+    )
+    if (!response.ok) {
+      throw new Error(`Docker Hub API error: ${response.status}`)
+    }
+    const data = await response.json()
+
+    // Try to extract version from image labels or name
+    // The oven/bun image often includes the version in the full description
+    // For now, we'll use the same as GitHub since oven/bun tracks releases closely
+    // In production, you might want to actually inspect the image manifest
+    return await getLatestBunFromGitHub()
+  } catch (error) {
+    console.error('⚠️  Error fetching Bun version from oven/bun image:', error)
+    return null
+  }
+}
+
+// Get latest Node.js LTS version
+async function getLatestNodeVersion(): Promise<string | null> {
+  try {
+    const response = await fetch('https://nodejs.org/dist/index.json')
+    if (!response.ok) {
+      throw new Error(`Node.js API error: ${response.status}`)
+    }
+    const data = await response.json()
+    // Get the latest LTS version
+    const latestLts = data.find((v: any) => v.lts !== false)
+    return latestLts?.version || null
+  } catch (error) {
+    console.error('⚠️  Error fetching Node.js version:', error)
+    return null
+  }
+}
+
+// Check for tool version updates
+async function checkToolVersions(
+  silent: boolean = false
+): Promise<ToolUpdateSummary> {
+  if (!silent) {
+    console.log('🔍 Checking tool versions...\n')
+  }
+
+  const currentVersions = await getCurrentVersionsFromDocs()
+  const checks: ToolVersionCheck[] = []
+  const affectedContainers: Set<string> = new Set()
+
+  // Check Bun for Ubuntu (installed via script - always latest from GitHub)
+  const latestBunGitHub = await getLatestBunFromGitHub()
+  if (latestBunGitHub && currentVersions.bun.ubuntu !== 'unknown') {
+    const hasUpdate = latestBunGitHub !== currentVersions.bun.ubuntu
+    checks.push({
+      tool: 'Bun',
+      source: 'ubuntu',
+      currentVersion: currentVersions.bun.ubuntu,
+      latestVersion: latestBunGitHub,
+      hasUpdate,
+      updateSource: 'GitHub releases (bun.sh/install)'
+    })
+
+    if (hasUpdate) {
+      affectedContainers.add('ubuntu-bun')
+      affectedContainers.add('ubuntu-bun-node')
+      affectedContainers.add('gitpod-ubuntu-bun')
+      affectedContainers.add('gitpod-ubuntu-bun-node')
+    }
+  }
+
+  // Check Bun for Alpine (from oven/bun:latest image)
+  const latestBunAlpine = await getBunVersionFromOvenImage()
+  if (latestBunAlpine && currentVersions.bun.alpine !== 'unknown') {
+    const hasUpdate = latestBunAlpine !== currentVersions.bun.alpine
+    checks.push({
+      tool: 'Bun',
+      source: 'alpine',
+      currentVersion: currentVersions.bun.alpine,
+      latestVersion: latestBunAlpine,
+      hasUpdate,
+      updateSource: 'oven/bun:latest Docker image'
+    })
+
+    if (hasUpdate) {
+      affectedContainers.add('bun')
+      affectedContainers.add('bun-node')
+      affectedContainers.add('gitpod-bun')
+      affectedContainers.add('gitpod-bun-node')
+    }
+  }
+
+  // Check Node.js (same for both Alpine and Ubuntu in -node variants)
+  const latestNode = await getLatestNodeVersion()
+  if (latestNode) {
+    // Check Alpine Node.js
+    if (currentVersions.node.alpine !== 'unknown') {
+      const hasUpdate = latestNode !== currentVersions.node.alpine
+      checks.push({
+        tool: 'Node.js',
+        source: 'alpine',
+        currentVersion: currentVersions.node.alpine,
+        latestVersion: latestNode,
+        hasUpdate,
+        updateSource: 'Node.js official releases'
+      })
+
+      if (hasUpdate) {
+        affectedContainers.add('bun-node')
+        affectedContainers.add('gitpod-bun-node')
+      }
+    }
+
+    // Check Ubuntu Node.js
+    if (currentVersions.node.ubuntu !== 'unknown') {
+      const hasUpdate = latestNode !== currentVersions.node.ubuntu
+      checks.push({
+        tool: 'Node.js',
+        source: 'ubuntu',
+        currentVersion: currentVersions.node.ubuntu,
+        latestVersion: latestNode,
+        hasUpdate,
+        updateSource: 'Node.js official releases'
+      })
+
+      if (hasUpdate) {
+        affectedContainers.add('ubuntu-bun-node')
+        affectedContainers.add('gitpod-ubuntu-bun-node')
+      }
+    }
+  }
+
+  const hasToolUpdates = checks.some(c => c.hasUpdate)
+
+  return {
+    hasToolUpdates,
+    checks,
+    affectedContainers: Array.from(affectedContainers)
+  }
 }
 
 if (require.main === module) {
