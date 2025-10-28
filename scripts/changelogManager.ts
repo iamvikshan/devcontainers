@@ -20,10 +20,6 @@ export class ChangelogManager {
     )
 
     try {
-      // Get real-time data
-      const sizes = await imageOperations.getAllImageSizes()
-      const baseImageDigests = await this.getBaseImageDigests()
-      const currentTime = new Date().toISOString()
       const currentDate = new Date().toISOString().split('T')[0]
 
       // Read existing CHANGELOG.md
@@ -42,9 +38,7 @@ export class ChangelogManager {
           overallVersion,
           currentDate,
           versionMap,
-          releaseNotes || [],
-          sizes,
-          baseImageDigests
+          releaseNotes || []
         )
       }
 
@@ -52,10 +46,6 @@ export class ChangelogManager {
       writeFileSync(this.changelogPath, content)
 
       console.log('✅ CHANGELOG.md updated successfully')
-      console.log(
-        `📊 Updated information for ${IMAGE_DEFINITIONS.names.length} images`
-      )
-      console.log(`🕒 Last updated: ${currentTime}`)
 
       if (versionMap) {
         const overallVersion = this.getHighestVersion(versionMap)
@@ -122,101 +112,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     version: string,
     date: string,
     versionMap: Record<string, string>,
-    releaseNotes: string[],
-    sizes: any,
-    baseImageDigests: Record<string, string>
+    releaseNotes: string[]
   ): string {
-    // Load tool versions if available
-    const toolVersions = this.loadToolVersions()
-
-    // Generate container updates section
-    const containerUpdates = this.generateContainerUpdatesSection(versionMap)
-
-    // Generate container information section
-    const containerInfo = this.generateContainerInfoSection(
+    // Generate Released Versions table for this release
+    const releasedVersionsTable = this.generateReleasedVersionsTable(
       versionMap,
-      sizes,
-      baseImageDigests,
-      toolVersions
+      date
     )
 
-    // Create the release entry
+    // Create the release entry (without Container Images section)
     const releaseEntry = `## [${version}] - ${date}
 
-## Container Updates
+${releasedVersionsTable}
 
-${containerUpdates}
+${releaseNotes.join('\n')}
 
-## Container Images
-
-${containerInfo}
-
-${
-  releaseNotes.length > 0
-    ? `## Release Notes
-
-${releaseNotes.map(note => `- ${note}`).join('\n')}
-
-`
-    : ''
-}---
+---
 
 `
 
-    // IMPORTANT: Insert AFTER the Released Versions table to keep it at the top
-    // Look for the --- separator after the Released Versions table
-    const releasedVersionsTableEnd = content.match(
-      /## Released Versions[\s\S]*?\n---\n/
+    // Insert the new release entry right after the file header
+    // Find the end of the header (after "All notable changes..." line)
+    const headerEndMatch = content.match(
+      /All notable changes to this project will be documented in this file\.\s*\n\s*\n/
     )
 
-    if (releasedVersionsTableEnd) {
-      // Insert right after the --- separator that ends the Released Versions table
+    if (headerEndMatch) {
       const insertPosition =
-        content.indexOf(releasedVersionsTableEnd[0]) +
-        releasedVersionsTableEnd[0].length
+        content.indexOf(headerEndMatch[0]) + headerEndMatch[0].length
       content =
         content.slice(0, insertPosition) +
-        '\n' +
         releaseEntry +
         content.slice(insertPosition)
     } else {
-      // Fallback: Use old logic if Released Versions table not found
-      const unreleasedIndex = content.indexOf('## [Unreleased]')
-      if (unreleasedIndex !== -1) {
-        // Insert after the Unreleased section
-        const nextSectionIndex = content.indexOf('\n## [', unreleasedIndex + 1)
-        if (nextSectionIndex !== -1) {
+      // Fallback: insert after the first blank line following the title
+      const firstHeadingIndex = content.indexOf('# Changelog')
+      if (firstHeadingIndex !== -1) {
+        const afterTitle = content.indexOf('\n\n', firstHeadingIndex)
+        if (afterTitle !== -1) {
           content =
-            content.slice(0, nextSectionIndex + 1) +
+            content.slice(0, afterTitle + 2) +
             releaseEntry +
-            content.slice(nextSectionIndex + 1)
-        } else {
-          // No other releases, add before the end
-          const endIndex = content.lastIndexOf('---')
-          if (endIndex !== -1) {
-            content =
-              content.slice(0, endIndex) +
-              releaseEntry +
-              content.slice(endIndex)
-          } else {
-            content += '\n' + releaseEntry
-          }
-        }
-      } else {
-        // No Unreleased section, add at the top after title
-        const firstHeadingIndex = content.indexOf('\n\n')
-        if (firstHeadingIndex !== -1) {
-          content =
-            content.slice(0, firstHeadingIndex + 2) +
-            releaseEntry +
-            content.slice(firstHeadingIndex + 2)
+            content.slice(afterTitle + 2)
         } else {
           content += '\n' + releaseEntry
         }
+      } else {
+        content += '\n' + releaseEntry
       }
     }
 
     return content
+  }
+
+  private generateReleasedVersionsTable(
+    versionMap: Record<string, string>,
+    date: string
+  ): string {
+    const rows = Object.entries(versionMap).map(([container, version]) => {
+      // Generate registry links
+      const ghcrLink = `[GHCR](https://ghcr.io/iamvikshan/devcontainers/${container}:${version})`
+      const dockerLink = `[Docker Hub](https://hub.docker.com/r/vikshan/${container})`
+      const gitlabLink = `[GitLab](https://registry.gitlab.com/vikshan/devcontainers/${container}:${version})`
+      const registryLinks = `${ghcrLink} · ${dockerLink} · ${gitlabLink}`
+
+      return `| ${container} | v${version} | ${date} | ${registryLinks} |`
+    })
+
+    return [
+      '### Released Versions',
+      '',
+      '| Container | Version | Date | Registry Links |',
+      '| --------- | ------- | ---- | -------------- |',
+      ...rows,
+      ''
+    ].join('\n')
   }
 
   private generateContainerUpdatesSection(

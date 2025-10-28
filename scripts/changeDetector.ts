@@ -8,6 +8,8 @@ export class ChangeDetector {
 
   setSilent(silent: boolean): void {
     this.silent = silent
+    // Propagate silent mode to imageOperations
+    imageOperations.setSilent(silent)
   }
 
   private log(message: string): void {
@@ -144,14 +146,7 @@ export class ChangeDetector {
   generateReleaseNotes(context: ReleaseContext): string[] {
     const notes: string[] = []
 
-    if (context.versionBumps.length > 0) {
-      notes.push('## Container Updates')
-      context.versionBumps.forEach(bump => {
-        notes.push(
-          `- **${bump.container}**: ${bump.currentVersion} → ${bump.newVersion} (${bump.reason})`
-        )
-      })
-    }
+    // Removed Container Updates section - now shown in Released Versions table
 
     if (context.baseImageUpdates && context.baseImageUpdates.length > 0) {
       notes.push('## Base Image Updates')

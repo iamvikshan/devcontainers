@@ -2,6 +2,7 @@ import { execSync } from 'child_process'
 import { writeFileSync } from 'fs'
 import { versionManager } from './versionManager'
 import { changeDetector } from './changeDetector'
+import { changelogManager } from './changelogManager'
 import { ReleaseContext, BuildResult } from './types'
 
 export class ReleaseOrchestrator {
@@ -119,24 +120,6 @@ export class ReleaseOrchestrator {
     })[0]
   }
 
-  // Generate a Released Versions table for a specific release
-  private generateVersionTable(
-    versionMap: Record<string, string>,
-    releaseDate: string
-  ): string {
-    const rows = Object.entries(versionMap).map(([container, version]) => {
-      return `| ${container} | v${version} | ${releaseDate} |`
-    })
-
-    return [
-      '### Released Versions',
-      '',
-      '| Container | Version | Date |',
-      '| --------- | ------- | ---- |',
-      ...rows
-    ].join('\n')
-  }
-
   // Create commit for base image updates
   async createBaseImageUpdateCommit(baseImageUpdates: any[]): Promise<void> {
     this.log('📝 Creating base image update commit...')
@@ -171,62 +154,6 @@ export class ReleaseOrchestrator {
       throw new Error(
         `Failed to create base image update commit: ${errorMessage}`
       )
-    }
-  }
-
-  // Update CHANGELOG.md
-  updateChangelog(
-    context: ReleaseContext,
-    versionMap: Record<string, string>
-  ): void {
-    this.log('📝 Updating CHANGELOG.md...')
-
-    try {
-      const releaseVersion = this.getHighestVersion(Object.values(versionMap))
-      const releaseDate = new Date().toISOString().split('T')[0]
-      const releaseNotes = changeDetector.generateReleaseNotes(context)
-
-      // Read existing changelog or create new one
-      let changelog = ''
-      try {
-        changelog = require('fs').readFileSync('CHANGELOG.md', 'utf-8')
-      } catch {
-        changelog =
-          '# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n'
-      }
-
-      // Generate Released Versions table for this release
-      const versionTable = this.generateVersionTable(versionMap, releaseDate)
-
-      // Prepare new entry
-      const newEntry = [
-        `## [${releaseVersion}] - ${releaseDate}`,
-        '',
-        versionTable,
-        '',
-        ...releaseNotes,
-        ''
-      ].join('\n')
-
-      // Insert new entry after the header
-      const lines = changelog.split('\n')
-      const headerEndIndex = lines.findIndex(line => line.startsWith('## '))
-
-      if (headerEndIndex === -1) {
-        // No existing releases, add after header
-        changelog += '\n' + newEntry
-      } else {
-        // Insert before first existing release
-        lines.splice(headerEndIndex, 0, newEntry)
-        changelog = lines.join('\n')
-      }
-
-      writeFileSync('CHANGELOG.md', changelog)
-      this.log('✅ CHANGELOG.md updated')
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error)
-      this.log(`⚠️  Error updating CHANGELOG.md: ${errorMessage}`)
     }
   }
 
@@ -275,8 +202,10 @@ export class ReleaseOrchestrator {
       // Prepare release
       const versionMap = this.prepareRelease(context)
 
-      // Update changelog
-      this.updateChangelog(context, versionMap)
+      // Update changelog using changelogManager
+      const releaseNotes = changeDetector.generateReleaseNotes(context)
+      await changelogManager.updateChangelogFile(versionMap, releaseNotes)
+      this.log('✅ CHANGELOG.md updated')
 
       // Generate outputs for workflow
       const outputs = this.generateWorkflowOutputs(context, versionMap)

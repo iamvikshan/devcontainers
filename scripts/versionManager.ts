@@ -238,32 +238,12 @@ export class VersionManager {
         const affectedContainers = new Set<string>()
 
         changedFiles.forEach(file => {
-          // Check if file is in a specific container directory
-          const containerMatch = file.match(/^base\/([^\/]+)/)
+          // Check if file is in a specific container directory under images/
+          const containerMatch = file.match(/^images\/([^\/]+)/)
           if (containerMatch) {
             const containerName = containerMatch[1]
             if (IMAGE_DEFINITIONS.names.includes(containerName)) {
               affectedContainers.add(containerName)
-            }
-          }
-
-          // Check for ubuntu subdirectories
-          const ubuntuMatch = file.match(/^base\/ubuntu\/([^\/]+)/)
-          if (ubuntuMatch) {
-            const subContainer = ubuntuMatch[1]
-            const fullName = `ubuntu-${subContainer}`
-            if (IMAGE_DEFINITIONS.names.includes(fullName)) {
-              affectedContainers.add(fullName)
-            }
-          }
-
-          // Check for gitpod containers
-          const gitpodMatch = file.match(/^gitpod\/([^\/]+)/)
-          if (gitpodMatch) {
-            const subContainer = gitpodMatch[1]
-            const fullName = `gitpod-${subContainer}`
-            if (IMAGE_DEFINITIONS.names.includes(fullName)) {
-              affectedContainers.add(fullName)
             }
           }
         })
@@ -362,7 +342,8 @@ export class VersionManager {
         return []
       }
 
-      // If manual version equals current versions for all containers, do nothing
+      // If manual version equals current versions for all containers, skip manual override
+      // and process other commits normally
       const allEqual = IMAGE_DEFINITIONS.names.every(name => {
         const current = versions[name]?.version || '0.0.0'
         return compareSemver(manualVersion!, current) === 0
@@ -370,24 +351,24 @@ export class VersionManager {
 
       if (allEqual) {
         this.log(
-          `\u2139\ufe0f Manual override v${manualVersion} matches current versions - nothing to do`
+          `\u2139\ufe0f Manual override v${manualVersion} matches current versions - processing other commits instead`
         )
-        return []
-      }
-
-      // Apply the manual version to ALL containers
-      IMAGE_DEFINITIONS.names.forEach(container => {
-        const currentVersion = versions[container]?.version || '1.0.0'
-        versionBumps.push({
-          container,
-          currentVersion,
-          newVersion: manualVersion!,
-          bumpType: 'major', // Manual releases can be any type, we use major as default
-          reason: 'manual release override'
+        // Don't return early - fall through to process other commits
+      } else {
+        // Apply the manual version to ALL containers
+        IMAGE_DEFINITIONS.names.forEach(container => {
+          const currentVersion = versions[container]?.version || '1.0.0'
+          versionBumps.push({
+            container,
+            currentVersion,
+            newVersion: manualVersion!,
+            bumpType: 'major', // Manual releases can be any type, we use major as default
+            reason: 'manual release override'
+          })
         })
-      })
 
-      return versionBumps
+        return versionBumps
+      }
     }
 
     const containerBumps: Record<
