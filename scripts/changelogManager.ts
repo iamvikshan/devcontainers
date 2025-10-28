@@ -5,9 +5,24 @@ import { imageOperations } from './imageOperations'
 
 export class ChangelogManager {
   private changelogPath: string
+  private silent: boolean = false
 
   constructor() {
     this.changelogPath = join(process.cwd(), 'CHANGELOG.md')
+  }
+
+  setSilent(silent: boolean): void {
+    this.silent = silent
+  }
+
+  private log(message: string): void {
+    // In workflow/silent mode we route informational logs to stderr so
+    // the caller can safely capture stdout for machine-readable output.
+    if (this.silent) {
+      console.error(message)
+    } else {
+      console.log(message)
+    }
   }
 
   // Update CHANGELOG.md with new release information
@@ -15,7 +30,7 @@ export class ChangelogManager {
     versionMap?: Record<string, string>,
     releaseNotes?: string[]
   ): Promise<void> {
-    console.log(
+    this.log(
       '📝 Updating CHANGELOG.md with release and container information...'
     )
 
@@ -45,11 +60,11 @@ export class ChangelogManager {
       // Write updated content
       writeFileSync(this.changelogPath, content)
 
-      console.log('✅ CHANGELOG.md updated successfully')
+  this.log('✅ CHANGELOG.md updated successfully')
 
       if (versionMap) {
         const overallVersion = this.getHighestVersion(versionMap)
-        console.log(`🚀 New version: ${overallVersion}`)
+        this.log(`🚀 New version: ${overallVersion}`)
       }
     } catch (error: any) {
       console.error('❌ Error updating CHANGELOG.md:', error.message)
@@ -59,7 +74,7 @@ export class ChangelogManager {
 
   // Sync sizes only (for --sync-only flag)
   async syncAllSizes(): Promise<void> {
-    console.log('🔄 Syncing sizes in CHANGELOG.md and README files...')
+    this.log('🔄 Syncing sizes in CHANGELOG.md and README files...')
 
     try {
       // Get real-time sizes
@@ -71,7 +86,7 @@ export class ChangelogManager {
       // Update CHANGELOG.md with new sizes
       await this.updateChangelogFile()
 
-      console.log('✅ All sizes synced successfully!')
+  this.log('✅ All sizes synced successfully!')
     } catch (error: any) {
       console.error('❌ Error syncing sizes:', error.message)
       throw error
@@ -307,14 +322,14 @@ ${releaseNotes.join('\n')}
         return JSON.parse(content)
       }
     } catch (error) {
-      console.log('⚠️  Could not load tool versions, using defaults')
+      this.log('⚠️  Could not load tool versions, using defaults')
     }
     return []
   }
 
   // Get base image digests
   async getBaseImageDigests(): Promise<Record<string, string>> {
-    console.log('🔍 Getting base image digests...')
+    this.log('🔍 Getting base image digests...')
 
     const digests: Record<string, string> = {}
 
@@ -344,6 +359,9 @@ export const changelogManager = new ChangelogManager()
 // CLI functionality
 async function main() {
   const args = process.argv.slice(2)
+  const workflowMode = args.includes('--workflow')
+  // Respect workflow mode by routing informational logs to stderr
+  changelogManager.setSilent(workflowMode)
   const newVersion = args
     .find(arg => arg.startsWith('--version='))
     ?.split('=')[1]
@@ -356,26 +374,36 @@ async function main() {
   const releaseNotes = releaseNotesArg ? releaseNotesArg.split(',') : undefined
   const syncOnly = args.includes('--sync-only')
 
-  console.log('🔄 Changelog Manager Starting...\n')
+  if (workflowMode) {
+    console.error('🔄 Changelog Manager Starting...\n')
+  } else {
+    console.log('🔄 Changelog Manager Starting...\n')
+  }
 
   try {
     if (syncOnly) {
       // Just sync sizes between README and CHANGELOG.md
-      console.log('📊 Syncing sizes only...')
+      if (workflowMode) console.error('📊 Syncing sizes only...')
+      else console.log('📊 Syncing sizes only...')
       await changelogManager.syncAllSizes()
     } else if (versionMapArg) {
       // Update with version map from new release system
-      console.log('📝 Updating CHANGELOG.md with version map...')
+      if (workflowMode)
+        console.error('📝 Updating CHANGELOG.md with version map...')
+      else console.log('📝 Updating CHANGELOG.md with version map...')
       const versionMap = JSON.parse(versionMapArg)
 
       await changelogManager.updateChangelogFile(versionMap, releaseNotes)
     } else {
       // Full version update with real-time data
-      console.log('📝 Updating CHANGELOG.md with real-time data...')
+      if (workflowMode)
+        console.error('📝 Updating CHANGELOG.md with real-time data...')
+      else console.log('📝 Updating CHANGELOG.md with real-time data...')
       await changelogManager.updateChangelogFile()
     }
 
-    console.log('\n🎉 Changelog management complete!')
+    if (workflowMode) console.error('\n🎉 Changelog management complete!')
+    else console.log('\n🎉 Changelog management complete!')
   } catch (error: any) {
     console.error('❌ Changelog management failed:', error.message)
     process.exit(1)

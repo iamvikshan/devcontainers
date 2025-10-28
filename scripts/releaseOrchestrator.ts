@@ -12,6 +12,8 @@ export class ReleaseOrchestrator {
     this.silent = silent
     versionManager.setSilent(silent)
     changeDetector.setSilent(silent)
+    // Ensure changelogManager follows the same silent/workflow behavior
+    changelogManager.setSilent?.(silent)
   }
 
   private log(message: string): void {
