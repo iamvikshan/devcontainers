@@ -51,7 +51,13 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ]; then
             TRIGGER="schedule"
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TRIGGER="manual"
+            # Check if triggered by base image check
+            if [[ "${{ github.event.inputs.trigger_reason }}" == *"Base image"* ]] || [[ "${{ github.event.inputs.trigger_reason }}" == *"base image"* ]]; then
+              TRIGGER="base-image-update"
+              echo "🔄 Detected base image update trigger"
+            else
+              TRIGGER="manual"
+            fi
           fi
 
           # Run release orchestrator in workflow mode

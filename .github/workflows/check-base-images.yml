@@ -130,7 +130,7 @@ jobs:
           echo "🚀 Triggering release workflow for base image updates..."
           echo "📦 Affected containers: $AFFECTED_CONTAINERS"
 
-          # Trigger the release workflow via workflow_dispatch
+          # Trigger the release workflow via workflow_dispatch with base-image-update trigger
           curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
