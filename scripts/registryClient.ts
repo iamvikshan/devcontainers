@@ -26,16 +26,7 @@ export function loadEnvironment(): void {
 
 // Centralized image definitions
 export const IMAGE_DEFINITIONS = {
-  names: [
-    'bun',
-    'bun-node',
-    'ubuntu-bun',
-    'ubuntu-bun-node',
-    'gitpod-bun',
-    'gitpod-bun-node',
-    'gitpod-ubuntu-bun',
-    'gitpod-ubuntu-bun-node'
-  ],
+  names: ['bun', 'bun-node', 'ubuntu-bun', 'ubuntu-bun-node'],
   registries: {
     ghcr: (image: string) =>
       `ghcr.io/${config.ghcrOwner}/${config.repoName}/${image}`,
@@ -47,11 +38,7 @@ export const IMAGE_DEFINITIONS = {
     bun: 'oven/bun',
     'bun-node': 'oven/bun',
     'ubuntu-bun': 'library/ubuntu',
-    'ubuntu-bun-node': 'library/ubuntu',
-    'gitpod-bun': 'oven/bun',
-    'gitpod-bun-node': 'oven/bun',
-    'gitpod-ubuntu-bun': 'library/ubuntu',
-    'gitpod-ubuntu-bun-node': 'library/ubuntu'
+    'ubuntu-bun-node': 'library/ubuntu'
   }
 }
 

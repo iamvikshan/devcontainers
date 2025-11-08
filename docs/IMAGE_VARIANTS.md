@@ -1,9 +1,8 @@
 # DevContainer Image Variants
 
-This document provides detailed information about all 8 available devcontainer images, including
-both standard and Gitpod-optimized variants.
+This document provides detailed information about all 4 available devcontainer images.
 
-## 📊 Standard Images Comparison
+## 📊 Images Comparison
 
 | Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- |
@@ -15,25 +14,7 @@ both standard and Gitpod-optimized variants.
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack |
 
-## 📊 Gitpod-Optimized Images Comparison
-
-| Feature         | gitpod-bun            | gitpod-bun-node       | gitpod-ubuntu-bun | gitpod-ubuntu-bun-node |
-| --------------- | --------------------- | --------------------- | ----------------- | ---------------------- |
-| **Base Image**  | gitpod/workspace-base | gitpod/workspace-base | ubuntu:jammy      | ubuntu:jammy           |
-| **Size**        | ~220 MB               | ~340 MB               | ~180 MB           | ~285 MB                |
-| **Bun Version** | 1.2.19                | 1.2.19                | 1.2.19            | 1.2.19                 |
-| **Node.js**     | ❌                    | ✅ v22 (via NVM)      | ❌                | ✅ v22 (via NVM)       |
-| **Gitpod User** | ✅ UID 33333          | ✅ UID 33333          | ✅ UID 33333      | ✅ UID 33333           |
-| **Shell**       | Bash (forced)         | Bash (forced)         | Bash (forced)     | Bash (forced)          |
-| **.bashrc.d/**  | ✅                    | ✅                    | ✅                | ✅                     |
-| **Best For**    | Gitpod Bun projects   | Gitpod full-stack     | Gitpod Ubuntu Bun | Gitpod Ubuntu full     |
-
 ## 🎯 Image Selection Guide
-
-### By Environment
-
-- **Local DevContainers (VS Code, etc.)** → Use standard images (`bun`, `bun-node`, `ubuntu-*`)
-- **Gitpod Cloud IDE** → Use gitpod-optimized images (`gitpod-*`)
 
 ### By Use Case
 
@@ -260,92 +241,7 @@ Do you need Node.js compatibility?
 | **Ubuntu packages** | ❌         | ❌       | ✅         | ✅              |
 | **Alpine packages** | ✅         | ✅       | ❌         | ❌              |
 
-## � Gitpod-Optimized Images
-
-### 5. gitpod-bun (~135 MB)
-
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/gitpod-bun:latest`
-
-**Description:** Lightweight Bun runtime optimized for Gitpod cloud development environments.
-Includes specific user configuration (UID 33333) and bash shell setup required by Gitpod.
-
-**Key Features:**
-
-- 🔧 **Gitpod user setup** - UID 33333 with proper permissions
-- 🐚 **Bash shell forced** - Enhanced compatibility
-- 📁 **.bashrc.d/** structure - Modular environment configuration
-- ⚡ **Bun 1.2.19** - Latest Bun runtime
-- 🎨 **Enhanced prompt** - Useful Bun aliases (bi, br, bt)
-
-**Perfect For:** Gitpod workspaces requiring pure Bun runtime without Node.js
-
-### 6. gitpod-bun-node (~250 MB)
-
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/gitpod-bun-node:latest`
-
-**Description:** Full JavaScript development environment for Gitpod with Bun, Node.js v22 (via NVM),
-and all major package managers.
-
-**Key Features:**
-
-- 🌟 **Complete Gitpod setup** - All Gitpod requirements met
-- 🔧 **Bun + Node.js** - Both runtimes available
-- 📦 **All package managers** - npm, yarn, pnpm
-- 🎯 **TypeScript support** - Ready for TypeScript projects
-- 🎨 **Shell completions** - Both Bun and Node.js
-
-**Perfect For:** Gitpod full-stack development with maximum compatibility
-
-### 7. gitpod-ubuntu-bun (~143 MB)
-
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun:latest`
-
-**Description:** Clean Ubuntu Jammy base with Bun and Gitpod-specific configuration. Maximum control
-with Ubuntu ecosystem.
-
-**Key Features:**
-
-- 🐧 **Ubuntu Jammy base** - Clean Ubuntu foundation
-- 👤 **Gitpod user configured** - UID 33333 setup
-- 🔧 **Bun runtime** - Latest version installed
-- 🛠️ **Essential tools** - Git, curl, development utilities
-- 📁 **Gitpod environment** - Proper .bashrc.d/ structure
-
-**Perfect For:** Gitpod projects needing Ubuntu packages with Bun
-
-### 8. gitpod-ubuntu-bun-node (~230 MB)
-
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun-node:latest`
-
-**Description:** Complete Ubuntu setup for Gitpod with both Bun and Node.js v22. Full development
-environment with maximum flexibility.
-
-**Key Features:**
-
-- 🌟 **Complete stack** - Ubuntu + Bun + Node.js + Gitpod
-- 🔧 **Node.js v22 + Bun** - All JavaScript runtimes
-- 📦 **All package managers** - npm, yarn, pnpm
-- 🐧 **Ubuntu ecosystem** - Full apt package access
-- 👤 **Gitpod optimized** - All Gitpod requirements met
-
-**Perfect For:** Gitpod Ubuntu full-stack development with system dependencies
-
-**Gitpod Usage Example:**
-
-```yaml
-# .gitpod.yml
-image: ghcr.io/iamvikshan/devcontainers/gitpod-bun-node:latest
-
-tasks:
-  - init: bun install
-    command: bun run dev
-
-ports:
-  - port: 3000
-    onOpen: open-preview
-```
-
-## �📦 Alternative Sources
+## 📦 Alternative Sources
 
 While we recommend using GitHub Container Registry as the primary source, all images are available
 from multiple registries:

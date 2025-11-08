@@ -278,7 +278,7 @@ ${releaseNotes.join('\n')}
 
     if (tools.eslint_version) {
       toolsList.push(`ESLint ${tools.eslint_version}`)
-    } else if (imageName.includes('node') && !imageName.includes('gitpod')) {
+    } else if (imageName.includes('node')) {
       toolsList.push('ESLint (global)')
     }
 
@@ -291,11 +291,7 @@ ${releaseNotes.join('\n')}
     }
 
     // Add special notes for certain containers
-    if (
-      imageName.includes('ubuntu') &&
-      imageName.includes('node') &&
-      !imageName.includes('gitpod')
-    ) {
+    if (imageName.includes('ubuntu') && imageName.includes('node')) {
       toolsList.push('ESLint (non-root)')
     }
 
@@ -305,9 +301,7 @@ ${releaseNotes.join('\n')}
   }
 
   private getContainerEmoji(imageName: string): string {
-    if (imageName.includes('gitpod')) {
-      return '🟠' // Gitpod orange
-    } else if (imageName.includes('ubuntu')) {
+    if (imageName.includes('ubuntu')) {
       return '🐧' // Ubuntu penguin
     } else {
       return '🚀' // Default rocket

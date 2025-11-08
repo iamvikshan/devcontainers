@@ -33,12 +33,12 @@ echo "🧠 Selecting representative containers for tool extraction..."
 # Find Alpine-based representative (bun-node preferred, then bun)
 for container in "${CONTAINERS[@]}"; do
   container=$(echo "$container" | xargs) # trim whitespace
-  # Alpine images: bun, bun-node, gitpod-bun, gitpod-bun-node
-  if [[ "$container" =~ ^(bun-node|gitpod-bun-node)$ ]]; then
+  # Alpine images: bun, bun-node
+  if [[ "$container" =~ ^(bun-node)$ ]]; then
     ALPINE_REP="$container"
     echo "✅ Selected '$ALPINE_REP' for Alpine-based versions (node-enabled)"
     break
-  elif [[ "$container" =~ ^(bun|gitpod-bun)$ ]] && [ -z "$ALPINE_REP" ]; then
+  elif [[ "$container" =~ ^(bun)$ ]] && [ -z "$ALPINE_REP" ]; then
     ALPINE_REP="$container"
   fi
 done
@@ -50,12 +50,12 @@ fi
 # Find Ubuntu-based representative (ubuntu-bun-node preferred, then ubuntu-bun)
 for container in "${CONTAINERS[@]}"; do
   container=$(echo "$container" | xargs)
-  # Ubuntu images: ubuntu-bun, ubuntu-bun-node, gitpod-ubuntu-bun, gitpod-ubuntu-bun-node
-  if [[ "$container" =~ ^(ubuntu-bun-node|gitpod-ubuntu-bun-node)$ ]]; then
+  # Ubuntu images: ubuntu-bun, ubuntu-bun-node
+  if [[ "$container" =~ ^(ubuntu-bun-node)$ ]]; then
     UBUNTU_REP="$container"
     echo "✅ Selected '$UBUNTU_REP' for Ubuntu-based versions (node-enabled)"
     break
-  elif [[ "$container" =~ ^(ubuntu-bun|gitpod-ubuntu-bun)$ ]] && [ -z "$UBUNTU_REP" ]; then
+  elif [[ "$container" =~ ^(ubuntu-bun)$ ]] && [ -z "$UBUNTU_REP" ]; then
     UBUNTU_REP="$container"
   fi
 done

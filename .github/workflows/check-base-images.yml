@@ -105,7 +105,7 @@ jobs:
             echo "⚠️  Force check enabled - treating as having updates"
             HAS_UPDATES="true"
             if [ "$AFFECTED_CONTAINERS" = "" ]; then
-              AFFECTED_CONTAINERS="bun,bun-node,ubuntu-bun,ubuntu-bun-node,gitpod-bun,gitpod-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node"
+              AFFECTED_CONTAINERS="bun,bun-node,ubuntu-bun,ubuntu-bun-node"
             fi
           fi
 

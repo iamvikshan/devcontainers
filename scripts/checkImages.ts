@@ -554,8 +554,6 @@ async function checkToolVersions(
     if (hasUpdate) {
       affectedContainers.add('ubuntu-bun')
       affectedContainers.add('ubuntu-bun-node')
-      affectedContainers.add('gitpod-ubuntu-bun')
-      affectedContainers.add('gitpod-ubuntu-bun-node')
     }
   }
 
@@ -575,8 +573,6 @@ async function checkToolVersions(
     if (hasUpdate) {
       affectedContainers.add('bun')
       affectedContainers.add('bun-node')
-      affectedContainers.add('gitpod-bun')
-      affectedContainers.add('gitpod-bun-node')
     }
   }
 
@@ -597,7 +593,6 @@ async function checkToolVersions(
 
       if (hasUpdate) {
         affectedContainers.add('bun-node')
-        affectedContainers.add('gitpod-bun-node')
       }
     }
 
@@ -615,7 +610,6 @@ async function checkToolVersions(
 
       if (hasUpdate) {
         affectedContainers.add('ubuntu-bun-node')
-        affectedContainers.add('gitpod-ubuntu-bun-node')
       }
     }
   }

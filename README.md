@@ -14,8 +14,6 @@ environments.
 
 ## Available Images
 
-### Standard DevContainer Images
-
 | Image               | Size    | Base   | Bun | Node.js | Best For                  |
 | ------------------- | ------- | ------ | --- | ------- | ------------------------- |
 | **bun**             | ~135 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
@@ -23,52 +21,25 @@ environments.
 | **ubuntu-bun**      | ~96 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
 | **ubuntu-bun-node** | ~167 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
 
-### Gitpod-Optimized Images
-
-Pre-configured for [Gitpod](https://gitpod.io/) cloud development environments with specific user
-setup (UID 33333) and bash shell configuration.
-
-| Image                      | Size    | Base         | Bun | Node.js | Best For                 |
-| -------------------------- | ------- | ------------ | --- | ------- | ------------------------ |
-| **gitpod-bun**             | ~135 MB | Gitpod Base  | ✅  | ❌      | Gitpod Bun projects      |
-| **gitpod-bun-node**        | ~250 MB | Gitpod Base  | ✅  | ✅      | Gitpod full-stack        |
-| **gitpod-ubuntu-bun**      | ~143 MB | Ubuntu Jammy | ✅  | ❌      | Gitpod Ubuntu Bun        |
-| **gitpod-ubuntu-bun-node** | ~230 MB | Ubuntu Jammy | ✅  | ✅      | Gitpod Ubuntu full-stack |
-
 ### 🎯 Choose Your Image
 
 ```
-Using Gitpod?
-├─ Yes → Need Node.js?
-│  ├─ Yes → Need Ubuntu base?
-│  │  ├─ Yes → gitpod-ubuntu-bun-node
-│  │  └─ No  → gitpod-bun-node
-│  └─ No  → Need Ubuntu base?
-│     ├─ Yes → gitpod-ubuntu-bun
-│     └─ No  → gitpod-bun
-└─ No  → Need Node.js?
-   ├─ Yes → Need Ubuntu base?
-   │  ├─ Yes → ubuntu-bun-node
-   │  └─ No  → bun-node
-   └─ No  → Need Ubuntu base?
-      ├─ Yes → ubuntu-bun
-      └─ No  → bun
+Need Node.js?
+├─ Yes → Need Ubuntu base?
+│  ├─ Yes → ubuntu-bun-node
+│  └─ No  → bun-node
+└─ No  → Need Ubuntu base?
+   ├─ Yes → ubuntu-bun
+   └─ No  → bun
 ```
 
 ### 📦 Quick Start
 
 ```bash
-# Standard DevContainer Images
 docker pull ghcr.io/iamvikshan/devcontainers/bun:latest
 docker pull ghcr.io/iamvikshan/devcontainers/bun-node:latest
 docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest
 docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest
-
-# Gitpod-Optimized Images
-docker pull ghcr.io/iamvikshan/devcontainers/gitpod-bun:latest
-docker pull ghcr.io/iamvikshan/devcontainers/gitpod-bun-node:latest
-docker pull ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun:latest
-docker pull ghcr.io/iamvikshan/devcontainers/gitpod-ubuntu-bun-node:latest
 ```
 
 > **Alternative Sources:** All images are also available on
@@ -124,30 +95,6 @@ services:
     working_dir: /workspace
     command: sleep infinity
 ```
-
-### Gitpod Configuration
-
-For Gitpod cloud development environments, create a `.gitpod.yml`:
-
-```yaml
-image:
-  file: .gitpod.Dockerfile
-# In your .gitpod.Dockerfile:
-# FROM ghcr.io/iamvikshan/devcontainers/gitpod-bun:latest
-```
-
-Or use directly in `.gitpod.yml`:
-
-```yaml
-image: ghcr.io/iamvikshan/devcontainers/gitpod-bun-node:latest
-
-tasks:
-  - init: bun install
-    command: bun run dev
-```
-
-> **Note:** Gitpod-optimized images include specific user configuration (UID 33333), bash shell
-> setup, and `.bashrc.d/` structure required by Gitpod environments.
 
 ## 📚 Documentation
 

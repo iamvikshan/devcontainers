@@ -104,36 +104,6 @@ test_image() {
       ;;
   esac
 
-  # Test Gitpod-specific features
-  case $image_name in
-    gitpod-*)
-      print_status "Testing Gitpod user setup..."
-      local user_check=$(docker run --rm "devcontainers/$image_name:test" id -u)
-      if [ "$user_check" = "33333" ]; then
-        print_success "✅ Gitpod user (UID 33333) is correct"
-      else
-        print_error "❌ Gitpod user UID is $user_check, expected 33333"
-        return 1
-      fi
-
-      print_status "Testing bash shell..."
-      local shell_check=$(docker run --rm "devcontainers/$image_name:test" bash -c 'echo $SHELL')
-      if [[ "$shell_check" == *"bash"* ]]; then
-        print_success "✅ Bash shell is configured"
-      else
-        print_warning "⚠️ Shell is $shell_check, might not be bash"
-      fi
-
-      print_status "Testing .bashrc.d structure..."
-      if docker run --rm "devcontainers/$image_name:test" test -d /home/gitpod/.bashrc.d; then
-        print_success "✅ .bashrc.d directory exists"
-      else
-        print_error "❌ .bashrc.d directory missing"
-        return 1
-      fi
-      ;;
-  esac
-
   # Test Git (should be in all images)
   print_status "Testing Git installation..."
   if docker run --rm "devcontainers/$image_name:test" git --version; then
@@ -213,58 +183,6 @@ main() {
     fi
   else
     failed_builds+=("ubuntu-bun-node (build failed)")
-  fi
-  echo
-
-  # Build gitpod-bun image
-  echo "================ GITPOD-BUN IMAGE =================="
-  if build_image "images/gitpod-bun/Dockerfile" "gitpod-bun" "images/gitpod-bun"; then
-    if test_image "gitpod-bun"; then
-      successful_builds+=("gitpod-bun")
-    else
-      failed_builds+=("gitpod-bun (test failed)")
-    fi
-  else
-    failed_builds+=("gitpod-bun (build failed)")
-  fi
-  echo
-
-  # Build gitpod-bun-node image
-  echo "============ GITPOD-BUN-NODE IMAGE ================="
-  if build_image "images/gitpod-bun-node/Dockerfile" "gitpod-bun-node" "images/gitpod-bun-node"; then
-    if test_image "gitpod-bun-node"; then
-      successful_builds+=("gitpod-bun-node")
-    else
-      failed_builds+=("gitpod-bun-node (test failed)")
-    fi
-  else
-    failed_builds+=("gitpod-bun-node (build failed)")
-  fi
-  echo
-
-  # Build gitpod-ubuntu-bun image
-  echo "============ GITPOD-UBUNTU-BUN IMAGE ==============="
-  if build_image "images/gitpod-ubuntu-bun/Dockerfile" "gitpod-ubuntu-bun" "images/gitpod-ubuntu-bun"; then
-    if test_image "gitpod-ubuntu-bun"; then
-      successful_builds+=("gitpod-ubuntu-bun")
-    else
-      failed_builds+=("gitpod-ubuntu-bun (test failed)")
-    fi
-  else
-    failed_builds+=("gitpod-ubuntu-bun (build failed)")
-  fi
-  echo
-
-  # Build gitpod-ubuntu-bun-node image
-  echo "======== GITPOD-UBUNTU-BUN-NODE IMAGE =============="
-  if build_image "images/gitpod-ubuntu-bun-node/Dockerfile" "gitpod-ubuntu-bun-node" "images/gitpod-ubuntu-bun-node"; then
-    if test_image "gitpod-ubuntu-bun-node"; then
-      successful_builds+=("gitpod-ubuntu-bun-node")
-    else
-      failed_builds+=("gitpod-ubuntu-bun-node (test failed)")
-    fi
-  else
-    failed_builds+=("gitpod-ubuntu-bun-node (build failed)")
   fi
   echo
 
