@@ -5,4 +5,3 @@ node_modules/
 
 # Exclude setup.sh files with complex bash arithmetic that prettier-plugin-sh can't parse
 images/**/setup.sh
-extract-tool-versions.sh

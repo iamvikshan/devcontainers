@@ -5,10 +5,7 @@
     "sync-sizes": "bun scripts/changelogManager.ts --sync-only",
     "update-versions": "bun scripts/changelogManager.ts",
     "rs": "bun f && git push -f",
-    "check-updates": "bun scripts/checkImages.ts",
-    "check-base-images": "bun scripts/checkImages.ts",
-    "check-base-images-json": "bun scripts/checkImages.ts --comprehensive --json-only",
-    "validate-check-images": "node scripts/validateCheckImages.js",
+    "check": "tsc --noEmit --skipLibCheck scripts/*.ts",
     "analyze-sizes": "bun scripts/imageOperations.ts --analyze-sizes",
     "build-all": "./scripts/build-all-images.sh",
     "build-bun": "docker build -f images/bun/Dockerfile -t devcontainers/bun:test images/bun",
@@ -26,10 +23,11 @@
     "analyze-changes": "bun scripts/changeDetector.ts"
   },
   "devDependencies": {
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "axios": "^1.13.2",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.6.2",
-    "prettier-plugin-sh": "^0.18.0"
+    "prettier": "^3.7.3",
+    "prettier-plugin-sh": "^0.18.0",
+    "typescript": "^5.9.3"
   }
 }

@@ -25,11 +25,13 @@ RUN if [ "${USERNAME}" != "root" ]; then \
 RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var/lib/apt/lists
 
 # Install all packages and Bun in a single layer
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     sudo \
     curl \
     unzip \
+    jq \
+    python3 \
     && curl -fsSL https://bun.sh/install | bash \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean \
@@ -54,7 +56,9 @@ RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && 
     echo "ubuntu_version=$(lsb_release -rs 2>/dev/null || cat /etc/os-release | grep VERSION_ID | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt && \
     echo "bun_version=$(bun --version)" >> /usr/local/share/tool-versions.txt && \
     echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
-    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
+    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
 
 # Copy the setup script and make it executable
 COPY setup.sh /usr/local/bin/setup.sh

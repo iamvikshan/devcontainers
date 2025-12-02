@@ -1,6 +1,6 @@
 import { execSync } from 'child_process'
 import { versionManager } from './versionManager'
-import { CommitAnalysis, ReleaseContext, VersionBump } from './types'
+import { ReleaseContext } from './types'
 import { imageOperations } from './imageOperations'
 
 export class ChangeDetector {
@@ -52,10 +52,11 @@ export class ChangeDetector {
       new Set(commits.flatMap(c => c.affectedContainers))
     )
 
-    // Check for base image updates if this is a scheduled run
+    // Check for base image updates and tool updates if this is a scheduled run
     let baseImageUpdates: any[] = []
     if (trigger === 'schedule' || trigger === 'base-image-update') {
       try {
+        // Check base image updates
         const updates = await imageOperations.checkBaseImageUpdates()
         baseImageUpdates = updates.filter(u => u.hasUpdate)
 
@@ -88,9 +89,45 @@ export class ChangeDetector {
             }
           })
         }
+
+        // Check tool version updates
+        const toolUpdates = await imageOperations.checkToolVersionUpdates()
+        if (
+          toolUpdates.hasUpdates &&
+          toolUpdates.affectedContainers.length > 0
+        ) {
+          this.log(
+            `🔧 Found tool updates for ${toolUpdates.affectedContainers.length} containers`
+          )
+
+          // Add tool update version bumps
+          toolUpdates.affectedContainers.forEach(containerName => {
+            if (!versionBumps.find(v => v.container === containerName)) {
+              const versions = versionManager.loadVersions()
+              const currentVersion = versions[containerName]?.version || '1.0.0'
+              const { newVersion } = versionManager.calculateVersionBump(
+                currentVersion,
+                'fix',
+                false
+              )
+
+              versionBumps.push({
+                container: containerName,
+                currentVersion,
+                newVersion,
+                bumpType: 'patch',
+                reason: 'tool version update'
+              })
+
+              if (!affectedContainers.includes(containerName)) {
+                affectedContainers.push(containerName)
+              }
+            }
+          })
+        }
       } catch (error) {
         this.log(
-          `⚠️  Error checking base image updates: ${error instanceof Error ? error.message : String(error)}`
+          `⚠️  Error checking external updates: ${error instanceof Error ? error.message : String(error)}`
         )
       }
     }

@@ -22,19 +22,18 @@
     "vscode": {
       "extensions": [
         "dbaeumer.vscode-eslint",
-        "GitHub.copilot",
-        "esbenp.prettier-vscode",
+        "prettier.prettier-vscode",
         "eamodio.gitlens",
         "oven.bun-vscode",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "WakaTime.vscode-wakatime"
       ]
     }
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bun update && docker --version",
-
-  // Set `remoteUser` to `root` to connect as root.
+  "postCreateCommand": "bun update && docker --version && chmod +x scripts/iamvikshan.sh && scripts/iamvikshan.sh",
+  // remoteUser` to `root` to connect as root.
   "remoteUser": "root",
 
   // Mount docker socket and enable privileged mode for Docker-in-Docker

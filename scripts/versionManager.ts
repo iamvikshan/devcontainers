@@ -1,12 +1,7 @@
 import { execSync } from 'child_process'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
-import {
-  ContainerVersion,
-  VersionBump,
-  CommitAnalysis,
-  ReleaseContext
-} from './types'
+import { ContainerVersion, VersionBump, CommitAnalysis } from './types'
 import { IMAGE_DEFINITIONS } from './registryClient'
 
 export class VersionManager {
@@ -502,6 +497,234 @@ export class VersionManager {
     } catch (error: any) {
       this.log(`⚠️  Error getting commits: ${error.message}`)
       return []
+    }
+  }
+
+  // ============================================================================
+  // External Version Checking (merged from versionChecker.ts)
+  // ============================================================================
+
+  // Fetch latest Bun version from GitHub releases
+  async fetchLatestBunVersion(): Promise<string | null> {
+    try {
+      const response = await fetch(
+        'https://api.github.com/repos/oven-sh/bun/releases/latest'
+      )
+      const data = await response.json()
+      return data.tag_name?.replace('bun-v', '') || null
+    } catch (error) {
+      this.log('⚠️  Error fetching Bun version from GitHub')
+      return null
+    }
+  }
+
+  // Fetch latest Node.js LTS version
+  async fetchLatestNodeVersion(): Promise<string | null> {
+    try {
+      const response = await fetch('https://nodejs.org/dist/index.json')
+      const data = await response.json()
+      const latestLts = data.find((v: any) => v.lts !== false)
+      return latestLts?.version?.replace('v', '') || null
+    } catch (error) {
+      this.log('⚠️  Error fetching Node.js version')
+      return null
+    }
+  }
+
+  // Fetch latest Python version
+  async fetchLatestPythonVersion(): Promise<string | null> {
+    try {
+      const response = await fetch('https://www.python.org/downloads/')
+      const html = await response.text()
+      const match = html.match(/Download Python (\d+\.\d+\.\d+)/i)
+      return match?.[1] || null
+    } catch (error) {
+      this.log('⚠️  Error fetching Python version')
+      return null
+    }
+  }
+
+  // Compare semantic versions
+  compareSemver(current: string, latest: string): boolean {
+    // Remove 'v' prefix if present
+    const cleanCurrent = current.replace(/^v/, '')
+    const cleanLatest = latest.replace(/^v/, '')
+
+    if (cleanCurrent === cleanLatest) return false
+
+    const currentParts = cleanCurrent.split('.').map(Number)
+    const latestParts = cleanLatest.split('.').map(Number)
+
+    for (
+      let i = 0;
+      i < Math.max(currentParts.length, latestParts.length);
+      i++
+    ) {
+      const curr = currentParts[i] || 0
+      const lat = latestParts[i] || 0
+
+      if (lat > curr) return true
+      if (lat < curr) return false
+    }
+
+    return false
+  }
+
+  // Load tool versions from cache in container-versions.json
+  loadToolVersionsFromCache(): Record<string, Record<string, string>> {
+    const versions = this.loadVersions()
+    const toolVersions: Record<string, Record<string, string>> = {}
+
+    for (const [containerName, containerInfo] of Object.entries(versions)) {
+      if ((containerInfo as any).toolVersions) {
+        toolVersions[containerName] = (containerInfo as any).toolVersions
+      }
+    }
+
+    return toolVersions
+  }
+
+  // Save tool versions to cache in container-versions.json
+  saveToolVersionsToCache(
+    containerName: string,
+    toolVersions: Record<string, string>
+  ): void {
+    const versions = this.loadVersions()
+
+    if (versions[containerName]) {
+      ;(versions[containerName] as any).toolVersions = toolVersions
+      this.saveVersions(versions)
+      this.log(`✅ Saved tool versions for ${containerName} to cache`)
+    } else {
+      this.log(`⚠️  Container ${containerName} not found in versions`)
+    }
+  }
+
+  // Compare cached tool versions with external APIs
+  async checkToolUpdates(): Promise<{
+    hasUpdates: boolean
+    affectedContainers: string[]
+    checks: Array<{
+      tool: string
+      currentVersion: string
+      latestVersion: string
+      hasUpdate: boolean
+      source: string
+    }>
+  }> {
+    this.log('🔧 Checking tool versions against external sources...\n')
+
+    const cachedVersions = this.loadToolVersionsFromCache()
+    const checks: Array<{
+      tool: string
+      currentVersion: string
+      latestVersion: string
+      hasUpdate: boolean
+      source: string
+    }> = []
+    const affectedContainers = new Set<string>()
+
+    // Get a representative container's tool versions (prefer ubuntu-bun-node as it has all tools)
+    const repContainer =
+      cachedVersions['ubuntu-bun-node'] ||
+      cachedVersions['bun-node'] ||
+      Object.values(cachedVersions)[0]
+
+    if (!repContainer) {
+      this.log('⚠️  No cached tool versions found')
+      return { hasUpdates: false, affectedContainers: [], checks: [] }
+    }
+
+    // Check Bun
+    if (repContainer.bun_version) {
+      const latestBun = await this.fetchLatestBunVersion()
+      if (latestBun) {
+        const hasUpdate = this.compareSemver(
+          repContainer.bun_version,
+          latestBun
+        )
+        checks.push({
+          tool: 'Bun',
+          currentVersion: repContainer.bun_version,
+          latestVersion: latestBun,
+          hasUpdate,
+          source: 'GitHub releases'
+        })
+
+        if (hasUpdate) {
+          // All containers use Bun
+          IMAGE_DEFINITIONS.names.forEach(name => affectedContainers.add(name))
+        }
+      }
+    }
+
+    // Check Node.js
+    if (repContainer.node_version) {
+      const latestNode = await this.fetchLatestNodeVersion()
+      if (latestNode) {
+        const hasUpdate = this.compareSemver(
+          repContainer.node_version.replace('v', ''),
+          latestNode
+        )
+        checks.push({
+          tool: 'Node.js',
+          currentVersion: repContainer.node_version,
+          latestVersion: `v${latestNode}`,
+          hasUpdate,
+          source: 'nodejs.org'
+        })
+
+        if (hasUpdate) {
+          // Only -node variants use Node
+          affectedContainers.add('bun-node')
+          affectedContainers.add('ubuntu-bun-node')
+        }
+      }
+    }
+
+    // Check Python
+    if (repContainer.python_version) {
+      const latestPython = await this.fetchLatestPythonVersion()
+      if (latestPython) {
+        const hasUpdate = this.compareSemver(
+          repContainer.python_version,
+          latestPython
+        )
+        checks.push({
+          tool: 'Python',
+          currentVersion: repContainer.python_version,
+          latestVersion: latestPython,
+          hasUpdate,
+          source: 'python.org'
+        })
+
+        if (hasUpdate) {
+          // All containers have Python
+          IMAGE_DEFINITIONS.names.forEach(name => affectedContainers.add(name))
+        }
+      }
+    }
+
+    // Log results
+    const updatesFound = checks.filter(c => c.hasUpdate)
+    if (updatesFound.length > 0) {
+      this.log('📦 Tool updates found:')
+      updatesFound.forEach(check => {
+        this.log(
+          `  • ${check.tool}: ${check.currentVersion} → ${check.latestVersion} (${check.source})`
+        )
+      })
+      this.log(
+        `\n🎯 Affected containers: ${Array.from(affectedContainers).join(', ')}`
+      )
+    } else {
+      this.log('✅ All tools are up to date!')
+    }
+
+    return {
+      hasUpdates: affectedContainers.size > 0,
+      affectedContainers: Array.from(affectedContainers),
+      checks
     }
   }
 }

@@ -309,15 +309,7 @@ ${releaseNotes.join('\n')}
   }
 
   private loadToolVersions(): any[] {
-    try {
-      const toolVersionsPath = join(process.cwd(), 'tool-versions.json')
-      if (existsSync(toolVersionsPath)) {
-        const content = readFileSync(toolVersionsPath, 'utf-8')
-        return JSON.parse(content)
-      }
-    } catch (error) {
-      this.log('⚠️  Could not load tool versions, using defaults')
-    }
+    // Tool versions should now be loaded from container-versions.json
     return []
   }
 
@@ -345,6 +337,74 @@ ${releaseNotes.join('\n')}
 
     return digests
   }
+
+  /**
+   * Update only the Released Versions table in CHANGELOG.md
+   * This is used by the workflow to quickly update version numbers without full changelog generation
+   */
+  async updateVersionsTable(versionMap: Record<string, string>): Promise<void> {
+    this.log('📝 Updating Released Versions table in CHANGELOG.md...')
+
+    if (!existsSync(this.changelogPath)) {
+      throw new Error('CHANGELOG.md not found')
+    }
+
+    let content = readFileSync(this.changelogPath, 'utf-8')
+    const currentDate = new Date().toISOString().split('T')[0]
+
+    // Find the Released Versions table
+    const tableRegex = /## Released Versions\s+([\s\S]*?)(?=\n---)/
+    const tableMatch = content.match(tableRegex)
+
+    if (!tableMatch) {
+      throw new Error('Released Versions table not found in CHANGELOG.md')
+    }
+
+    const tableContent = tableMatch[1]
+    const lines = tableContent.split('\n')
+
+    // Update the table rows
+    const updatedLines = lines.map(line => {
+      if (
+        !line.includes('|') ||
+        line.includes('Container') ||
+        line.includes('---')
+      ) {
+        return line
+      }
+
+      const cells = line
+        .split('|')
+        .map(c => c.trim())
+        .filter(Boolean)
+
+      if (cells.length < 3) return line
+
+      const containerName = cells[0]
+
+      // Check if this container was updated
+      if (versionMap[containerName]) {
+        const newVersion = versionMap[containerName]
+        cells[1] = `v${newVersion}`
+        cells[2] = currentDate
+        return `| ${cells.join(' | ')} |`
+      }
+
+      return line
+    })
+
+    // Replace the table in the content
+    const updatedTable = updatedLines.join('\n')
+    const newContent = content.replace(
+      tableRegex,
+      `## Released Versions\n${updatedTable}\n`
+    )
+
+    writeFileSync(this.changelogPath, newContent)
+
+    this.log('✅ Released Versions table updated successfully')
+    this.log(`📦 Updated versions: ${Object.keys(versionMap).join(', ')}`)
+  }
 }
 
 // Export singleton instance
@@ -367,6 +427,7 @@ async function main() {
     ?.split('=')[1]
   const releaseNotes = releaseNotesArg ? releaseNotesArg.split(',') : undefined
   const syncOnly = args.includes('--sync-only')
+  const updateTableOnly = args.includes('--update-table')
 
   if (workflowMode) {
     console.error('🔄 Changelog Manager Starting...\n')
@@ -380,6 +441,13 @@ async function main() {
       if (workflowMode) console.error('📊 Syncing sizes only...')
       else console.log('📊 Syncing sizes only...')
       await changelogManager.syncAllSizes()
+    } else if (updateTableOnly && versionMapArg) {
+      // Just update the Released Versions table
+      if (workflowMode)
+        console.error('📝 Updating Released Versions table only...')
+      else console.log('📝 Updating Released Versions table only...')
+      const versionMap = JSON.parse(versionMapArg)
+      await changelogManager.updateVersionsTable(versionMap)
     } else if (versionMapArg) {
       // Update with version map from new release system
       if (workflowMode)

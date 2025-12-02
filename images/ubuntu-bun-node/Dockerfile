@@ -29,11 +29,13 @@ RUN if [ "${USERNAME}" != "root" ]; then \
 RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var/lib/apt/lists
 
 # Install all packages, Node.js, Bun, and ESLint in a single layer
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     sudo \
     curl \
     unzip \
+    jq \
+    python3 \
     && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
     && apt-get install -y nodejs \
     && curl -fsSL https://bun.sh/install | bash \
@@ -64,7 +66,9 @@ RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && 
     echo "node_version=$(node --version)" >> /usr/local/share/tool-versions.txt && \
     echo "npm_version=$(npm --version)" >> /usr/local/share/tool-versions.txt && \
     echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
-    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
+    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
 
 # Copy the setup script and make it executable
 COPY setup.sh /usr/local/bin/setup.sh

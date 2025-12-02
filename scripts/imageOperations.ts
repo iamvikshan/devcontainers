@@ -295,39 +295,25 @@ export class ImageOperations {
   }
 
   // Load tool versions from tool-versions.json
+  // Load tool versions from container-versions.json
   private loadToolVersions(): Map<string, any> {
     const toolVersionMap = new Map<string, any>()
-
     try {
       const { join } = require('path')
-      const toolVersionsPath = join(process.cwd(), 'tool-versions.json')
-
-      if (existsSync(toolVersionsPath)) {
-        const content = readFileSync(toolVersionsPath, 'utf-8')
-        const toolVersions = JSON.parse(content)
-
-        // Convert array to map for easier lookup
-        if (Array.isArray(toolVersions)) {
-          toolVersions.forEach((tv: any) => {
-            if (tv.container && tv.versions) {
-              toolVersionMap.set(tv.container, tv.versions)
-            }
-          })
-          this.log(
-            `📊 Loaded tool versions for ${toolVersionMap.size} containers`
-          )
-        }
-      } else {
-        this.log(
-          '⚠️  tool-versions.json not found, skipping tool version updates'
-        )
+      const versionsPath = join(process.cwd(), 'container-versions.json')
+      if (existsSync(versionsPath)) {
+        const content = readFileSync(versionsPath, 'utf-8')
+        const versions = JSON.parse(content)
+        Object.entries(versions).forEach(([container, info]: [string, any]) => {
+          if (info.toolVersions) {
+            toolVersionMap.set(container, info.toolVersions)
+          }
+        })
+        this.log(`📊 Loaded tool versions for ${toolVersionMap.size} containers`)
       }
     } catch (error) {
-      this.logError(
-        `⚠️  Error loading tool versions: ${error instanceof Error ? error.message : String(error)}`
-      )
+      this.logError(`⚠️  Error loading tool versions: ${error instanceof Error ? error.message : String(error)}`)
     }
-
     return toolVersionMap
   }
 
@@ -702,6 +688,55 @@ export class ImageOperations {
     }
 
     this.log('\n✅ Analysis complete!')
+  }
+
+  // Check for tool version updates
+  public async checkToolVersionUpdates(): Promise<{
+    hasUpdates: boolean
+    affectedContainers: string[]
+    updates: Array<{
+      tool: string
+      containerName: string
+      currentVersion: string
+      latestVersion: string
+    }>
+  }> {
+    this.log('🔧 Checking tool version updates...')
+
+    try {
+      // Import and use versionManager for tool update checking
+      const { versionManager } = await import('./versionManager')
+      versionManager.setSilent(this.silent)
+
+      const result = await versionManager.checkToolUpdates()
+
+      // Transform the result to match our interface
+      const updates = result.checks
+        .filter(c => c.hasUpdate)
+        .flatMap(check =>
+          result.affectedContainers.map(containerName => ({
+            tool: check.tool,
+            containerName,
+            currentVersion: check.currentVersion,
+            latestVersion: check.latestVersion
+          }))
+        )
+
+      return {
+        hasUpdates: result.hasUpdates,
+        affectedContainers: result.affectedContainers,
+        updates
+      }
+    } catch (error) {
+      this.logError(
+        `⚠️  Error checking tool versions: ${error instanceof Error ? error.message : String(error)}`
+      )
+      return {
+        hasUpdates: false,
+        affectedContainers: [],
+        updates: []
+      }
+    }
   }
 }
 

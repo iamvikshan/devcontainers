@@ -5,10 +5,12 @@ ARG USERNAME=root
 
 # Install all packages in a single layer to minimize image size
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     sudo \
     curl \
+    jq \
+    python3 \
     && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g eslint \
@@ -46,7 +48,9 @@ RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && 
     echo "eslint_version=$(eslint --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
     echo "debian_version=$(cat /etc/debian_version)" >> /usr/local/share/tool-versions.txt && \
     echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
-    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
+    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
 
 # Copy the setup script and make it executable
 COPY setup.sh /usr/local/bin/setup.sh

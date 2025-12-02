@@ -100,6 +100,10 @@ export class ToolVersionExtractor {
           'git --version 2>/dev/null | cut -d\' \' -f3 || echo "not_installed"',
         curl_version:
           'curl --version 2>/dev/null | head -n1 | cut -d\' \' -f2 || echo "not_installed"',
+        jq_version:
+          'jq --version 2>/dev/null | cut -d\'-\' -f2 || echo "not_installed"',
+        python_version:
+          'python3 --version 2>/dev/null | cut -d\' \' -f2 || echo "not_installed"',
         debian_version:
           'cat /etc/debian_version 2>/dev/null || echo "not_available"',
         ubuntu_version:
@@ -204,37 +208,6 @@ export class ToolVersionExtractor {
     }
   }
 
-  // Save tool versions to a JSON file
-  saveToolVersions(
-    versions: ContainerToolVersions[],
-    outputPath?: string
-  ): void {
-    const filePath = outputPath || join(process.cwd(), 'tool-versions.json')
-
-    try {
-      writeFileSync(filePath, JSON.stringify(versions, null, 2))
-      this.log(`✅ Tool versions saved to ${filePath}`)
-    } catch (error) {
-      throw new Error(`Failed to save tool versions: ${error.message}`)
-    }
-  }
-
-  // Load tool versions from JSON file
-  loadToolVersions(inputPath?: string): ContainerToolVersions[] {
-    const filePath = inputPath || join(process.cwd(), 'tool-versions.json')
-
-    if (!existsSync(filePath)) {
-      return []
-    }
-
-    try {
-      const content = readFileSync(filePath, 'utf-8')
-      return JSON.parse(content)
-    } catch (error) {
-      this.log(`⚠️  Error loading tool versions: ${error.message}`)
-      return []
-    }
-  }
 
   // Update container versions with tool version data
   updateContainerVersionsWithTools(
@@ -318,6 +291,42 @@ export class ToolVersionExtractor {
 
     return results
   }
+
+  // Save tool versions to container-versions.json cache
+  async saveToolVersionsToCache(
+    results: ContainerToolVersions[]
+  ): Promise<void> {
+    const cacheFile = join(process.cwd(), 'container-versions.json')
+
+    try {
+      let cache: any = {}
+
+      // Load existing cache
+      if (existsSync(cacheFile)) {
+        const content = readFileSync(cacheFile, 'utf-8')
+        cache = JSON.parse(content)
+      }
+
+      // Update each container's toolVersions
+      for (const result of results) {
+        if (cache[result.container]) {
+          cache[result.container].toolVersions = result.versions
+          cache[result.container].lastUpdated = result.extractedAt
+          this.log(
+            `✅ Updated cache for ${result.container} with ${Object.keys(result.versions).length} tool versions`
+          )
+        } else {
+          this.log(`⚠️  Container ${result.container} not found in cache`)
+        }
+      }
+
+      // Save updated cache
+      writeFileSync(cacheFile, JSON.stringify(cache, null, 2))
+      this.log(`\n✅ Saved tool versions to cache: ${cacheFile}`)
+    } catch (error) {
+      throw new Error(`Failed to save to cache: ${error.message}`)
+    }
+  }
 }
 
 // Export singleton instance
@@ -340,6 +349,7 @@ async function main() {
     ?.split('=')[1]
   const local = args.includes('--local')
   const silent = args.includes('--silent')
+  const saveToCache = args.includes('--save-to-cache')
 
   if (silent) {
     toolVersionExtractor.setSilent(true)
@@ -361,16 +371,20 @@ async function main() {
       )
     } else {
       console.error(
-        'Usage: bun scripts/toolVersionExtractor.ts --registry=ghcr|gitlab|dockerhub [--containers=bun,bun-node] [--version=latest] [--output=path] [--silent]'
+        'Usage: bun scripts/toolVersionExtractor.ts --registry=ghcr|gitlab|dockerhub [--containers=bun,bun-node] [--version=latest] [--output=path] [--save-to-cache] [--silent]'
       )
       console.error(
-        '   or: bun scripts/toolVersionExtractor.ts --local --containers=bun,bun-node [--version=latest] [--output=path] [--silent]'
+        '   or: bun scripts/toolVersionExtractor.ts --local --containers=bun,bun-node [--version=latest] [--output=path] [--save-to-cache] [--silent]'
       )
       process.exit(1)
     }
 
     if (results.length > 0) {
-      toolVersionExtractor.saveToolVersions(results, outputPath)
+      if (saveToCache) {
+        await toolVersionExtractor.saveToolVersionsToCache(results)
+      } else {
+        toolVersionExtractor.saveToolVersions(results, outputPath)
+      }
       console.log(
         `\n📊 Extracted tool versions from ${results.length} containers`
       )

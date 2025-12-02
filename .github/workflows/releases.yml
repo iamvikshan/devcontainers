@@ -1,6 +1,9 @@
 name: Release DevContainers
 
 on:
+  schedule:
+    # Run daily at 5 AM UTC to check for base image and tool updates
+    - cron: "0 5 * * *"
   workflow_dispatch:
     inputs:
       trigger_reason:
@@ -120,13 +123,12 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           repository-name: ${{ github.event.repository.name }}
 
-      - name: Extract tool versions
+      - name: Cache tool versions
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
-        continue-on-error: true
-        uses: ./.github/actions/extract-versions
-        with:
-          version-map: ${{ steps.release_analysis.outputs.version_map }}
-          affected-containers: ${{ steps.release_analysis.outputs.affected_containers }}
+        run: |
+          echo "💾 Caching tool versions to container-versions.json..."
+          AFFECTED="${{ steps.release_analysis.outputs.affected_containers }}"
+          bun scripts/toolVersionExtractor.ts --local --containers="$AFFECTED" --save-to-cache || echo "⚠️ Failed to cache tool versions, continuing..."
 
       - name: Update CHANGELOG.md with release info
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
@@ -134,7 +136,21 @@ jobs:
           VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
         run: |
           echo "📝 Updating CHANGELOG.md with new release versions..."
-          bun scripts/updateVersionsTable.ts --version-map="$VERSION_MAP" || echo "⚠️ Failed to update CHANGELOG.md, continuing..."
+          bun scripts/changelogManager.ts --update-table --version-map="$VERSION_MAP" || echo "⚠️ Failed to update CHANGELOG.md, continuing..."
+
+      - name: Commit version cache
+        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add container-versions.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update tool versions cache [skip ci]"
+            git push
+            echo "✅ Committed tool versions cache"
+          else
+            echo "ℹ️  No changes to container-versions.json"
+          fi
 
       - name: Update documentation
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'

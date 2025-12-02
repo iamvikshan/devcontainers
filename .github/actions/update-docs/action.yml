@@ -38,6 +38,7 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         files-to-stage: "README.md CHANGELOG.md docs/IMAGE_VARIANTS.md"
+        commit-message: "docs: update documentation [skip ci]"
         version-map: ${{ inputs.version-map }}
         commit-body: |-
           - Updated CHANGELOG.md with container versions and tool information
