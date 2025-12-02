@@ -16,10 +16,10 @@ environments.
 
 | Image               | Size    | Base   | Bun | Node.js | Best For                  |
 | ------------------- | ------- | ------ | --- | ------- | ------------------------- |
-| **bun**             | ~135 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
-| **bun-node**        | ~228 MB | Alpine | ✅  | ✅      | Full-stack development    |
-| **ubuntu-bun**      | ~96 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
-| **ubuntu-bun-node** | ~167 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
+| **bun**             | ~64 MB  | Alpine | ✅  | ❌      | Pure Bun projects         |
+| **bun-node**        | ~96 MB  | Alpine | ✅  | ✅      | Full-stack development    |
+| **ubuntu-bun**      | ~65 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
+| **ubuntu-bun-node** | ~135 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
 
 ### 🎯 Choose Your Image
 
@@ -118,16 +118,16 @@ All images include:
 
 #### Alpine-based Images (`bun`, `bun-node`)
 
-- **Bun** 1.2.19 - Fast JavaScript runtime
-- **Node.js** v24.5.0 _(bun-node only)_
-- **npm** 11.5.1 _(bun-node only)_
+- **Bun** 1.3.3 - Fast JavaScript runtime
+- **Node.js** v22.11.0 _(bun-node only)_
+- **npm** 10.9.0 _(bun-node only)_
 - **ESLint** _(bun-node only)_
 
 #### Ubuntu-based Images (`ubuntu-bun`, `ubuntu-bun-node`)
 
-- **Bun** 1.2.19 - Installed via script
-- **Node.js** v24.5.0 _(ubuntu-bun-node only)_
-- **npm** 11.5.1 _(ubuntu-bun-node only)_
+- **Bun** 1.3.3 - Installed via script
+- **Node.js** v25.2.0 _(ubuntu-bun-node only)_
+- **npm** 11.6.2 _(ubuntu-bun-node only)_
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)
 

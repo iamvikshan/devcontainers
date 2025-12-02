@@ -8,9 +8,9 @@ This document provides detailed information about all 4 available devcontainer i
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     |
 | **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           |
-| **Bun Version** | 1.2.19            | 1.2.19                 | 1.2.19           | 1.2.19            |
-| **Node.js**     | ❌                | ✅ v24.5.0             | ❌               | ✅ v24.5.0        |
-| **npm**         | ❌                | ✅ 11.5.1              | ❌               | ✅ 11.5.1         |
+| **Bun Version** | 1.3.3             | 1.3.3                  | 1.3.3            | 1.3.3             |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.5.0        |
+| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 11.5.1         |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack |
 
@@ -26,7 +26,7 @@ This document provides detailed information about all 4 available devcontainer i
 
 ## 🐳 Image Details
 
-### 1. bun (~135 MB)
+### 1. bun (~64 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun:latest`
 
@@ -36,13 +36,13 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
 **Key Features:**
 
 - ⚡ **Fastest startup** - Minimal Alpine base
-- 🔧 **Bun 1.2.19** - Latest Bun runtime
+- 🔧 **Bun 1.3.3** - Latest Bun runtime
 - 📦 **Alpine packages** - Access to apk package manager
 - 🚀 **Performance optimized** - Smallest footprint for Bun
 
 **Included Tools:**
 
-- Bun 1.2.19
+- Bun 1.3.3
 - Git, SSH client, curl
 - Alpine package manager (apk)
 - Basic development utilities
@@ -70,7 +70,7 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
 }
 ```
 
-### 2. bun-node (~228 MB)
+### 2. bun-node (~96 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
 
@@ -81,14 +81,14 @@ that need Bun's performance with Node.js ecosystem compatibility.
 
 - 🚀 **Best of both worlds** - Bun speed + Node.js compatibility
 - 📦 **Full npm ecosystem** - Access to all npm packages
-- 🔧 **Latest runtimes** - Bun 1.2.19 + Node.js v24.5.0
+- 🔧 **Latest runtimes** - Bun 1.3.3 + Node.js v22.11.0
 - 🛠️ **Development tools** - ESLint pre-installed
 
 **Included Tools:**
 
-- Bun 1.2.19
-- Node.js v24.5.0
-- npm 11.5.1
+- Bun 1.3.3
+- Node.js v22.11.0
+- npm 10.9.0
 - ESLint (global)
 - Git, SSH client, curl
 - Alpine package manager (apk)
@@ -116,7 +116,7 @@ that need Bun's performance with Node.js ecosystem compatibility.
 }
 ```
 
-### 3. ubuntu-bun (~96 MB)
+### 3. ubuntu-bun (~65 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
 
@@ -132,7 +132,7 @@ and tooling. The smallest image in our collection!
 
 **Included Tools:**
 
-- Bun 1.2.19 (installed via script)
+- Bun 1.3.3 (installed via script)
 - Git, SSH client, curl, unzip
 - sudo (administrative access)
 - Ubuntu package manager (apt)
@@ -161,7 +161,7 @@ and tooling. The smallest image in our collection!
 }
 ```
 
-### 4. ubuntu-bun-node (~167 MB)
+### 4. ubuntu-bun-node (~135 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
 
@@ -177,9 +177,9 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
 
 **Included Tools:**
 
-- Bun 1.2.19 (installed via script)
-- Node.js v24.5.0
-- npm 11.5.1
+- Bun 1.3.3 (installed via script)
+- Node.js v22.11.0
+- npm 10.9.0
 - ESLint (global)
 - Git, SSH client, curl, unzip
 - sudo (administrative access)

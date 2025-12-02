@@ -309,10 +309,14 @@ export class ImageOperations {
             toolVersionMap.set(container, info.toolVersions)
           }
         })
-        this.log(`📊 Loaded tool versions for ${toolVersionMap.size} containers`)
+        this.log(
+          `📊 Loaded tool versions for ${toolVersionMap.size} containers`
+        )
       }
     } catch (error) {
-      this.logError(`⚠️  Error loading tool versions: ${error instanceof Error ? error.message : String(error)}`)
+      this.logError(
+        `⚠️  Error loading tool versions: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
     return toolVersionMap
   }

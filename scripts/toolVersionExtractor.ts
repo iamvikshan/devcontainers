@@ -210,7 +210,6 @@ export class ToolVersionExtractor {
     }
   }
 
-
   // Update container versions with tool version data
   updateContainerVersionsWithTools(
     containerVersions: Record<string, any>,
