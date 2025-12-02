@@ -2,16 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.2] - 2025-10-28
+## [0.0.3] - 2025-10-28
 
 ### Released Versions
 
 | Container       | Version | Date       | Registry Links                                                                                                                                                                                                              |
 | --------------- | ------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| bun             | v0.0.2  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun:0.0.2) · [Docker Hub](https://hub.docker.com/r/vikshan/bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun:0.0.2)                                     |
-| bun-node        | v0.0.2  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun-node:0.0.2) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun-node:0.0.2)                      |
-| ubuntu-bun      | v0.0.2  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:0.0.2) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:0.0.2)                |
-| ubuntu-bun-node | v0.0.2  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:0.0.2) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:0.0.2) |
+| bun             | v0.0.3  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun:0.0.3) · [Docker Hub](https://hub.docker.com/r/vikshan/bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun:0.0.3)                                     |
+| bun-node        | v0.0.3  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun-node:0.0.3) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun-node:0.0.3)                      |
+| ubuntu-bun      | v0.0.3  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:0.0.3) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:0.0.3)                |
+| ubuntu-bun-node | v0.0.3  | 2025-10-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:0.0.3) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:0.0.3) |
 
 ## Bug Fixes
 

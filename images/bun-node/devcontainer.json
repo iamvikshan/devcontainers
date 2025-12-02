@@ -1,5 +1,5 @@
 {
-  "name": "Bun + Node.js",
+  "name": "Alpine + Bun + Node.js",
   "build": {
     "dockerfile": "Dockerfile"
   },

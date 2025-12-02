@@ -104,6 +104,8 @@ export class ToolVersionExtractor {
           'jq --version 2>/dev/null | cut -d\'-\' -f2 || echo "not_installed"',
         python_version:
           'python3 --version 2>/dev/null | cut -d\' \' -f2 || echo "not_installed"',
+        alpine_version:
+          'cat /etc/alpine-release 2>/dev/null || echo "not_available"',
         debian_version:
           'cat /etc/debian_version 2>/dev/null || echo "not_available"',
         ubuntu_version:

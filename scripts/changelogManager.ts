@@ -303,6 +303,8 @@ ${releaseNotes.join('\n')}
   private getContainerEmoji(imageName: string): string {
     if (imageName.includes('ubuntu')) {
       return '🐧' // Ubuntu penguin
+    } else if (imageName.startsWith('bun')) {
+      return '🏔️' // Alpine mountain
     } else {
       return '🚀' // Default rocket
     }
