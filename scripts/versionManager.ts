@@ -24,32 +24,59 @@ export class VersionManager {
 
   // Load current container versions
   loadVersions(): Record<string, ContainerVersion> {
-    // First try to load from CHANGELOG.md (source of truth)
+    // Load existing JSON to preserve toolVersions
+    let existingVersions: Record<string, ContainerVersion> = {}
+    if (existsSync(this.versionsFile)) {
+      try {
+        const content = readFileSync(this.versionsFile, 'utf-8')
+        existingVersions = JSON.parse(content)
+      } catch {
+        // Ignore parsing errors
+      }
+    }
+
+    // First try to load from CHANGELOG.md (source of truth for version numbers)
     const versionsFromChangelog = this.loadVersionsFromChangelog()
     if (
       versionsFromChangelog &&
       Object.keys(versionsFromChangelog).length > 0
     ) {
       this.log('📋 Loaded versions from CHANGELOG.md')
-      // Save to JSON for this run
-      this.saveVersions(versionsFromChangelog)
-      return versionsFromChangelog
+      // Merge: use changelog versions but preserve toolVersions from existing JSON
+      const merged = this.mergeVersionsPreservingToolVersions(
+        versionsFromChangelog,
+        existingVersions
+      )
+      this.saveVersions(merged)
+      return merged
     }
 
     // Fallback to JSON file if it exists
-    if (existsSync(this.versionsFile)) {
-      try {
-        const content = readFileSync(this.versionsFile, 'utf-8')
-        const versions = JSON.parse(content)
-        this.log('📋 Loaded versions from container-versions.json')
-        return versions
-      } catch (error: any) {
-        this.log(`⚠️  Error reading versions file: ${error.message}`)
-      }
+    if (Object.keys(existingVersions).length > 0) {
+      this.log('📋 Loaded versions from container-versions.json')
+      return existingVersions
     }
 
     // Last resort: initialize with defaults
     return this.initializeVersions()
+  }
+
+  // Merge versions from changelog with existing JSON, preserving toolVersions
+  private mergeVersionsPreservingToolVersions(
+    fromChangelog: Record<string, ContainerVersion>,
+    existing: Record<string, ContainerVersion>
+  ): Record<string, ContainerVersion> {
+    const merged: Record<string, ContainerVersion> = {}
+
+    for (const [name, version] of Object.entries(fromChangelog)) {
+      merged[name] = {
+        ...version,
+        // Preserve toolVersions from existing if present
+        toolVersions: existing[name]?.toolVersions
+      }
+    }
+
+    return merged
   }
 
   // Load versions from CHANGELOG.md (source of truth)

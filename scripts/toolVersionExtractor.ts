@@ -344,12 +344,8 @@ async function main() {
     .find(arg => arg.startsWith('--containers='))
     ?.split('=')[1]
     ?.split(',')
-  const outputPath = args
-    .find(arg => arg.startsWith('--output='))
-    ?.split('=')[1]
   const local = args.includes('--local')
   const silent = args.includes('--silent')
-  const saveToCache = args.includes('--save-to-cache')
 
   if (silent) {
     toolVersionExtractor.setSilent(true)
@@ -371,20 +367,17 @@ async function main() {
       )
     } else {
       console.error(
-        'Usage: bun scripts/toolVersionExtractor.ts --registry=ghcr|gitlab|dockerhub [--containers=bun,bun-node] [--version=latest] [--output=path] [--save-to-cache] [--silent]'
+        'Usage: bun scripts/toolVersionExtractor.ts --registry=ghcr|gitlab|dockerhub [--containers=bun,bun-node] [--version=latest] [--save-to-cache] [--silent]'
       )
       console.error(
-        '   or: bun scripts/toolVersionExtractor.ts --local --containers=bun,bun-node [--version=latest] [--output=path] [--save-to-cache] [--silent]'
+        '   or: bun scripts/toolVersionExtractor.ts --local --containers=bun,bun-node [--version=latest] [--save-to-cache] [--silent]'
       )
       process.exit(1)
     }
 
     if (results.length > 0) {
-      if (saveToCache) {
-        await toolVersionExtractor.saveToolVersionsToCache(results)
-      } else {
-        toolVersionExtractor.saveToolVersions(results, outputPath)
-      }
+      // Always save to container-versions.json cache (tool-versions.json is deprecated)
+      await toolVersionExtractor.saveToolVersionsToCache(results)
       console.log(
         `\n📊 Extracted tool versions from ${results.length} containers`
       )

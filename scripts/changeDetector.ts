@@ -2,6 +2,7 @@ import { execSync } from 'child_process'
 import { versionManager } from './versionManager'
 import { ReleaseContext } from './types'
 import { imageOperations } from './imageOperations'
+import { IMAGE_DEFINITIONS } from './registryClient'
 
 export class ChangeDetector {
   private silent = false
@@ -23,6 +24,12 @@ export class ChangeDetector {
     trigger: ReleaseContext['trigger'] = 'push'
   ): Promise<ReleaseContext> {
     this.log('🔍 Analyzing changes for release...')
+
+    // For manual trigger, release ALL containers
+    if (trigger === 'manual') {
+      this.log('🎯 Manual trigger detected - releasing ALL containers')
+      return this.createManualReleaseContext()
+    }
 
     const rawCommits = versionManager.getCommitsSinceLastRelease()
     // Filter out commits that don't affect any containers
@@ -142,8 +149,38 @@ export class ChangeDetector {
     }
   }
 
+  // Create release context for manual trigger (all containers)
+  private createManualReleaseContext(): ReleaseContext {
+    const versions = versionManager.loadVersions()
+    const versionBumps = IMAGE_DEFINITIONS.names.map(container => {
+      const currentVersion = versions[container]?.version || '1.0.0'
+      const { newVersion, bumpType } = versionManager.calculateVersionBump(
+        currentVersion,
+        'fix',
+        false
+      )
+      return {
+        container,
+        currentVersion,
+        newVersion,
+        bumpType,
+        reason: 'manual release'
+      }
+    })
+
+    return {
+      trigger: 'manual',
+      affectedContainers: [...IMAGE_DEFINITIONS.names],
+      versionBumps,
+      commits: [],
+      baseImageUpdates: []
+    }
+  }
+
   // Check if any containers need to be released
   shouldRelease(context: ReleaseContext): boolean {
+    // Manual trigger always releases
+    if (context.trigger === 'manual') return true
     return (
       context.versionBumps.length > 0 ||
       (context.baseImageUpdates?.length ?? 0) > 0

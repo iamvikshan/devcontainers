@@ -1,6 +1,46 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ]
+  "extends": ["config:recommended"],
+  "docker": {
+    "enabled": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^images/bun(-node)?/Dockerfile$"],
+      "matchStrings": ["ARG VARIANT=(?<currentValue>\\S+)\\n"],
+      "depNameTemplate": "oven/bun",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^images/ubuntu-bun(-node)?/Dockerfile$"],
+      "matchStrings": ["ARG VARIANT=(?<currentValue>\\S+)\\n"],
+      "depNameTemplate": "ubuntu",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "ubuntu"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "automerge": true,
+      "matchUpdateTypes": ["minor", "patch"],
+      "schedule": ["after 10pm on sunday"]
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "groupSlug": "github-actions"
+    },
+    {
+      "matchManagers": ["npm"],
+      "groupName": "npm-dependencies",
+      "groupSlug": "npm"
+    }
+  ],
+  "schedule": ["after 10pm on sunday"],
+  "dependencyDashboard": true,
+  "prConcurrentLimit": 5
 }
