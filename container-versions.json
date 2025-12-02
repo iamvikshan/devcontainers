@@ -1,9 +1,9 @@
 {
   "bun": {
     "name": "bun",
-    "version": "0.0.3",
-    "lastUpdated": "2025-12-02T12:39:23.952Z",
-    "baseImage": "oven/bun:alpine",
+    "version": "0.0.4",
+    "lastUpdated": "2025-12-02T13:18:54.789Z",
+    "baseImage": "oven/bun",
     "toolVersions": {
       "build_date": "2025-12-02T00:00:00Z",
       "base_image": "oven/bun:alpine",
@@ -15,9 +15,9 @@
   },
   "bun-node": {
     "name": "bun-node",
-    "version": "0.0.3",
-    "lastUpdated": "2025-12-02T12:39:23.953Z",
-    "baseImage": "oven/bun:alpine",
+    "version": "0.0.4",
+    "lastUpdated": "2025-12-02T13:18:54.789Z",
+    "baseImage": "oven/bun",
     "toolVersions": {
       "build_date": "2025-12-02T00:00:00Z",
       "base_image": "oven/bun:alpine",
@@ -32,8 +32,8 @@
   },
   "ubuntu-bun": {
     "name": "ubuntu-bun",
-    "version": "0.0.2",
-    "lastUpdated": "2025-12-02T12:39:23.953Z",
+    "version": "0.0.4",
+    "lastUpdated": "2025-12-02T13:18:54.789Z",
     "baseImage": "library/ubuntu",
     "toolVersions": {
       "build_date": "2025-11-22T05:11:23Z",
@@ -46,8 +46,8 @@
   },
   "ubuntu-bun-node": {
     "name": "ubuntu-bun-node",
-    "version": "0.0.2",
-    "lastUpdated": "2025-12-02T12:39:23.953Z",
+    "version": "0.0.4",
+    "lastUpdated": "2025-12-02T13:18:54.789Z",
     "baseImage": "library/ubuntu",
     "toolVersions": {
       "build_date": "2025-11-22T05:12:22Z",
