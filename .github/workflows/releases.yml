@@ -7,9 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       trigger_reason:
-        description: "Reason for manual trigger"
+        description: "Reason for manual trigger (optional)"
         required: false
-        default: "Manual release trigger"
+        default: ""
+        type: string
+      version:
+        description: "Override version (e.g., 0.0.5) - leave empty for auto-increment"
+        required: false
+        default: ""
         type: string
   push:
     branches: [main]
@@ -47,6 +52,7 @@ jobs:
 
           # Determine trigger type
           TRIGGER="push"
+          VERSION_OVERRIDE=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             TRIGGER="schedule"
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -57,10 +63,21 @@ jobs:
             else
               TRIGGER="manual"
             fi
+            # Check for version override
+            if [ -n "${{ github.event.inputs.version }}" ]; then
+              VERSION_OVERRIDE="${{ github.event.inputs.version }}"
+              echo "🎯 Version override: $VERSION_OVERRIDE"
+            fi
+          fi
+
+          # Build command with optional version override
+          CMD="bun scripts/releaseOrchestrator.ts --trigger=$TRIGGER --workflow"
+          if [ -n "$VERSION_OVERRIDE" ]; then
+            CMD="$CMD --version=$VERSION_OVERRIDE"
           fi
 
           # Run release orchestrator in workflow mode
-          RESULT=$(bun scripts/releaseOrchestrator.ts --trigger=$TRIGGER --workflow)
+          RESULT=$($CMD)
           echo "📋 Release analysis result: $RESULT"
 
           # Parse the JSON result
@@ -137,20 +154,6 @@ jobs:
         run: |
           echo "📝 Updating CHANGELOG.md with new release versions..."
           bun scripts/changelogManager.ts --update-table --version-map="$VERSION_MAP" || echo "⚠️ Failed to update CHANGELOG.md, continuing..."
-
-      - name: Commit version cache
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add container-versions.json
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: update tool versions cache [skip ci]"
-            git push
-            echo "✅ Committed tool versions cache"
-          else
-            echo "ℹ️  No changes to container-versions.json"
-          fi
 
       - name: Update documentation
         if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'

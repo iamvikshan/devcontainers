@@ -494,14 +494,28 @@ export class VersionManager {
   // Get commits since last release for specific containers
   getCommitsSinceLastRelease(containers?: string[]): CommitAnalysis[] {
     try {
-      // Analyze recent commits only (configurable via env var)
-      const commitLimit = parseInt(
-        process.env.COMMIT_ANALYSIS_LIMIT || '20',
-        10
-      )
-      const gitCommand = `git log --oneline --format="%H|%s" -${commitLimit}`
+      // Find the last release commit (our automated commit message pattern)
+      // This is more reliable than a fixed number of commits
+      const lastReleaseCommit = this.findLastReleaseCommit()
 
-      this.log(`ℹ️  Analyzing last ${commitLimit} commits`)
+      let gitCommand: string
+      if (lastReleaseCommit) {
+        // Get all commits since the last release commit (exclusive)
+        gitCommand = `git log ${lastReleaseCommit}..HEAD --oneline --format="%H|%s"`
+        this.log(
+          `ℹ️  Analyzing commits since last release (${lastReleaseCommit.substring(0, 7)})`
+        )
+      } else {
+        // Fallback: analyze last 20 commits if no release commit found
+        const commitLimit = parseInt(
+          process.env.COMMIT_ANALYSIS_LIMIT || '20',
+          10
+        )
+        gitCommand = `git log --oneline --format="%H|%s" -${commitLimit}`
+        this.log(
+          `ℹ️  No release commit found, analyzing last ${commitLimit} commits`
+        )
+      }
 
       const output = execSync(gitCommand, { encoding: 'utf-8' }).trim()
       if (!output) return []
@@ -524,6 +538,40 @@ export class VersionManager {
     } catch (error: any) {
       this.log(`⚠️  Error getting commits: ${error.message}`)
       return []
+    }
+  }
+
+  // Find the last release commit by looking for our automated commit message
+  private findLastReleaseCommit(): string | null {
+    try {
+      // Look for commits matching our release commit patterns
+      // Pattern 1: "chore: update versions and documentation [skip ci]" (new combined commit)
+      // Pattern 2: "docs: update documentation [skip ci]" (old pattern)
+      // Pattern 3: "chore: update tool versions cache [skip ci]" (old pattern)
+      const patterns = [
+        'chore: update versions and documentation \\[skip ci\\]',
+        'docs: update documentation \\[skip ci\\]',
+        'chore: update tool versions cache \\[skip ci\\]'
+      ]
+
+      for (const pattern of patterns) {
+        try {
+          const result = execSync(
+            `git log --oneline --format="%H" --grep="${pattern}" -1`,
+            { encoding: 'utf-8' }
+          ).trim()
+
+          if (result) {
+            return result
+          }
+        } catch {
+          // Pattern not found, try next
+        }
+      }
+
+      return null
+    } catch (error) {
+      return null
     }
   }
 

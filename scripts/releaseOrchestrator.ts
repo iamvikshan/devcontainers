@@ -242,10 +242,18 @@ async function main() {
   const trigger = (args
     .find(arg => arg.startsWith('--trigger='))
     ?.split('=')[1] || 'push') as ReleaseContext['trigger']
+  const versionOverride = args
+    .find(arg => arg.startsWith('--version='))
+    ?.split('=')[1]
   const workflowMode = args.includes('--workflow')
 
   if (workflowMode) {
     releaseOrchestrator.setSilent(true)
+  }
+
+  // Pass version override to changeDetector if provided
+  if (versionOverride) {
+    changeDetector.setVersionOverride(versionOverride)
   }
 
   try {

@@ -182,4 +182,4 @@ bun run sync-sizes
 2. Create a feature branch
 3. Submit a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
 
-![Alt](https://repobeats.axiom.co/api/embed/4c4567be5d5226fd9349cc999f54ee8500605621.svg 'Repobeats analytics image')
+![Alt](https://repobeats.axiom.co/api/embed/8d282a5449c103e135703ea0472d24444b60d064.svg 'Repobeats analytics image')

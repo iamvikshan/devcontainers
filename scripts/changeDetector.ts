@@ -6,11 +6,16 @@ import { IMAGE_DEFINITIONS } from './registryClient'
 
 export class ChangeDetector {
   private silent = false
+  private versionOverride: string | undefined
 
   setSilent(silent: boolean): void {
     this.silent = silent
     // Propagate silent mode to imageOperations
     imageOperations.setSilent(silent)
+  }
+
+  setVersionOverride(version: string): void {
+    this.versionOverride = version
   }
 
   private log(message: string): void {
@@ -152,13 +157,38 @@ export class ChangeDetector {
   // Create release context for manual trigger (all containers)
   private createManualReleaseContext(): ReleaseContext {
     const versions = versionManager.loadVersions()
+
+    // Get commits since last release for release notes (even in manual mode)
+    const rawCommits = versionManager.getCommitsSinceLastRelease()
+    const commits = rawCommits.filter(
+      c => c.affectedContainers && c.affectedContainers.length > 0
+    )
+
     const versionBumps = IMAGE_DEFINITIONS.names.map(container => {
       const currentVersion = versions[container]?.version || '1.0.0'
-      const { newVersion, bumpType } = versionManager.calculateVersionBump(
-        currentVersion,
-        'fix',
-        false
-      )
+
+      // Use version override if provided, otherwise auto-increment
+      let newVersion: string
+      let bumpType: 'major' | 'minor' | 'patch'
+
+      if (this.versionOverride) {
+        newVersion = this.versionOverride
+        // Determine bump type based on version difference
+        const [curMajor, curMinor] = currentVersion.split('.').map(Number)
+        const [newMajor, newMinor] = newVersion.split('.').map(Number)
+        if (newMajor > curMajor) bumpType = 'major'
+        else if (newMinor > curMinor) bumpType = 'minor'
+        else bumpType = 'patch'
+      } else {
+        const result = versionManager.calculateVersionBump(
+          currentVersion,
+          'fix',
+          false
+        )
+        newVersion = result.newVersion
+        bumpType = result.bumpType
+      }
+
       return {
         container,
         currentVersion,
@@ -172,7 +202,7 @@ export class ChangeDetector {
       trigger: 'manual',
       affectedContainers: [...IMAGE_DEFINITIONS.names],
       versionBumps,
-      commits: [],
+      commits, // Include commits for release notes
       baseImageUpdates: []
     }
   }

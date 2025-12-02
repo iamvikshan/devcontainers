@@ -37,10 +37,11 @@ runs:
       uses: ./.github/actions/git-operations
       with:
         github-token: ${{ inputs.github-token }}
-        files-to-stage: "README.md CHANGELOG.md docs/IMAGE_VARIANTS.md"
-        commit-message: "docs: update documentation [skip ci]"
+        files-to-stage: "container-versions.json README.md CHANGELOG.md docs/IMAGE_VARIANTS.md"
+        commit-message: "chore: update versions and documentation [skip ci]"
         version-map: ${{ inputs.version-map }}
         commit-body: |-
+          - Updated container-versions.json with tool versions cache
           - Updated CHANGELOG.md with container versions and tool information
           - Updated README files with latest image sizes
         skip-if-no-changes: "true"
