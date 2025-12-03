@@ -1,13 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "docker": {
-    "enabled": true
-  },
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^images/bun(-node)?/Dockerfile$"],
+      "managerFilePatterns": ["/^images/bun(-node)?/Dockerfile$/"],
       "matchStrings": ["ARG VARIANT=(?<currentValue>\\S+)\\n"],
       "depNameTemplate": "oven/bun",
       "datasourceTemplate": "docker",
@@ -15,7 +12,7 @@
     },
     {
       "customType": "regex",
-      "fileMatch": ["^images/ubuntu-bun(-node)?/Dockerfile$"],
+      "managerFilePatterns": ["/^images/ubuntu-bun(-node)?/Dockerfile$/"],
       "matchStrings": ["ARG VARIANT=(?<currentValue>\\S+)\\n"],
       "depNameTemplate": "ubuntu",
       "datasourceTemplate": "docker",
@@ -23,6 +20,10 @@
     }
   ],
   "packageRules": [
+    {
+      "matchCategories": ["docker"],
+      "enabled": true
+    },
     {
       "matchDatasources": ["docker"],
       "automerge": true,
