@@ -25,11 +25,20 @@ env:
   GL_USERNAME: vikshan
 
 jobs:
-  release:
+  # ============================================
+  # Job 1: Analyze what needs to be released
+  # ============================================
+  analyze:
+    name: Analyze Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
+    outputs:
+      should_release: ${{ steps.release_analysis.outputs.should_release }}
+      release_type: ${{ steps.release_analysis.outputs.release_type }}
+      affected_containers: ${{ steps.release_analysis.outputs.affected_containers }}
+      version_map: ${{ steps.release_analysis.outputs.version_map }}
+      matrix: ${{ steps.set_matrix.outputs.matrix }}
 
     steps:
       - name: Checkout
@@ -56,17 +65,15 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ]; then
             TRIGGER="schedule"
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            # Check if triggered by base image check
             if [[ "${{ github.event.inputs.trigger_reason }}" == *"Base image"* ]] || [[ "${{ github.event.inputs.trigger_reason }}" == *"base image"* ]]; then
               TRIGGER="base-image-update"
               echo "🔄 Detected base image update trigger"
             else
               TRIGGER="manual"
             fi
-            # Check for version override
             if [ -n "${{ github.event.inputs.version }}" ]; then
               VERSION_OVERRIDE="${{ github.event.inputs.version }}"
-              echo "🎯 Version override: $VERSION_OVERRIDE"
+              echo "�� Version override: $VERSION_OVERRIDE"
             fi
           fi
 
@@ -87,18 +94,15 @@ jobs:
           AFFECTED_CONTAINERS=$(echo "$RESULT" | jq -r '.outputs.affected_containers')
           VERSION_MAP=$(echo "$RESULT" | jq -r '.outputs.version_map')
 
-          echo "success=$SUCCESS" >> $GITHUB_OUTPUT
           echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
           echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
           echo "affected_containers=$AFFECTED_CONTAINERS" >> $GITHUB_OUTPUT
           echo "version_map=$VERSION_MAP" >> $GITHUB_OUTPUT
 
           if [ "$SUCCESS" = "true" ] && [ "$SHOULD_RELEASE" = "true" ]; then
-            echo "release_needed=true" >> $GITHUB_OUTPUT
             echo "🚀 Release needed: $RELEASE_TYPE"
             echo "📦 Affected containers: $AFFECTED_CONTAINERS"
           else
-            echo "release_needed=false" >> $GITHUB_OUTPUT
             if [ "$SUCCESS" = "false" ]; then
               ERROR=$(echo "$RESULT" | jq -r '.error // "Unknown error"')
               echo "❌ Release analysis failed: $ERROR"
@@ -107,66 +111,160 @@ jobs:
             fi
           fi
 
-      - name: Configure registries
-        if: steps.release_analysis.outputs.release_needed == 'true'
-        uses: ./.github/actions/configure-registries
-        with:
-          github-pat: ${{ secrets.GH_TOKEN }}
-          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          github-registry: ${{ env.GITHUB_REGISTRY }}
-          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
-          github-username: ${{ github.actor }}
-          dockerhub-username: ${{ env.GL_USERNAME }}
-          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set build matrix
+        id: set_matrix
+        if: steps.release_analysis.outputs.should_release == 'true'
+        run: |
+          # Convert comma-separated containers to JSON array for matrix
+          CONTAINERS="${{ steps.release_analysis.outputs.affected_containers }}"
+          if [ -n "$CONTAINERS" ]; then
+            MATRIX=$(echo "$CONTAINERS" | jq -R 'split(",") | map(gsub("^\\s+|\\s+$"; ""))' -c)
+            echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+            echo "📦 Build matrix: $MATRIX"
+          else
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Build and push containers
-        if: steps.release_analysis.outputs.release_needed == 'true'
-        id: build_containers
-        uses: ./.github/actions/build-and-push
-        with:
-          version-map: ${{ steps.release_analysis.outputs.version_map }}
-          affected-containers: ${{ steps.release_analysis.outputs.affected_containers }}
-          github-registry: ${{ env.GITHUB_REGISTRY }}
-          gitlab-registry: ${{ env.GITLAB_REGISTRY }}
-          dockerhub-username: ${{ env.GL_USERNAME }}
-          repository-name: ${{ github.event.repository.name }}
+  # ============================================
+  # Job 2: Build and push images (matrix)
+  # ============================================
+  build:
+    name: Build ${{ matrix.image }}
+    needs: analyze
+    if: needs.analyze.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ${{ fromJson(needs.analyze.outputs.matrix) }}
 
-      - name: Cleanup untagged images
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
-        continue-on-error: true
-        uses: ./.github/actions/cleanup-images
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.1
+
+      - name: Get version for this image
+        id: version
+        run: |
+          VERSION=$(echo '${{ needs.analyze.outputs.version_map }}' | jq -r '.["${{ matrix.image }}"] // "latest"')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Building ${{ matrix.image }}:v$VERSION"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.0.0
+
+      # Login to all 3 registries
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3.0.0
         with:
-          affected-containers: ${{ steps.release_analysis.outputs.affected_containers }}
-          github-token: ${{ secrets.GH_TOKEN }}
-          repository-name: ${{ github.event.repository.name }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to GitLab Container Registry
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: registry.gitlab.com
+          username: oauth2
+          password: ${{ secrets.GITLAB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3.0.0
+        with:
+          username: ${{ env.GL_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5.0.0
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}
+            registry.gitlab.com/${{ env.GL_USERNAME }}/devcontainers/${{ matrix.image }}
+            ${{ env.GL_USERNAME }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=v${{ steps.version.outputs.version }}
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v6.0.0
+        with:
+          context: images/${{ matrix.image }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+
+  # ============================================
+  # Job 3: Finalize (changelog, docs, cleanup)
+  # ============================================
+  finalize:
+    name: Finalize Release
+    needs: [analyze, build]
+    if: needs.analyze.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.1
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Bun and install dependencies
+        uses: iamvikshan/.github/.github/actions/setup-bun@main
 
       - name: Cache tool versions
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
         run: |
           echo "💾 Caching tool versions to container-versions.json..."
-          AFFECTED="${{ steps.release_analysis.outputs.affected_containers }}"
+          AFFECTED="${{ needs.analyze.outputs.affected_containers }}"
           bun scripts/toolVersionExtractor.ts --local --containers="$AFFECTED" --save-to-cache || echo "⚠️ Failed to cache tool versions, continuing..."
 
-      - name: Update CHANGELOG.md with release info
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
+      - name: Update CHANGELOG.md
         env:
-          VERSION_MAP: ${{ steps.release_analysis.outputs.version_map }}
+          VERSION_MAP: ${{ needs.analyze.outputs.version_map }}
         run: |
           echo "📝 Updating CHANGELOG.md with new release versions..."
           bun scripts/changelogManager.ts --update-table --version-map="$VERSION_MAP" || echo "⚠️ Failed to update CHANGELOG.md, continuing..."
 
       - name: Update documentation
-        if: steps.release_analysis.outputs.release_needed == 'true' && steps.build_containers.outputs.build-success == 'true'
         continue-on-error: true
         uses: ./.github/actions/update-docs
         with:
           gitlab-token: ${{ secrets.GITLAB_TOKEN }}
           github-token: ${{ secrets.GH_TOKEN }}
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          version-map: ${{ steps.release_analysis.outputs.version_map }}
+          version-map: ${{ needs.analyze.outputs.version_map }}
 
-      - name: No release needed
-        if: steps.release_analysis.outputs.release_needed != 'true'
+      - name: Cleanup untagged images
+        continue-on-error: true
+        uses: ./.github/actions/cleanup-images
+        with:
+          affected-containers: ${{ needs.analyze.outputs.affected_containers }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          repository-name: ${{ github.event.repository.name }}
+
+  # ============================================
+  # Job 4: No release needed (info only)
+  # ============================================
+  no-release:
+    name: No Release Needed
+    needs: analyze
+    if: needs.analyze.outputs.should_release != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
         run: |
           echo "ℹ️  No Docker image release needed - all images are up to date"
           echo "✅ Workflow completed successfully"
