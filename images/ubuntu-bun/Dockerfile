@@ -26,6 +26,7 @@ RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var
 
 # Install all packages and Bun in a single layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     git \
     sudo \
     curl \

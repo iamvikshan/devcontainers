@@ -2,25 +2,7 @@
   "scripts": {
     "f": "prettier --write \"**/*.*\"",
     "s": "bun scripts/changelogManager.ts --sync-only",
-    "sync-sizes": "bun scripts/changelogManager.ts --sync-only",
-    "update-versions": "bun scripts/changelogManager.ts",
-    "rs": "bun f && git push -f",
-    "check": "tsc --noEmit --skipLibCheck scripts/*.ts",
-    "analyze-sizes": "bun scripts/imageOperations.ts --analyze-sizes",
-    "build-all": "./scripts/build-all-images.sh",
-    "build-bun": "docker build -f images/bun/Dockerfile -t devcontainers/bun:test images/bun",
-    "build-bun-node": "docker build -f images/bun-node/Dockerfile -t devcontainers/bun-node:test images/bun-node",
-    "build-ubuntu-bun": "docker build -f images/ubuntu-bun/Dockerfile -t devcontainers/ubuntu-bun:test images/ubuntu-bun",
-    "build-ubuntu-bun-node": "docker build -f images/ubuntu-bun-node/Dockerfile -t devcontainers/ubuntu-bun-node:test images/ubuntu-bun-node",
-    "verify-docker": "./scripts/verify-docker-setup.sh",
-    "test-workflows": "bun scripts/test-workflow-steps.ts",
-    "test-workflow-logic": "bun scripts/test-workflow-logic.ts",
-    "test-workflow-simulation": "bun scripts/test-workflow-simulation.ts",
-    "release-check": "bun scripts/releaseOrchestrator.ts",
-    "release-check-workflow": "bun scripts/releaseOrchestrator.ts --workflow",
-    "extract-tool-versions": "bun scripts/toolVersionExtractor.ts",
-    "create-issue": "bun scripts/issueManager.ts",
-    "analyze-changes": "bun scripts/changeDetector.ts"
+    "check": "tsc --noEmit --skipLibCheck scripts/*.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
