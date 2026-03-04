@@ -4,6 +4,7 @@ import {
   RegistryClient
 } from './registryClient'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { join } from 'path'
 
 export interface ImageSizeInfo {
   name: string
@@ -299,7 +300,6 @@ export class ImageOperations {
   private loadToolVersions(): Map<string, any> {
     const toolVersionMap = new Map<string, any>()
     try {
-      const { join } = require('path')
       const versionsPath = join(process.cwd(), 'container-versions.json')
       if (existsSync(versionsPath)) {
         const content = readFileSync(versionsPath, 'utf-8')
@@ -596,7 +596,7 @@ export class ImageOperations {
       Object.entries(patterns).forEach(([registry, pattern]) => {
         updatedContent = updatedContent.replace(pattern, match => {
           // Extract image name from the match
-          const imageNameMatch = match.match(/([^\/]+):latest/)
+          const imageNameMatch = match.match(/([^/]+):latest/)
           if (!imageNameMatch) return match
 
           const imageName = imageNameMatch[1]
@@ -709,21 +709,26 @@ export class ImageOperations {
 
     try {
       // Import and use versionManager for tool update checking
-      const { versionManager } = await import('./versionManager')
+      const { versionManager } = await import('./versionManager.js')
       versionManager.setSilent(this.silent)
 
       const result = await versionManager.checkToolUpdates()
 
       // Transform the result to match our interface
       const updates = result.checks
-        .filter(c => c.hasUpdate)
-        .flatMap(check =>
-          result.affectedContainers.map(containerName => ({
-            tool: check.tool,
-            containerName,
-            currentVersion: check.currentVersion,
-            latestVersion: check.latestVersion
-          }))
+        .filter((c: { hasUpdate: boolean }) => c.hasUpdate)
+        .flatMap(
+          (check: {
+            tool: string
+            currentVersion: string
+            latestVersion: string
+          }) =>
+            result.affectedContainers.map((containerName: string) => ({
+              tool: check.tool,
+              containerName,
+              currentVersion: check.currentVersion,
+              latestVersion: check.latestVersion
+            }))
         )
 
       return {

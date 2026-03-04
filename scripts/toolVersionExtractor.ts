@@ -57,8 +57,9 @@ export class ToolVersionExtractor {
       )
       return await this.extractManually(imageName, tag)
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
       this.log(
-        `❌ Error extracting tool versions from ${fullImageName}: ${error.message}`
+        `❌ Error extracting tool versions from ${fullImageName}: ${message}`
       )
       return {}
     }
@@ -104,6 +105,8 @@ export class ToolVersionExtractor {
           'jq --version 2>/dev/null | cut -d\'-\' -f2 || echo "not_installed"',
         python_version:
           'python3 --version 2>/dev/null | cut -d\' \' -f2 || echo "not_installed"',
+        btop_version:
+          'btop --version 2>/dev/null | head -n1 || echo "not_installed"',
         alpine_version:
           'cat /etc/alpine-release 2>/dev/null || echo "not_available"',
         debian_version:
@@ -135,7 +138,8 @@ export class ToolVersionExtractor {
       versions.build_date = new Date().toISOString()
       versions.extracted_manually = 'true'
     } catch (error) {
-      this.log(`⚠️  Error in manual extraction: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Error in manual extraction: ${message}`)
     }
 
     return versions
@@ -174,9 +178,8 @@ export class ToolVersionExtractor {
           )
         }
       } catch (error) {
-        this.log(
-          `⚠️  Failed to extract from ${containerName}: ${error.message}`
-        )
+        const message = error instanceof Error ? error.message : String(error)
+        this.log(`⚠️  Failed to extract from ${containerName}: ${message}`)
       }
     }
 
@@ -286,7 +289,8 @@ export class ToolVersionExtractor {
           this.log(`📋 Tried these image names: ${possibleNames.join(', ')}`)
         }
       } catch (error) {
-        this.log(`❌ Error extracting from ${containerName}: ${error.message}`)
+        const message = error instanceof Error ? error.message : String(error)
+        this.log(`❌ Error extracting from ${containerName}: ${message}`)
       }
     }
 
@@ -325,7 +329,8 @@ export class ToolVersionExtractor {
       writeFileSync(cacheFile, JSON.stringify(cache, null, 2))
       this.log(`\n✅ Saved tool versions to cache: ${cacheFile}`)
     } catch (error) {
-      throw new Error(`Failed to save to cache: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to save to cache: ${message}`, { cause: error })
     }
   }
 }
@@ -386,7 +391,8 @@ async function main() {
       console.log('ℹ️  No tool versions extracted')
     }
   } catch (error) {
-    console.error('❌ Tool version extraction failed:', error.message)
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('❌ Tool version extraction failed:', message)
     process.exit(1)
   }
 }

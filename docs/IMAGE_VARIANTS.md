@@ -44,6 +44,7 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
 
 - Bun 1.3.3
 - Git, SSH client, curl
+- btop (system resource monitor)
 - Alpine package manager (apk)
 - Basic development utilities
 
@@ -91,6 +92,7 @@ that need Bun's performance with Node.js ecosystem compatibility.
 - npm 10.9.0
 - ESLint (global)
 - Git, SSH client, curl
+- btop (system resource monitor)
 - Alpine package manager (apk)
 
 **Perfect For:**
@@ -134,6 +136,7 @@ and tooling. The smallest image in our collection!
 
 - Bun 1.3.3 (installed via script)
 - Git, SSH client, curl, unzip
+- btop (system resource monitor)
 - sudo (administrative access)
 - Ubuntu package manager (apt)
 - Basic development utilities
@@ -182,6 +185,7 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
 - npm 10.9.0
 - ESLint (global)
 - Git, SSH client, curl, unzip
+- btop (system resource monitor)
 - sudo (administrative access)
 - Ubuntu package manager (apt)
 

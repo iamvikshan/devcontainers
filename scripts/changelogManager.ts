@@ -66,8 +66,9 @@ export class ChangelogManager {
         const overallVersion = this.getHighestVersion(versionMap)
         this.log(`🚀 New version: ${overallVersion}`)
       }
-    } catch (error: any) {
-      console.error('❌ Error updating CHANGELOG.md:', error.message)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error('❌ Error updating CHANGELOG.md:', message)
       throw error
     }
   }
@@ -87,8 +88,9 @@ export class ChangelogManager {
       await this.updateChangelogFile()
 
       this.log('✅ All sizes synced successfully!')
-    } catch (error: any) {
-      console.error('❌ Error syncing sizes:', error.message)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error('❌ Error syncing sizes:', message)
       throw error
     }
   }
@@ -331,8 +333,9 @@ ${releaseNotes.join('\n')}
         if (latestTag?.digest) {
           digests[imageName] = latestTag.digest
         }
-      } catch (error: any) {
-        console.error(`Error getting digest for ${baseImage}:`, error.message)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error(`Error getting digest for ${baseImage}:`, message)
         digests[imageName] = 'sha256:unknown'
       }
     }
@@ -351,7 +354,7 @@ ${releaseNotes.join('\n')}
       throw new Error('CHANGELOG.md not found')
     }
 
-    let content = readFileSync(this.changelogPath, 'utf-8')
+    const content = readFileSync(this.changelogPath, 'utf-8')
     const currentDate = new Date().toISOString().split('T')[0]
 
     // Find the Released Versions table
@@ -468,8 +471,9 @@ async function main() {
 
     if (workflowMode) console.error('\n🎉 Changelog management complete!')
     else console.log('\n🎉 Changelog management complete!')
-  } catch (error: any) {
-    console.error('❌ Changelog management failed:', error.message)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('❌ Changelog management failed:', message)
     process.exit(1)
   }
 }

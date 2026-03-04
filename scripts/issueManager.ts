@@ -98,10 +98,11 @@ export class IssueManager {
         issueUrl: response.data.html_url
       }
     } catch (error) {
-      this.log(`❌ Failed to create issue: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`❌ Failed to create issue: ${message}`)
       return {
         success: false,
-        error: error.message
+        error: message
       }
     }
   }
@@ -190,7 +191,8 @@ export class IssueManager {
 
       return response.data.length > 0 ? response.data[0] : null
     } catch (error) {
-      this.log(`⚠️  Error checking for existing issues: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Error checking for existing issues: ${message}`)
       return null
     }
   }
@@ -237,7 +239,8 @@ export class IssueManager {
         `✅ Updated existing issue #${issueNumber} with new failure information`
       )
     } catch (error) {
-      this.log(`⚠️  Failed to update existing issue: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Failed to update existing issue: ${message}`)
     }
   }
 
@@ -271,7 +274,8 @@ export class IssueManager {
         )
       }
     } catch (error) {
-      this.log(`⚠️  Error closing build failure issues: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Error closing build failure issues: ${message}`)
     }
   }
 
@@ -320,7 +324,8 @@ export class IssueManager {
 
       this.log(`✅ Closed build failure issue #${issueNumber}`)
     } catch (error) {
-      this.log(`⚠️  Failed to close issue #${issueNumber}: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Failed to close issue #${issueNumber}: ${message}`)
     }
   }
 
@@ -361,10 +366,11 @@ export class IssueManager {
         issueUrl
       }
     } catch (error) {
-      this.log(`❌ Failed to create issue via gh CLI: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`❌ Failed to create issue via gh CLI: ${message}`)
       return {
         success: false,
-        error: error.message
+        error: message
       }
     }
   }
@@ -446,7 +452,8 @@ async function main() {
       process.exit(1)
     }
   } catch (error) {
-    console.error('❌ Issue management failed:', error.message)
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('❌ Issue management failed:', message)
     process.exit(1)
   }
 }

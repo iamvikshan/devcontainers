@@ -2,14 +2,21 @@
   "scripts": {
     "f": "prettier --write \"**/*.*\"",
     "s": "bun scripts/changelogManager.ts --sync-only",
-    "check": "tsc --noEmit --skipLibCheck scripts/*.ts"
+    "f:check": "prettier --check .",
+    "lint": "eslint",
+    "check": "bun lint && tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^25.0.0",
-    "axios": "^1.13.2",
+    "@eslint/js": "^10.0.1",
+    "@types/eslint__js": "^9.14.0",
+    "@types/node": "^25.3.3",
+    "axios": "^1.13.6",
+    "eslint": "^10.0.2",
+    "husky": "^9.1.7",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.7.3",
+    "prettier": "^3.8.1",
     "prettier-plugin-sh": "^0.18.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
   }
 }

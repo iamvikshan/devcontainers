@@ -1,6 +1,6 @@
 {
   "name": "Ubuntu + Bun + Docker",
-  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest",
+  "image": "vikshan/ubuntu-bun:latest",
 
   // Add Docker-in-Docker feature
   "features": {
@@ -22,17 +22,19 @@
     "vscode": {
       "extensions": [
         "dbaeumer.vscode-eslint",
-        "prettier.prettier-vscode",
+        "esbenp.prettier-vscode",
         "eamodio.gitlens",
         "oven.bun-vscode",
         "ms-azuretools.vscode-docker",
+        "coderabbit.coderabbit-vscode",
+        "DeepScan.vscode-deepscan",
         "WakaTime.vscode-wakatime"
       ]
     }
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bun update && docker --version && chmod +x scripts/iamvikshan.sh && scripts/iamvikshan.sh",
+  "postCreateCommand": "[ -f scripts/iamvikshan.sh ] && chmod +x scripts/iamvikshan.sh; bun install && sudo ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime",
   // remoteUser` to `root` to connect as root.
   "remoteUser": "root",
 

@@ -114,6 +114,7 @@ All images include:
 - **Git** - Version control
 - **SSH client** - Secure connections
 - **curl** - HTTP requests
+- **btop** - System resource monitor
 - **Basic development utilities**
 
 #### Alpine-based Images (`bun`, `bun-node`)

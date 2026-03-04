@@ -103,7 +103,9 @@ export class ReleaseOrchestrator {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error)
-      throw new Error(`Failed to generate release summary: ${errorMessage}`)
+      throw new Error(`Failed to generate release summary: ${errorMessage}`, {
+        cause: error
+      })
     }
   }
 
@@ -154,7 +156,8 @@ export class ReleaseOrchestrator {
       const errorMessage =
         error instanceof Error ? error.message : String(error)
       throw new Error(
-        `Failed to create base image update commit: ${errorMessage}`
+        `Failed to create base image update commit: ${errorMessage}`,
+        { cause: error }
       )
     }
   }

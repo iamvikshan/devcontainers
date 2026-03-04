@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     sudo \
     curl \
     jq \
-    python3
+    python3 \
+    btop
 
 # Extract and store tool versions
 RUN mkdir -p /usr/local/share && \
@@ -25,6 +26,7 @@ RUN mkdir -p /usr/local/share && \
     echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)"; \
     echo "jq_version=$(jq --version | cut -d'-' -f2)"; \
     echo "python_version=$(python3 --version | cut -d' ' -f2)"; \
+    echo "btop_version=$(btop --version | head -n1)"; \
     } > /usr/local/share/tool-versions.txt
 
 # Copy and setup script

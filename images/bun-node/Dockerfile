@@ -12,6 +12,7 @@ RUN apk add --no-cache \
     curl \
     jq \
     python3 \
+    btop \
     nodejs \
     npm \
     && npm install -g eslint
@@ -44,7 +45,8 @@ RUN mkdir -p /usr/local/share && \
     echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
     echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
     echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt && \
-    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
+    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt
 
 # Copy the setup script and make it executable
 COPY setup.sh /usr/local/bin/setup.sh

@@ -141,8 +141,9 @@ export class VersionManager {
       }
 
       return Object.keys(versions).length > 0 ? versions : null
-    } catch (error: any) {
-      this.log(`⚠️  Error parsing CHANGELOG.md: ${error.message}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Error parsing CHANGELOG.md: ${message}`)
       return null
     }
   }
@@ -175,8 +176,11 @@ export class VersionManager {
   saveVersions(versions: Record<string, ContainerVersion>): void {
     try {
       writeFileSync(this.versionsFile, JSON.stringify(versions, null, 2))
-    } catch (error: any) {
-      throw new Error(`Failed to save versions: ${error.message}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to save versions: ${message}`, {
+        cause: error
+      })
     }
   }
 
@@ -261,7 +265,7 @@ export class VersionManager {
 
         changedFiles.forEach(file => {
           // Check if file is in a specific container directory under images/
-          const containerMatch = file.match(/^images\/([^\/]+)/)
+          const containerMatch = file.match(/^images\/([^/]+)/)
           if (containerMatch) {
             const containerName = containerMatch[1]
             if (IMAGE_DEFINITIONS.names.includes(containerName)) {
@@ -273,9 +277,10 @@ export class VersionManager {
         if (affectedContainers.size > 0) {
           return Array.from(affectedContainers)
         }
-      } catch (error: any) {
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
         this.log(
-          `⚠️  Could not determine changed files for ${commitHash}: ${error.message}`
+          `⚠️  Could not determine changed files for ${commitHash}: ${message}`
         )
       }
     }
@@ -340,7 +345,7 @@ export class VersionManager {
     if (manualReleaseCommit && manualReleaseCommit.manualVersion) {
       const manualVersion = manualReleaseCommit.manualVersion
 
-      this.log(`3 Manual release override requested: v${manualVersion}`)
+      this.log(`📋 Manual release override requested: v${manualVersion}`)
 
       // Helper: compare semver strings 'MAJOR.MINOR.PATCH'
       const compareSemver = (a: string, b: string): number => {
@@ -535,8 +540,9 @@ export class VersionManager {
       }
 
       return commits
-    } catch (error: any) {
-      this.log(`⚠️  Error getting commits: ${error.message}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      this.log(`⚠️  Error getting commits: ${message}`)
       return []
     }
   }

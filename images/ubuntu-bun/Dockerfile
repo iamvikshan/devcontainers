@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     jq \
     python3 \
+    btop \
     && curl -fsSL https://bun.sh/install | bash \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean \
@@ -59,7 +60,8 @@ RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && 
     echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
     echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
     echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt && \
-    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt
+    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
+    echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt
 
 # Copy the setup script and make it executable
 COPY setup.sh /usr/local/bin/setup.sh

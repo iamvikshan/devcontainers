@@ -1,5 +1,8 @@
 node_modules
-bun.lockb
 .env
 package-lock.json
-bun.lock
+*.lock*
+*ignore
+.husky/
+.prettierrc.json
+.vscode/

@@ -102,7 +102,10 @@ export class RegistryClient {
       this.dockerHubToken = response.data.token
       return response.data.token
     } catch (error) {
-      throw new Error(`Docker Hub authentication failed: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      throw new Error(`Docker Hub authentication failed: ${message}`, {
+        cause: error
+      })
     }
   }
 
@@ -115,10 +118,8 @@ export class RegistryClient {
       )
       return response.data.results
     } catch (error) {
-      console.error(
-        `Error fetching Docker Hub tags for ${image}:`,
-        error.message
-      )
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`Error fetching Docker Hub tags for ${image}:`, message)
       return []
     }
   }
@@ -140,10 +141,8 @@ export class RegistryClient {
 
       return response.data.full_size || 0
     } catch (error) {
-      console.error(
-        `Error getting Docker Hub size for ${image}:`,
-        error.message
-      )
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`Error getting Docker Hub size for ${image}:`, message)
       return 0
     }
   }
@@ -183,7 +182,8 @@ export class RegistryClient {
         layerCount: layers.length
       }
     } catch (error) {
-      console.error(`Error getting GHCR manifest for ${image}:`, error.message)
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`Error getting GHCR manifest for ${image}:`, message)
       return null
     }
   }
@@ -236,10 +236,8 @@ export class RegistryClient {
         layerCount: layers.length
       }
     } catch (error) {
-      console.error(
-        `Error getting GitLab manifest for ${image}:`,
-        error.message
-      )
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`Error getting GitLab manifest for ${image}:`, message)
       return null
     }
   }
@@ -266,7 +264,10 @@ export class RegistryClient {
   }
 
   public static getBaseImageForContainer(containerName: string): string {
-    return IMAGE_DEFINITIONS.baseImages[containerName] || ''
+    return (
+      (IMAGE_DEFINITIONS.baseImages as Record<string, string>)[containerName] ||
+      ''
+    )
   }
 }
 
