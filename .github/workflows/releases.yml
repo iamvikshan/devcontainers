@@ -153,28 +153,28 @@ jobs:
           echo "📦 Building ${{ matrix.image }}:v$VERSION"
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.7.0
+        uses: docker/setup-qemu-action@v4.0.0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.12.0
 
       # Login to all 3 registries
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3.7.0
+        uses: docker/login-action@v4.0.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Log in to GitLab Container Registry
-        uses: docker/login-action@v3.7.0
+        uses: docker/login-action@v4.0.0
         with:
           registry: registry.gitlab.com
           username: oauth2
           password: ${{ secrets.GITLAB_TOKEN }}
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3.7.0
+        uses: docker/login-action@v4.0.0
         with:
           username: ${{ env.GL_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
