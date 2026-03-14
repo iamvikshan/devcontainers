@@ -1,6 +1,26 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    "schedule:daily",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "reviewers": ["iamvikshan"],
+  "assignees": ["iamvikshan"],
+  "prHourlyLimit": 2,
+  "timezone": "UTC",
+  "minimumReleaseAge": "3 days",
+  "schedule": ["after 10pm on sunday"],
+  "dependencyDashboard": true,
+  "prConcurrentLimit": 5,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"],
+    "automerge": true,
+    "labels": ["dependencies", "lockfile"]
+  },
   "customManagers": [
     {
       "customType": "regex",
@@ -13,6 +33,14 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["/^images/ubuntu-bun(-node)?/Dockerfile$/"],
+      "matchStrings": ["ARG VARIANT=(?<currentValue>\\S+)\\n"],
+      "depNameTemplate": "ubuntu",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "ubuntu"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^images/ubuntu-tools/Dockerfile$/"],
       "matchStrings": ["ARG VARIANT=(?<currentValue>\\S+)\\n"],
       "depNameTemplate": "ubuntu",
       "datasourceTemplate": "docker",
@@ -30,18 +58,58 @@
       "matchUpdateTypes": ["minor", "patch"],
       "schedule": ["after 10pm on sunday"]
     },
+
     {
-      "matchManagers": ["github-actions"],
-      "groupName": "github-actions",
-      "groupSlug": "github-actions"
+      "description": "General NPM packages",
+      "matchManagers": ["npm"],
+      "labels": ["dependencies", "npm"]
     },
     {
-      "matchManagers": ["npm"],
-      "groupName": "npm-dependencies",
-      "groupSlug": "npm"
+      "description": "TypeScript and type definitions",
+      "matchPackagePatterns": ["^@types/", "^typescript$"],
+      "excludePackageNames": ["@types/react", "@types/react-dom"],
+      "groupName": "typescript",
+      "labels": ["dependencies", "npm", "typescript"]
+    },
+    {
+      "description": "Prettier and formatting",
+      "matchPackagePatterns": ["^prettier"],
+      "groupName": "prettier",
+      "labels": ["dependencies", "npm", "formatting"]
+    },
+    {
+      "description": "GitHub Actions - labels for all updates",
+      "matchManagers": ["github-actions"],
+      "labels": ["dependencies", "github-actions", "ci"]
+    },
+    {
+      "description": "GitHub Actions - automerge non-major updates",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Auto-merge patch updates for production deps",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "description": "Auto-merge minor and patch updates for dev deps",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "description": "Major version updates require manual review",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "major"]
     }
   ],
-  "schedule": ["after 10pm on sunday"],
-  "dependencyDashboard": true,
-  "prConcurrentLimit": 5
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "osvVulnerabilityAlerts": true
 }

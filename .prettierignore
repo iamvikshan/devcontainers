@@ -5,3 +5,6 @@ node_modules/
 
 # Exclude setup.sh files with complex bash arithmetic that prettier-plugin-sh can't parse
 images/**/setup.sh
+
+# Exclude Dockerfiles under images due to known parser/plugin limitation
+images/**/Dockerfile

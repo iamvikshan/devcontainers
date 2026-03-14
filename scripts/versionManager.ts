@@ -4,6 +4,11 @@ import { join } from 'path'
 import { ContainerVersion, VersionBump, CommitAnalysis } from './types'
 import { IMAGE_DEFINITIONS } from './registryClient'
 
+type NodeDistIndexEntry = {
+  version?: string
+  lts?: string | false
+}
+
 export class VersionManager {
   private versionsFile: string
   private silent = false
@@ -20,6 +25,14 @@ export class VersionManager {
     if (!this.silent) {
       console.log(message)
     }
+  }
+
+  private getContainerBaseImage(containerName: string): string {
+    const baseImages = IMAGE_DEFINITIONS.baseImages
+    if (containerName in baseImages) {
+      return baseImages[containerName as keyof typeof baseImages]
+    }
+    return 'unknown'
   }
 
   // Load current container versions
@@ -127,9 +140,7 @@ export class VersionManager {
               name: containerName,
               version: versionMatch[1],
               lastUpdated: new Date().toISOString(),
-              baseImage:
-                (IMAGE_DEFINITIONS.baseImages as any)[containerName] ||
-                'unknown'
+              baseImage: this.getContainerBaseImage(containerName)
             }
           }
         }
@@ -164,7 +175,7 @@ export class VersionManager {
         name,
         version: baseVersion,
         lastUpdated: now,
-        baseImage: (IMAGE_DEFINITIONS.baseImages as any)[name] || 'unknown'
+        baseImage: this.getContainerBaseImage(name)
       }
     })
 
@@ -192,7 +203,7 @@ export class VersionManager {
     const manualMatch = commitMessage.match(manualReleaseRegex)
 
     if (manualMatch) {
-      const [, version, description] = manualMatch
+      const [, version] = manualMatch
       this.log(`🎯 Manual release override detected: v${version}`)
       return {
         hash: commitHash,
@@ -218,7 +229,7 @@ export class VersionManager {
       }
     }
 
-    const [, type, scopeMatch, breaking, description] = match
+    const [, type, scopeMatch, breaking] = match
     const scope = scopeMatch ? scopeMatch.slice(1, -1) : undefined
     const isBreaking = !!breaking || commitMessage.includes('BREAKING CHANGE')
 
@@ -576,7 +587,7 @@ export class VersionManager {
       }
 
       return null
-    } catch (error) {
+    } catch {
       return null
     }
   }
@@ -593,7 +604,7 @@ export class VersionManager {
       )
       const data = await response.json()
       return data.tag_name?.replace('bun-v', '') || null
-    } catch (error) {
+    } catch {
       this.log('⚠️  Error fetching Bun version from GitHub')
       return null
     }
@@ -603,10 +614,10 @@ export class VersionManager {
   async fetchLatestNodeVersion(): Promise<string | null> {
     try {
       const response = await fetch('https://nodejs.org/dist/index.json')
-      const data = await response.json()
-      const latestLts = data.find((v: any) => v.lts !== false)
+      const data = (await response.json()) as NodeDistIndexEntry[]
+      const latestLts = data.find(v => v.lts !== false)
       return latestLts?.version?.replace('v', '') || null
-    } catch (error) {
+    } catch {
       this.log('⚠️  Error fetching Node.js version')
       return null
     }
@@ -619,7 +630,7 @@ export class VersionManager {
       const html = await response.text()
       const match = html.match(/Download Python (\d+\.\d+\.\d+)/i)
       return match?.[1] || null
-    } catch (error) {
+    } catch {
       this.log('⚠️  Error fetching Python version')
       return null
     }
@@ -657,8 +668,8 @@ export class VersionManager {
     const toolVersions: Record<string, Record<string, string>> = {}
 
     for (const [containerName, containerInfo] of Object.entries(versions)) {
-      if ((containerInfo as any).toolVersions) {
-        toolVersions[containerName] = (containerInfo as any).toolVersions
+      if (containerInfo.toolVersions) {
+        toolVersions[containerName] = containerInfo.toolVersions
       }
     }
 
@@ -671,9 +682,10 @@ export class VersionManager {
     toolVersions: Record<string, string>
   ): void {
     const versions = this.loadVersions()
+    const containerVersion = versions[containerName]
 
-    if (versions[containerName]) {
-      ;(versions[containerName] as any).toolVersions = toolVersions
+    if (containerVersion) {
+      containerVersion.toolVersions = toolVersions
       this.saveVersions(versions)
       this.log(`✅ Saved tool versions for ${containerName} to cache`)
     } else {
@@ -687,6 +699,7 @@ export class VersionManager {
     affectedContainers: string[]
     checks: Array<{
       tool: string
+      containerName: string
       currentVersion: string
       latestVersion: string
       hasUpdate: boolean
@@ -698,6 +711,7 @@ export class VersionManager {
     const cachedVersions = this.loadToolVersionsFromCache()
     const checks: Array<{
       tool: string
+      containerName: string
       currentVersion: string
       latestVersion: string
       hasUpdate: boolean
@@ -705,86 +719,91 @@ export class VersionManager {
     }> = []
     const affectedContainers = new Set<string>()
 
-    // Get a representative container's tool versions (prefer ubuntu-bun-node as it has all tools)
-    const repContainer =
-      cachedVersions['ubuntu-bun-node'] ||
-      cachedVersions['bun-node'] ||
-      Object.values(cachedVersions)[0]
+    const checkToolByContainer = async ({
+      tool,
+      toolKey,
+      source,
+      fetchLatestVersion,
+      formatLatestVersion = (latestVersion: string) => latestVersion,
+      normalizeCurrentVersion = (currentVersion: string) => currentVersion,
+      normalizeLatestVersion = (latestVersion: string) => latestVersion
+    }: {
+      tool: string
+      toolKey: string
+      source: string
+      fetchLatestVersion: () => Promise<string | null>
+      formatLatestVersion?: (latestVersion: string) => string
+      normalizeCurrentVersion?: (currentVersion: string) => string
+      normalizeLatestVersion?: (latestVersion: string) => string
+    }): Promise<void> => {
+      const containersWithTool = Object.entries(cachedVersions).filter(
+        ([, versions]) => Boolean(versions[toolKey])
+      )
 
-    if (!repContainer) {
+      if (containersWithTool.length === 0) {
+        return
+      }
+
+      const latestVersionRaw = await fetchLatestVersion()
+      if (!latestVersionRaw) {
+        return
+      }
+
+      const latestVersion = normalizeLatestVersion(latestVersionRaw)
+
+      containersWithTool.forEach(([containerName, versions]) => {
+        const currentVersion = versions[toolKey]
+        const hasUpdate = this.compareSemver(
+          normalizeCurrentVersion(currentVersion),
+          latestVersion
+        )
+
+        checks.push({
+          tool,
+          containerName,
+          currentVersion,
+          latestVersion: formatLatestVersion(latestVersionRaw),
+          hasUpdate,
+          source
+        })
+
+        if (hasUpdate) {
+          affectedContainers.add(containerName)
+        }
+      })
+    }
+
+    if (Object.keys(cachedVersions).length === 0) {
       this.log('⚠️  No cached tool versions found')
       return { hasUpdates: false, affectedContainers: [], checks: [] }
     }
 
     // Check Bun
-    if (repContainer.bun_version) {
-      const latestBun = await this.fetchLatestBunVersion()
-      if (latestBun) {
-        const hasUpdate = this.compareSemver(
-          repContainer.bun_version,
-          latestBun
-        )
-        checks.push({
-          tool: 'Bun',
-          currentVersion: repContainer.bun_version,
-          latestVersion: latestBun,
-          hasUpdate,
-          source: 'GitHub releases'
-        })
-
-        if (hasUpdate) {
-          // All containers use Bun
-          IMAGE_DEFINITIONS.names.forEach(name => affectedContainers.add(name))
-        }
-      }
-    }
+    await checkToolByContainer({
+      tool: 'Bun',
+      toolKey: 'bun_version',
+      source: 'GitHub releases',
+      fetchLatestVersion: () => this.fetchLatestBunVersion()
+    })
 
     // Check Node.js
-    if (repContainer.node_version) {
-      const latestNode = await this.fetchLatestNodeVersion()
-      if (latestNode) {
-        const hasUpdate = this.compareSemver(
-          repContainer.node_version.replace('v', ''),
-          latestNode
-        )
-        checks.push({
-          tool: 'Node.js',
-          currentVersion: repContainer.node_version,
-          latestVersion: `v${latestNode}`,
-          hasUpdate,
-          source: 'nodejs.org'
-        })
-
-        if (hasUpdate) {
-          // Only -node variants use Node
-          affectedContainers.add('bun-node')
-          affectedContainers.add('ubuntu-bun-node')
-        }
-      }
-    }
+    await checkToolByContainer({
+      tool: 'Node.js',
+      toolKey: 'node_version',
+      source: 'nodejs.org',
+      fetchLatestVersion: () => this.fetchLatestNodeVersion(),
+      formatLatestVersion: latestNode => `v${latestNode.replace(/^v/, '')}`,
+      normalizeCurrentVersion: currentNode => currentNode.replace(/^v/, ''),
+      normalizeLatestVersion: latestNode => latestNode.replace(/^v/, '')
+    })
 
     // Check Python
-    if (repContainer.python_version) {
-      const latestPython = await this.fetchLatestPythonVersion()
-      if (latestPython) {
-        const hasUpdate = this.compareSemver(
-          repContainer.python_version,
-          latestPython
-        )
-        checks.push({
-          tool: 'Python',
-          currentVersion: repContainer.python_version,
-          latestVersion: latestPython,
-          hasUpdate,
-          source: 'python.org'
-        })
-
-        if (hasUpdate) {
-          // All containers have Python
-          IMAGE_DEFINITIONS.names.forEach(name => affectedContainers.add(name))
-        }
-      }
-    }
+    await checkToolByContainer({
+      tool: 'Python',
+      toolKey: 'python_version',
+      source: 'python.org',
+      fetchLatestVersion: () => this.fetchLatestPythonVersion()
+    })
 
     // Log results
     const updatesFound = checks.filter(c => c.hasUpdate)
@@ -792,7 +811,7 @@ export class VersionManager {
       this.log('📦 Tool updates found:')
       updatesFound.forEach(check => {
         this.log(
-          `  • ${check.tool}: ${check.currentVersion} → ${check.latestVersion} (${check.source})`
+          `  • ${check.containerName} ${check.tool}: ${check.currentVersion} → ${check.latestVersion} (${check.source})`
         )
       })
       this.log(

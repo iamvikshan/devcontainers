@@ -12,6 +12,7 @@ This guide provides comprehensive setup instructions for all devcontainer images
 | **bun-node**        | oven/bun | Bun, Node.js, npm, Git | ~239 MB | Full-stack with Bun + Node.js |
 | **ubuntu-bun**      | Ubuntu   | Bun, Git               | ~131 MB | Ubuntu-based Bun development  |
 | **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git | ~201 MB | Ubuntu-based full-stack       |
+| **ubuntu-tools**    | Ubuntu   | Python, jq, Git, curl  | ~80 MB  | Tools-only automation         |
 
 ### 2. Registry Options
 
@@ -128,6 +129,11 @@ Recommended extensions for each image type:
 - `ms-vscode.vscode-typescript-next` - TypeScript support
 - `bradlc.vscode-tailwindcss` - Tailwind CSS support
 
+#### Tools-only Image (ubuntu-tools)
+
+- `ms-python.python` - Python support
+- `ms-toolsai.jupyter` - Optional notebook workflows
+
 ### Port Forwarding
 
 Common ports you might need to forward:
@@ -166,6 +172,8 @@ bun run build
 bun run script.ts
 ```
 
+> `ubuntu-tools` does not include Bun by default. Use this section only for Bun-based images.
+
 ### npm Commands (Node images only)
 
 ```bash
@@ -180,6 +188,8 @@ npm install -D dev-package-name
 npm run dev
 npm run build
 ```
+
+> `ubuntu-tools` does not include Node.js or npm by default.
 
 ## 🐛 Troubleshooting
 

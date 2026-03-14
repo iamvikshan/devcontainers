@@ -1,4 +1,4 @@
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import axios from 'axios'
 
 export interface BuildFailure {
@@ -25,7 +25,11 @@ export class IssueManager {
   private silent = false
 
   constructor() {
-    this.githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || ''
+    this.githubToken =
+      process.env.GITHUB_TOKEN ||
+      process.env.GH_PAT ||
+      process.env.GH_TOKEN ||
+      ''
     this.owner = process.env.GITHUB_REPOSITORY?.split('/')[0] || ''
     this.repo = process.env.GITHUB_REPOSITORY?.split('/')[1] || ''
   }
@@ -342,19 +346,25 @@ export class IssueManager {
       const body = this.generateIssueBody(failure)
       const labels = ['bug', 'build-failure', `container:${failure.container}`]
 
-      const command = [
-        'gh',
-        'issue',
-        'create',
-        '--title',
-        `"${title}"`,
-        '--body',
-        `"${body}"`,
-        '--label',
-        labels.join(',')
-      ].join(' ')
+      const env = { ...process.env }
+      if (!env.GH_TOKEN && this.githubToken) {
+        env.GH_TOKEN = this.githubToken
+      }
 
-      const output = execSync(command, { encoding: 'utf-8' }).trim()
+      const output = execFileSync(
+        'gh',
+        [
+          'issue',
+          'create',
+          '--title',
+          title,
+          '--body',
+          body,
+          '--label',
+          labels.join(',')
+        ],
+        { encoding: 'utf-8', env }
+      ).trim()
       const issueUrl = output.split('\n').pop() || ''
       const issueNumber = issueUrl.split('/').pop()
 

@@ -1,18 +1,18 @@
 # DevContainer Image Variants
 
-This document provides detailed information about all 4 available devcontainer images.
+This document provides detailed information about all 5 available devcontainer images.
 
 ## 📊 Images Comparison
 
-| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   |
-| --------------- | ----------------- | ---------------------- | ---------------- | ----------------- |
-| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     |
-| **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           |
-| **Bun Version** | 1.3.3             | 1.3.3                  | 1.3.3            | 1.3.3             |
-| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.5.0        |
-| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 11.5.1         |
-| **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      |
-| **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack |
+| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ubuntu-tools          |
+| --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | --------------------- |
+| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:24.04          |
+| **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           | ~80 MB                |
+| **Bun Version** | 1.3.3             | 1.3.3                  | 1.3.3            | 1.3.3             | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.5.0        | ❌                    |
+| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 11.5.1         | ❌                    |
+| **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)          |
+| **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | Tools-only automation |
 
 ## 🎯 Image Selection Guide
 
@@ -21,12 +21,13 @@ This document provides detailed information about all 4 available devcontainer i
 - **Pure Bun Development** → `bun` or `ubuntu-bun`
 - **Full-Stack Projects** → `bun-node` or `ubuntu-bun-node`
 - **Need Ubuntu Packages** → `ubuntu-bun` or `ubuntu-bun-node`
+- **Need Ubuntu Tools Without JS Runtimes** → `ubuntu-tools`
 - **Smallest Size** → `ubuntu-bun` (94 MB)
 - **Most Features** → `bun-node` (227 MB)
 
 ## 🐳 Image Details
 
-### 1. bun (~64 MB)
+### 1. bun (~133 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun:latest`
 
@@ -71,7 +72,7 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
 }
 ```
 
-### 2. bun-node (~96 MB)
+### 2. bun-node (~227 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
 
@@ -118,7 +119,7 @@ that need Bun's performance with Node.js ecosystem compatibility.
 }
 ```
 
-### 3. ubuntu-bun (~65 MB)
+### 3. ubuntu-bun (~94 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
 
@@ -164,7 +165,7 @@ and tooling. The smallest image in our collection!
 }
 ```
 
-### 4. ubuntu-bun-node (~135 MB)
+### 4. ubuntu-bun-node (~166 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
 
@@ -181,8 +182,8 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
 **Included Tools:**
 
 - Bun 1.3.3 (installed via script)
-- Node.js v22.11.0
-- npm 10.9.0
+- Node.js v24.5.0
+- npm 11.5.1
 - ESLint (global)
 - Git, SSH client, curl, unzip
 - btop (system resource monitor)
@@ -212,38 +213,86 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
 }
 ```
 
+### 5. ubuntu-tools (~80 MB)
+
+**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest`
+
+**Description:** Ubuntu-based tools-only environment for automation, scripting, and utility-heavy
+workflows that do not require Bun or Node.js runtimes.
+
+**Key Features:**
+
+- 🧰 **Tools-focused image** - Includes Python, jq, Git, curl, and btop
+- 🐧 **Ubuntu base** - Standard Ubuntu package ecosystem with apt
+- 🔐 **sudo access** - Administrative privileges for setup tasks
+- 🚫 **No JS runtime bundle** - No Bun, Node.js, npm, or ESLint preinstalled
+
+**Included Tools:**
+
+- Python 3
+- jq
+- Git, SSH client, curl, unzip
+- btop (system resource monitor)
+- sudo (administrative access)
+- Ubuntu package manager (apt)
+
+**Perfect For:**
+
+- Automation scripts and CI utilities
+- Python-first tooling workflows
+- JSON/data transformation tasks
+- Projects requiring a minimal tools baseline
+
+**Example Configuration:**
+
+```json
+{
+  "name": "Tools Workspace",
+  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "esbenp.prettier-vscode"]
+    }
+  }
+}
+```
+
 ## 🎯 Choosing the Right Image
 
 ### Decision Tree
 
 ```
-Do you need Node.js compatibility?
-├─ No → Do you prefer Ubuntu?
-│  ├─ Yes → ubuntu-bun
-│  └─ No → bun
-└─ Yes → Do you prefer Ubuntu?
-   ├─ Yes → ubuntu-bun-node
-   └─ No → bun-node
+Do you need Bun runtime?
+├─ No → ubuntu-tools
+└─ Yes → Do you need Node.js compatibility?
+  ├─ No → Do you prefer Ubuntu?
+  │  ├─ Yes → ubuntu-bun
+  │  └─ No → bun
+  └─ Yes → Do you prefer Ubuntu?
+    ├─ Yes → ubuntu-bun-node
+    └─ No → bun-node
 ```
 
 ### Performance Considerations
 
 **Smallest to Largest:**
 
-1. **ubuntu-bun** (~131 MB) - Most efficient Ubuntu option
-2. **bun** (~133 MB) - Most efficient overall
-3. **ubuntu-bun-node** (~201 MB) - Balanced Ubuntu option
-4. **bun-node** (~239 MB) - Full-featured but larger
+1. **ubuntu-tools** (~80 MB) - Tools-focused baseline
+2. **ubuntu-bun** (~94 MB) - Most efficient Ubuntu Bun option
+3. **bun** (~133 MB) - Most efficient Bun runtime option
+4. **ubuntu-bun-node** (~166 MB) - Balanced Ubuntu full-stack option
+5. **bun-node** (~227 MB) - Full-featured but larger
 
 ### Compatibility Matrix
 
-| Feature             | bun        | bun-node | ubuntu-bun | ubuntu-bun-node |
-| ------------------- | ---------- | -------- | ---------- | --------------- |
-| **Bun APIs**        | ✅ Full    | ✅ Full  | ✅ Full    | ✅ Full         |
-| **Node.js APIs**    | ⚠️ Limited | ✅ Full  | ⚠️ Limited | ✅ Full         |
-| **npm packages**    | ⚠️ Some    | ✅ All   | ⚠️ Some    | ✅ All          |
-| **Ubuntu packages** | ❌         | ❌       | ✅         | ✅              |
-| **Alpine packages** | ✅         | ✅       | ❌         | ❌              |
+| Feature             | bun        | bun-node | ubuntu-bun | ubuntu-bun-node | ubuntu-tools |
+| ------------------- | ---------- | -------- | ---------- | --------------- | ------------ |
+| **Bun APIs**        | ✅ Full    | ✅ Full  | ✅ Full    | ✅ Full         | ❌           |
+| **Node.js APIs**    | ⚠️ Limited | ✅ Full  | ⚠️ Limited | ✅ Full         | ❌           |
+| **npm packages**    | ⚠️ Some    | ✅ All   | ⚠️ Some    | ✅ All          | ❌           |
+| **Ubuntu packages** | ❌         | ❌       | ✅         | ✅              | ✅           |
+| **Alpine packages** | ✅         | ✅       | ❌         | ❌              | ❌           |
+| **Debian packages** | ❌         | ❌       | ❌         | ❌              | ❌           |
 
 ## 📦 Alternative Sources
 

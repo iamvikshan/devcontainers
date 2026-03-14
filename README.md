@@ -20,17 +20,20 @@ environments.
 | **bun-node**        | ~96 MB  | Alpine | ✅  | ✅      | Full-stack development    |
 | **ubuntu-bun**      | ~65 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
 | **ubuntu-bun-node** | ~135 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
+| **ubuntu-tools**    | ~80 MB  | Ubuntu | ❌  | ❌      | Tools-only automation     |
 
 ### 🎯 Choose Your Image
 
 ```
-Need Node.js?
-├─ Yes → Need Ubuntu base?
-│  ├─ Yes → ubuntu-bun-node
-│  └─ No  → bun-node
-└─ No  → Need Ubuntu base?
-   ├─ Yes → ubuntu-bun
-   └─ No  → bun
+Need Bun runtime?
+├─ Yes → Need Node.js?
+│  ├─ Yes → Need Ubuntu base?
+│  │  ├─ Yes → ubuntu-bun-node
+│  │  └─ No  → bun-node
+│  └─ No  → Need Ubuntu base?
+│     ├─ Yes → ubuntu-bun
+│     └─ No  → bun
+└─ No  → ubuntu-tools
 ```
 
 ### 📦 Quick Start
@@ -40,6 +43,7 @@ docker pull ghcr.io/iamvikshan/devcontainers/bun:latest
 docker pull ghcr.io/iamvikshan/devcontainers/bun-node:latest
 docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest
 docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest
+docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest
 ```
 
 > **Alternative Sources:** All images are also available on
@@ -129,6 +133,14 @@ All images include:
 - **Bun** 1.3.3 - Installed via script
 - **Node.js** v25.2.0 _(ubuntu-bun-node only)_
 - **npm** 11.6.2 _(ubuntu-bun-node only)_
+- **sudo** - Administrative access
+- **Ubuntu package manager** (apt)
+
+#### Ubuntu tools-only Image (`ubuntu-tools`)
+
+- **Python 3** - General scripting runtime
+- **jq** - JSON processing utility
+- **No Bun, Node.js, npm, or ESLint** - Purpose-built tools-only variant
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)
 

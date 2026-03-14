@@ -12,7 +12,7 @@
 # Safe to run multiple times (idempotent).
 #
 # Usage:
-#   ./iamvikshan.sh [--repo <repository-url>] [--force|--yes]
+#   ./git.sh [--repo <repository-url>] [--force|--yes]
 #
 # Options:
 #   --repo <url>       Override the target repository URL (default: https://github.com/iamvikshan/devcontainers)
@@ -22,9 +22,9 @@
 #   TARGET_REPO    Set this to override the default target repository URL
 #
 # Examples:
-#   ./iamvikshan.sh
-#   ./iamvikshan.sh --repo https://github.com/myorg/myrepo.git
-#   TARGET_REPO=https://github.com/myorg/myrepo.git ./iamvikshan.sh
+#   ./git.sh
+#   ./git.sh --repo https://github.com/myorg/myrepo.git
+#   TARGET_REPO=https://github.com/myorg/myrepo.git ./git.sh
 
 set -euo pipefail
 
@@ -59,6 +59,9 @@ TARGET_REPO="${TARGET_REPO:-$DEFAULT_TARGET_REPO}"
 
 # Flag to force remote URL changes without prompting (for non-interactive use)
 FORCE_REMOTE_UPDATE=false
+
+# Flag to track SSH signing key prune failure (deferred failure: final status will be incomplete)
+PRUNE_FAILED=false
 
 # Initialize optional variables with defaults to satisfy 'set -u'
 : "${GITHUB_TOKEN:=}"
@@ -108,6 +111,127 @@ if [[ ! "$TARGET_REPO" =~ ^(https://|git@) ]]; then
   exit 1
 fi
 
+# Function to prune SSH signing keys to enforce maximum of 5
+# Deletes oldest keys first (by created_at timestamp)
+# Uses gh built-in jq query output as TSV (no external jq dependency)
+# Returns 0 on success, 1 on failure
+prune_ssh_signing_keys() {
+  local max_keys=5
+
+  # Fetch all signing keys with pagination as TSV rows: created_at<TAB>id
+  # NOTE: Defensive '|| FETCH_EXIT=$?' pattern prevents 'set -e' from killing the script
+  local FETCH_EXIT=0
+  local keys_tsv=""
+  keys_tsv=$(gh api /user/ssh_signing_keys --paginate --jq '.[] | [.created_at, .id] | @tsv') || FETCH_EXIT=$?
+
+  if [[ $FETCH_EXIT -ne 0 ]]; then
+    echo "Failed to fetch SSH signing keys"
+    if [[ -n "$keys_tsv" ]]; then
+      echo "$keys_tsv"
+    fi
+    return 1
+  fi
+
+  # Create temporary files for validated key rows and delete list
+  local temp_keys
+  local temp_sorted
+  local temp_delete
+  temp_keys=$(mktemp)
+  temp_sorted=$(mktemp)
+  temp_delete=$(mktemp)
+  trap 'rm -f "$temp_keys" "$temp_sorted" "$temp_delete"' RETURN
+
+  # Persist fetched TSV output (empty output is valid when no keys exist)
+  if [[ -n "$keys_tsv" ]]; then
+    printf '%s\n' "$keys_tsv" > "$temp_keys" || {
+      echo "Failed to store SSH signing key list"
+      return 1
+    }
+  else
+    : > "$temp_keys" || {
+      echo "Failed to initialize SSH signing key list"
+      return 1
+    }
+  fi
+
+  # Validate and normalize rows as created_at<TAB>id
+  local PARSE_EXIT=0
+  awk -F '\t' '
+        NF == 0 { next }
+        NF != 2 || $1 == "" || $2 == "" { bad = 1; next }
+        $2 !~ /^[0-9]+$/ { bad = 1; next }
+        { print $1 "\t" $2; count++ }
+        END {
+            if (bad) exit 1
+        }
+    ' "$temp_keys" > "$temp_sorted" || PARSE_EXIT=$?
+
+  if [[ $PARSE_EXIT -ne 0 ]]; then
+    echo "Failed to parse SSH signing keys"
+    return 1
+  fi
+
+  local key_count=0
+  key_count=$(awk -F '\t' 'NF == 2 {count++} END {print count+0}' "$temp_sorted")
+
+  if [[ $key_count -le $max_keys ]]; then
+    echo "SSH signing keys: $key_count key(s) found (within max of $max_keys)"
+    return 0
+  fi
+
+  local delete_needed=0
+  delete_needed=$((key_count - max_keys))
+
+  echo "Found $key_count SSH signing keys (exceeds max of $max_keys)"
+  echo "    Deleting $delete_needed oldest key(s)..."
+
+  # Sort by date ascending (oldest first), then delete exactly the oldest excess entries
+  local BUILD_DELETE_LIST_EXIT=0
+  sort "$temp_sorted" | head -n "$delete_needed" | awk -F '\t' '{print $2}' > "$temp_delete" || BUILD_DELETE_LIST_EXIT=$?
+
+  if [[ $BUILD_DELETE_LIST_EXIT -ne 0 ]]; then
+    echo "Failed to build delete list for old SSH signing keys"
+    return 1
+  fi
+
+  local delete_list_count=0
+  delete_list_count=$(awk 'NF > 0 {count++} END {print count+0}' "$temp_delete")
+  if [[ $delete_list_count -ne $delete_needed ]]; then
+    echo "Failed to identify old SSH signing keys to delete"
+    return 1
+  fi
+
+  # Delete each old key
+  local delete_count=0
+  local delete_fail_count=0
+  while IFS= read -r key_id; do
+    if [[ -z "$key_id" ]]; then
+      continue
+    fi
+
+    # NOTE: Defensive '|| DELETE_EXIT=$?' pattern prevents 'set -e' from killing the script
+    local DELETE_EXIT=0
+    local delete_output=""
+    delete_output=$(gh api -X DELETE /user/ssh_signing_keys/"$key_id" 2>&1) || DELETE_EXIT=$?
+
+    if [[ $DELETE_EXIT -eq 0 ]]; then
+      echo "    Deleted signing key ID $key_id"
+      delete_count=$((delete_count + 1))
+    else
+      echo "    Failed to delete signing key ID $key_id: $delete_output"
+      delete_fail_count=$((delete_fail_count + 1))
+    fi
+  done < "$temp_delete"
+
+  if [[ $delete_fail_count -gt 0 ]]; then
+    echo "Failed to delete $delete_fail_count old signing key(s) - setup marked incomplete"
+    return 1
+  fi
+
+  echo "Pruned $delete_count old signing key(s), now have max $max_keys keys"
+  return 0
+}
+
 # Define the canonical check_dev_setup function body using a here-doc
 # This ensures both code paths (insert after setup.sh and fallback append) use identical content
 read -r -d '' FUNCTION_DEF << 'FUNCTION_EOF' || true
@@ -137,10 +261,10 @@ check_dev_setup() {
     if [[ -z "$gh_user" || "$gh_user" != "GIT_USER_PLACEHOLDER" ]]; then
         if [[ -n "$GITHUB_TOKEN" ]]; then
             echo "⚠️  GitHub CLI is using existing GITHUB_TOKEN, not GIT_USER_PLACEHOLDER"
-            echo "   Run: ./iamvikshan.sh to authenticate as GIT_USER_PLACEHOLDER"
+            echo "   Run: ./git.sh to authenticate as GIT_USER_PLACEHOLDER"
         else
             echo "⚠️  GitHub CLI is not authenticated as GIT_USER_PLACEHOLDER"
-            echo "   Run: ./iamvikshan.sh to authenticate"
+            echo "   Run: ./git.sh to authenticate"
         fi
         return 1
     fi
@@ -470,6 +594,25 @@ else
   fi
 fi
 
+# Prune remote SSH signing keys (attempt oldest-first deletion; failures are recorded for final status)
+if [[ "$HAS_SIGNING_SCOPE" = "true" ]]; then
+  echo "Pruning SSH signing keys (target max 5; failures are recorded for final status)..."
+  PRUNE_EXIT_CODE=0
+  PRUNE_OUTPUT=$(prune_ssh_signing_keys) || PRUNE_EXIT_CODE=$?
+
+  if [[ $PRUNE_EXIT_CODE -eq 0 ]]; then
+    echo "$PRUNE_OUTPUT"
+  else
+    echo "❌ SSH signing key pruning failed"
+    echo "   Exit code: $PRUNE_EXIT_CODE"
+    echo "   Output: $PRUNE_OUTPUT"
+    echo "   Continuing execution; final status will be incomplete if prune failed"
+    PRUNE_FAILED=true
+  fi
+else
+  echo "⚠️  Skipping SSH signing key pruning (missing write:ssh_signing_key scope)"
+fi
+
 # Configure Git for SSH signing
 git config --global gpg.format ssh
 git config --global user.signingkey "$SIGNING_KEY_PUB"
@@ -685,6 +828,9 @@ fi
 if [[ -z "$FINAL_SIGNING_KEY" || "$FINAL_GPGSIGN" != "true" ]]; then
   SETUP_COMPLETE=false
 fi
+if [[ "$PRUNE_FAILED" = "true" ]]; then
+  SETUP_COMPLETE=false
+fi
 
 if [[ "$SETUP_COMPLETE" = "true" ]]; then
   echo "=========================================="
@@ -714,6 +860,10 @@ else
   if [[ -z "$FINAL_SIGNING_KEY" || "$FINAL_GPGSIGN" != "true" ]]; then
     echo "SSH signing key setup needs attention"
     echo "Run this script again to complete SSH signing setup"
+  fi
+  if [[ "$PRUNE_FAILED" = "true" ]]; then
+    echo "SSH signing key pruning failed"
+    echo "Ensure you have sufficient scopes and re-run: $SCRIPT_NAME"
   fi
   echo ""
   exit 1

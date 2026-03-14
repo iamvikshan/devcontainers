@@ -6,6 +6,9 @@ import {
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
+type ToolVersions = Record<string, string>
+type ToolVersionsByContainer = Map<string, ToolVersions>
+
 export interface ImageSizeInfo {
   name: string
   registry: string
@@ -297,14 +300,17 @@ export class ImageOperations {
 
   // Load tool versions from tool-versions.json
   // Load tool versions from container-versions.json
-  private loadToolVersions(): Map<string, any> {
-    const toolVersionMap = new Map<string, any>()
+  private loadToolVersions(): ToolVersionsByContainer {
+    const toolVersionMap: ToolVersionsByContainer = new Map()
     try {
       const versionsPath = join(process.cwd(), 'container-versions.json')
       if (existsSync(versionsPath)) {
         const content = readFileSync(versionsPath, 'utf-8')
-        const versions = JSON.parse(content)
-        Object.entries(versions).forEach(([container, info]: [string, any]) => {
+        const versions = JSON.parse(content) as Record<
+          string,
+          { toolVersions?: ToolVersions }
+        >
+        Object.entries(versions).forEach(([container, info]) => {
           if (info.toolVersions) {
             toolVersionMap.set(container, info.toolVersions)
           }
@@ -324,7 +330,7 @@ export class ImageOperations {
   private async updateSingleReadme(
     readmePath: string,
     sizeMap: Map<string, Map<string, number>>,
-    toolVersions: Map<string, any> = new Map()
+    toolVersions: ToolVersionsByContainer = new Map()
   ): Promise<void> {
     // Check if the file exists before attempting to read it
     if (!existsSync(readmePath)) {
@@ -362,20 +368,20 @@ export class ImageOperations {
       // Update tool versions in README.md
       if (toolVersions.size > 0) {
         // Get Alpine-based image versions (from bun or bun-node)
-        let alpineVersions: any = null
+        let alpineVersions: ToolVersions | null = null
         for (const containerName of ['bun-node', 'bun']) {
           if (toolVersions.has(containerName)) {
-            alpineVersions = toolVersions.get(containerName)
+            alpineVersions = toolVersions.get(containerName) ?? null
             this.log(`📋 Using Alpine tool versions from '${containerName}'`)
             break
           }
         }
 
         // Get Ubuntu-based image versions (from ubuntu-bun or ubuntu-bun-node)
-        let ubuntuVersions: any = null
+        let ubuntuVersions: ToolVersions | null = null
         for (const containerName of ['ubuntu-bun-node', 'ubuntu-bun']) {
           if (toolVersions.has(containerName)) {
-            ubuntuVersions = toolVersions.get(containerName)
+            ubuntuVersions = toolVersions.get(containerName) ?? null
             this.log(`📋 Using Ubuntu tool versions from '${containerName}'`)
             break
           }
@@ -458,114 +464,71 @@ export class ImageOperations {
 
       // First, update tool versions in comparison tables if tool-versions.json is available
       if (toolVersions.size > 0) {
-        // Get a representative container's tool versions for the tables
-        // Priority: bun-node > bun > ubuntu-bun-node > ubuntu-bun
-        let representativeVersions: any = null
-        for (const containerName of [
-          'bun-node',
-          'bun',
-          'ubuntu-bun-node',
-          'ubuntu-bun'
-        ]) {
-          if (toolVersions.has(containerName)) {
-            representativeVersions = toolVersions.get(containerName)
-            this.log(
-              `📋 Using tool versions from '${containerName}' for IMAGE_VARIANTS tables`
-            )
-            break
-          }
+        const getToolVersion = (
+          containerName: string,
+          toolKey: string
+        ): string | null => {
+          const versions = toolVersions.get(containerName)
+          return versions?.[toolKey] || null
         }
 
-        if (representativeVersions) {
-          // Update Bun Version rows in both tables
-          if (representativeVersions.bun_version) {
-            const bunVersion = representativeVersions.bun_version
-            // Match and replace each version number while preserving spacing
-            updatedContent = updatedContent.replace(
-              /(\| \*\*Bun Version\*\* \| )([0-9.]+)( +\| )([0-9.]+)( +\| )([0-9.]+)( +\| )([0-9.]+)( +\|)/g,
-              (match, p1, v1, p3, v2, p5, v3, p7, v4, p9) => {
-                // Calculate padding to maintain column width
-                const pad = (original: string, newVal: string) => {
-                  const diff = original.length - newVal.length
-                  return diff > 0 ? newVal + ' '.repeat(diff) : newVal
-                }
-                return `${p1}${pad(v1, bunVersion)}${p3}${pad(v2, bunVersion)}${p5}${pad(v3, bunVersion)}${p7}${pad(v4, bunVersion)}${p9}`
-              }
+        const tableHeaderMatch = updatedContent.match(
+          /^\|\s*Feature\s*\|([^\n]+)$/m
+        )
+
+        if (tableHeaderMatch) {
+          const tableContainers = tableHeaderMatch[1]
+            .split('|')
+            .map(value => value.trim())
+            .filter(Boolean)
+
+          const buildToolRow = (
+            rowLabel: string,
+            getValue: (containerName: string) => string
+          ): string => {
+            const values = tableContainers.map(containerName =>
+              getValue(containerName)
             )
-            this.log(`  ✅ Updated Bun version to ${bunVersion} in tables`)
+            return `| **${rowLabel}** | ${values.join(' | ')} |`
           }
 
-          // Update Node.js versions in tables
-          if (representativeVersions.node_version) {
-            const nodeVersion = representativeVersions.node_version
-            updatedContent = updatedContent.replace(
-              /(\| \*\*Node\.js\*\* +\| ❌ +\| ✅ )v[0-9.]+/g,
-              `$1${nodeVersion}`
+          updatedContent = updatedContent.replace(
+            /^\|\s*\*\*Bun Version\*\*\s*\|.*$/m,
+            buildToolRow(
+              'Bun Version',
+              containerName =>
+                getToolVersion(containerName, 'bun_version') || '❌'
             )
-            updatedContent = updatedContent.replace(
-              /(\| \*\*Node\.js\*\* +\| ❌ +\| ❌ +\| ✅ )v[0-9.]+/g,
-              `$1${nodeVersion}`
-            )
-            this.log(`  ✅ Updated Node.js version to ${nodeVersion}`)
-          }
+          )
 
-          // Update npm versions in tables
-          if (representativeVersions.npm_version) {
-            const npmVersion = representativeVersions.npm_version
-            updatedContent = updatedContent.replace(
-              /(\| \*\*npm\*\* +\| ❌ +\| ✅ )[0-9.]+/g,
-              `$1${npmVersion}`
-            )
-            updatedContent = updatedContent.replace(
-              /(\| \*\*npm\*\* +\| ❌ +\| ❌ +\| ✅ )[0-9.]+/g,
-              `$1${npmVersion}`
-            )
-            this.log(`  ✅ Updated npm version to ${npmVersion}`)
-          }
+          updatedContent = updatedContent.replace(
+            /^\|\s*\*\*Node\.js\*\*\s*\|.*$/m,
+            buildToolRow('Node.js', containerName => {
+              const nodeVersion = getToolVersion(containerName, 'node_version')
+              return nodeVersion ? `✅ ${nodeVersion}` : '❌'
+            })
+          )
 
-          // Update individual tool version mentions in descriptions
-          // Pattern: "Bun X.X.X" anywhere in the document
-          if (representativeVersions.bun_version) {
-            const bunVersion = representativeVersions.bun_version
-            updatedContent = updatedContent.replace(
-              /Bun [0-9.]+/g,
-              `Bun ${bunVersion}`
-            )
-          }
+          updatedContent = updatedContent.replace(
+            /^\|\s*\*\*npm\*\*\s*\|.*$/m,
+            buildToolRow('npm', containerName => {
+              const npmVersion = getToolVersion(containerName, 'npm_version')
+              return npmVersion ? `✅ ${npmVersion}` : '❌'
+            })
+          )
 
-          // Pattern: "Node.js vX.X.X" anywhere in the document
-          if (representativeVersions.node_version) {
-            const nodeVersion = representativeVersions.node_version
-            updatedContent = updatedContent.replace(
-              /Node\.js v[0-9.]+/g,
-              `Node.js ${nodeVersion}`
-            )
-          }
-
-          // Pattern: "npm X.X.X" anywhere in the document
-          if (representativeVersions.npm_version) {
-            const npmVersion = representativeVersions.npm_version
-            updatedContent = updatedContent.replace(
-              /npm [0-9.]+/g,
-              `npm ${npmVersion}`
-            )
-          }
+          this.log(
+            `  ✅ Updated IMAGE_VARIANTS capability rows for ${tableContainers.length} images`
+          )
         }
       }
 
       // Update the comparison table sizes
       const tablePattern = /(\| \*\*Size\*\* +\| ~)\d+( MB)/g
-      updatedContent = updatedContent.replace(
-        tablePattern,
-        (match, prefix, suffix) => {
-          // This updates the "Size" column in the comparison table
-          const rowMatch = updatedContent.match(
-            new RegExp(`\\| \\*\\*([^*]+)\\*\\* +\\| ~\\d+ MB`, 'g')
-          )
-          // For IMAGE_VARIANTS, we need to update each row individually
-          return match // Keep original for now, will be updated by individual image sections
-        }
-      )
+      updatedContent = updatedContent.replace(tablePattern, match => {
+        // For IMAGE_VARIANTS, comparison-table size updates are handled per image section below.
+        return match
+      })
 
       // Update individual image section headers with sizes
       const imageSectionPattern = /### \d+\. ([^(]+) \(~\d+ MB\)/g
@@ -717,18 +680,18 @@ export class ImageOperations {
       // Transform the result to match our interface
       const updates = result.checks
         .filter((c: { hasUpdate: boolean }) => c.hasUpdate)
-        .flatMap(
+        .map(
           (check: {
             tool: string
+            containerName: string
             currentVersion: string
             latestVersion: string
-          }) =>
-            result.affectedContainers.map((containerName: string) => ({
-              tool: check.tool,
-              containerName,
-              currentVersion: check.currentVersion,
-              latestVersion: check.latestVersion
-            }))
+          }) => ({
+            tool: check.tool,
+            containerName: check.containerName,
+            currentVersion: check.currentVersion,
+            latestVersion: check.latestVersion
+          })
         )
 
       return {

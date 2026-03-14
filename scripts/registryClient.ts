@@ -26,7 +26,7 @@ export function loadEnvironment(): void {
 
 // Centralized image definitions
 export const IMAGE_DEFINITIONS = {
-  names: ['bun', 'bun-node', 'ubuntu-bun', 'ubuntu-bun-node'],
+  names: ['bun', 'bun-node', 'ubuntu-bun', 'ubuntu-bun-node', 'ubuntu-tools'],
   registries: {
     ghcr: (image: string) =>
       `ghcr.io/${config.ghcrOwner}/${config.repoName}/${image}`,
@@ -38,7 +38,8 @@ export const IMAGE_DEFINITIONS = {
     bun: 'oven/bun',
     'bun-node': 'oven/bun',
     'ubuntu-bun': 'library/ubuntu',
-    'ubuntu-bun-node': 'library/ubuntu'
+    'ubuntu-bun-node': 'library/ubuntu',
+    'ubuntu-tools': 'library/ubuntu'
   }
 }
 

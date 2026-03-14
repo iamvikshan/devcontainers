@@ -36,6 +36,9 @@ npm run build-ubuntu-bun
 
 # Build ubuntu-bun-node image
 npm run build-ubuntu-bun-node
+
+# Build ubuntu-tools image
+npm run build-ubuntu-tools
 ```
 
 ## 🔧 Manual Docker Commands
@@ -68,6 +71,13 @@ cd base/ubuntu/bun-node
 docker build -t devcontainers/ubuntu-bun-node:test .
 ```
 
+### Ubuntu-Tools Image
+
+```bash
+cd images/ubuntu-tools
+docker build -t devcontainers/ubuntu-tools:test .
+```
+
 ## 🧪 Testing Built Images
 
 ### Test Image Runs
@@ -84,6 +94,9 @@ docker run --rm devcontainers/ubuntu-bun:test echo "Hello from Ubuntu+Bun!"
 
 # Test ubuntu-bun-node image
 docker run --rm devcontainers/ubuntu-bun-node:test echo "Hello from Ubuntu+Bun+Node!"
+
+# Test ubuntu-tools image
+docker run --rm devcontainers/ubuntu-tools:test echo "Hello from Ubuntu tools!"
 ```
 
 ### Test Installed Tools
@@ -98,6 +111,10 @@ docker run --rm devcontainers/bun-node:test npm --version
 
 # Test Git installation (all images)
 docker run --rm devcontainers/bun:test git --version
+
+# Test Python and jq installation (ubuntu-tools image)
+docker run --rm devcontainers/ubuntu-tools:test python3 --version
+docker run --rm devcontainers/ubuntu-tools:test jq --version
 ```
 
 ### Interactive Testing
@@ -108,6 +125,7 @@ docker run -it --rm devcontainers/bun:test bash
 docker run -it --rm devcontainers/bun-node:test bash
 docker run -it --rm devcontainers/ubuntu-bun:test bash
 docker run -it --rm devcontainers/ubuntu-bun-node:test bash
+docker run -it --rm devcontainers/ubuntu-tools:test bash
 ```
 
 ## 📊 Image Inspection

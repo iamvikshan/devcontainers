@@ -72,3 +72,14 @@ updates:
       - "base-image-update"
     commit-message:
       prefix: "chore"
+
+  - package-ecosystem: "docker"
+    directory: "/images/ubuntu-tools"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 2
+    labels:
+      - "docker"
+      - "base-image-update"
+    commit-message:
+      prefix: "chore"

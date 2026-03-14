@@ -1,8 +1,5 @@
 node_modules
 .env
-package-lock.json
-*.lock*
 *ignore
-.husky/
-.prettierrc.json
 .vscode/
+plans/
