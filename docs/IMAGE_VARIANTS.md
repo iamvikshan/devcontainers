@@ -9,8 +9,8 @@ This document provides detailed information about all 5 available devcontainer i
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:24.04          |
 | **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           | ~80 MB                |
 | **Bun Version** | 1.3.3             | 1.3.3                  | 1.3.3            | 1.3.3             | ❌                    |
-| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.5.0        | ❌                    |
-| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 11.5.1         | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v25.2.0        | ❌                    |
+| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 11.6.2         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | Tools-only automation |
 
