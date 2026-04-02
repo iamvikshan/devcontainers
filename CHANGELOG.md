@@ -8,11 +8,11 @@ All notable changes to this project will be documented in this file.
 
 | Container       | Version | Date       | Registry Links                                                                                                                                                                                                              |
 | --------------- | ------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| bun             | v0.1.26 | 2026-04-01 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun:0.0.4)                                     |
-| bun-node        | v0.1.26 | 2026-04-01 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun-node:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun-node:0.0.4)                      |
-| ubuntu-bun      | v0.1.26 | 2026-04-01 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:0.0.4)                |
-| ubuntu-bun-node | v0.1.26 | 2026-04-01 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:0.0.4) |
-| ubuntu-tools    | v0.2.18 | 2026-04-01 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-tools:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-tools) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-tools:0.0.4)          |
+| bun             | v0.1.27 | 2026-04-02 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun:0.0.4)                                     |
+| bun-node        | v0.1.27 | 2026-04-02 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun-node:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/bun-node:0.0.4)                      |
+| ubuntu-bun      | v0.1.27 | 2026-04-02 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:0.0.4)                |
+| ubuntu-bun-node | v0.1.27 | 2026-04-02 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:0.0.4) |
+| ubuntu-tools    | v0.2.19 | 2026-04-02 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-tools:0.0.4) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-tools) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-tools:0.0.4)          |
 
 ---
 
