@@ -8,7 +8,7 @@ The devcontainer includes Docker-in-Docker for building and testing images local
 
 ```bash
 # Check that Docker is properly installed and working
-npm run verify-docker
+docker version
 ```
 
 ## 🚀 Quick Build Commands
@@ -16,29 +16,31 @@ npm run verify-docker
 ### Build All Images (Recommended)
 
 ```bash
-# Run the comprehensive build script
-npm run build-all
-# or
-./scripts/build-all-images.sh
+# Build every image from the repository root
+set -e
+
+for image in bun bun-node ubuntu-bun ubuntu-bun-node ubuntu-tools; do
+  docker build -t "devcontainers/${image}:test" "images/${image}"
+done
 ```
 
 ### Build Individual Images
 
 ```bash
 # Build bun image
-npm run build-bun
+docker build -t devcontainers/bun:test images/bun
 
 # Build bun-node image
-npm run build-bun-node
+docker build -t devcontainers/bun-node:test images/bun-node
 
 # Build ubuntu-bun image
-npm run build-ubuntu-bun
+docker build -t devcontainers/ubuntu-bun:test images/ubuntu-bun
 
 # Build ubuntu-bun-node image
-npm run build-ubuntu-bun-node
+docker build -t devcontainers/ubuntu-bun-node:test images/ubuntu-bun-node
 
 # Build ubuntu-tools image
-npm run build-ubuntu-tools
+docker build -t devcontainers/ubuntu-tools:test images/ubuntu-tools
 ```
 
 ## 🔧 Manual Docker Commands
@@ -46,36 +48,31 @@ npm run build-ubuntu-tools
 ### Bun Image
 
 ```bash
-cd base/bun/.devcontainer
-docker build -t devcontainers/bun:test .
+docker build -t devcontainers/bun:test images/bun
 ```
 
 ### Bun-Node Image
 
 ```bash
-cd base/bun-node/.devcontainer
-docker build -t devcontainers/bun-node:test .
+docker build -t devcontainers/bun-node:test images/bun-node
 ```
 
 ### Ubuntu-Bun Image
 
 ```bash
-cd base/ubuntu/bun
-docker build -t devcontainers/ubuntu-bun:test .
+docker build -t devcontainers/ubuntu-bun:test images/ubuntu-bun
 ```
 
 ### Ubuntu-Bun-Node Image
 
 ```bash
-cd base/ubuntu/bun-node
-docker build -t devcontainers/ubuntu-bun-node:test .
+docker build -t devcontainers/ubuntu-bun-node:test images/ubuntu-bun-node
 ```
 
 ### Ubuntu-Tools Image
 
 ```bash
-cd images/ubuntu-tools
-docker build -t devcontainers/ubuntu-tools:test .
+docker build -t devcontainers/ubuntu-tools:test images/ubuntu-tools
 ```
 
 ## 🧪 Testing Built Images
@@ -121,11 +118,11 @@ docker run --rm devcontainers/ubuntu-tools:test jq --version
 
 ```bash
 # Start interactive shell in any image
-docker run -it --rm devcontainers/bun:test bash
-docker run -it --rm devcontainers/bun-node:test bash
-docker run -it --rm devcontainers/ubuntu-bun:test bash
-docker run -it --rm devcontainers/ubuntu-bun-node:test bash
-docker run -it --rm devcontainers/ubuntu-tools:test bash
+docker run -it --rm devcontainers/bun:test zsh
+docker run -it --rm devcontainers/bun-node:test zsh
+docker run -it --rm devcontainers/ubuntu-bun:test zsh
+docker run -it --rm devcontainers/ubuntu-bun-node:test zsh
+docker run -it --rm devcontainers/ubuntu-tools:test zsh
 ```
 
 ## 📊 Image Inspection
@@ -134,7 +131,7 @@ docker run -it --rm devcontainers/ubuntu-tools:test bash
 
 ```bash
 # List all built images
-docker images devcontainers/*
+docker images --filter=reference='devcontainers/*'
 
 # View image history (layers)
 docker history devcontainers/bun:test
@@ -147,7 +144,7 @@ docker inspect devcontainers/bun:test
 
 ```bash
 # Compare image sizes
-docker images devcontainers/* --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
+docker images --filter=reference='devcontainers/*' --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
 
 # Detailed size analysis
 docker system df -v
@@ -159,7 +156,7 @@ docker system df -v
 
 ```bash
 # Remove all test images
-docker rmi $(docker images "devcontainers/*:test" -q)
+docker rmi $(docker images --filter=reference='devcontainers/*:test' -q)
 
 # Remove specific test image
 docker rmi devcontainers/bun:test
@@ -212,10 +209,10 @@ docker system prune -a
 
 ```bash
 # Build with verbose output
-docker build --progress=plain -t devcontainers/bun:test base/bun/.devcontainer
+docker build --progress=plain -t devcontainers/bun:test images/bun
 
 # Build without cache
-docker build --no-cache -t devcontainers/bun:test base/bun/.devcontainer
+docker build --no-cache -t devcontainers/bun:test images/bun
 ```
 
 ## 🎯 Image Optimization Tips
@@ -226,19 +223,19 @@ docker build --no-cache -t devcontainers/bun:test base/bun/.devcontainer
 
    ```dockerfile
    RUN apt-get update && apt-get install -y \
-    package1 \
-    package2 \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+     package1 \
+     package2 \
+     && rm -rf /var/lib/apt/lists/* \
+     && apt-get clean
    ```
 
 2. **Clean up in the same layer**:
 
    ```dockerfile
    RUN install-something \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean \
-    && rm -rf /tmp/* /var/tmp/*
+     && rm -rf /var/lib/apt/lists/* \
+     && apt-get clean \
+     && rm -rf /tmp/* /var/tmp/*
    ```
 
 3. **Use .dockerignore** to exclude unnecessary files from build context
@@ -246,18 +243,17 @@ docker build --no-cache -t devcontainers/bun:test base/bun/.devcontainer
 4. **Monitor image sizes** after changes:
 
    ```bash
-   # Check current sizes across all registries
-   bun run sync-sizes
-   # or bun run s
+   # Check current sizes across local test images
+   docker images --filter=reference='devcontainers/*' --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
    
-   # Analyze detailed size information
-   bun run analyze-sizes
+   # Review Docker disk usage
+   docker system df -v
    ```
 
 ## 📝 Notes
 
 - All test images are tagged with `:test` to avoid conflicts
-- The build script automatically cleans up test images when done
+- The examples tag images with `:test` to keep cleanup straightforward
 - Use `docker logs <container_id>` to debug container issues
-- Check Dockerfile syntax with `docker build --dry-run` (if available)
+- Check Dockerfile changes with `docker build --progress=plain` to inspect the full output
 - Images are automatically updated weekly and when base images change

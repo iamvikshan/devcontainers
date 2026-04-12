@@ -1,6 +1,7 @@
 # DevContainer Setup Guide
 
 This guide provides comprehensive setup instructions for all devcontainer images in this repository.
+Interactive shells default to a customized Zsh + Oh My Zsh setup, so the examples below use `zsh`.
 
 ## 🚀 Quick Start
 
@@ -45,7 +46,10 @@ docker.io/vikshan/[image]:latest
      "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
      "customizations": {
        "vscode": {
-         "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+         "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
+         "settings": {
+           "terminal.integrated.defaultProfile.linux": "zsh"
+         }
        }
      },
      "postCreateCommand": "bun install",
@@ -64,7 +68,7 @@ docker run -it --rm \
   -v $(pwd):/workspace \
   -w /workspace \
   ghcr.io/iamvikshan/devcontainers/bun:latest \
-  bash
+  zsh
 
 # Run specific commands
 docker run --rm \

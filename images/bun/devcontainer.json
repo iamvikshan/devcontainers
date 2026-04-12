@@ -16,6 +16,14 @@
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "zsh"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
       "extensions": ["dbaeumer.vscode-eslint", "GitHub.copilot", "esbenp.prettier-vscode", "eamodio.gitlens", "oven.bun-vscode"]
     }
   },

@@ -6,19 +6,20 @@
     "f": "(git diff --name-only --diff-filter=ACMR HEAD && git ls-files --others --exclude-standard) | grep -E '\\.(ts|tsx|js|jsx|json|css|md|mjs)$' | xargs bunx prettier --write --ignore-unknown",
     "f:all": "prettier --write .",
     "f:check": "prettier --check .",
+    "upd": "bun update --latest && bun f",
     "prepare": "test -d .git && husky || true"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/eslint__js": "^9.14.0",
-    "@types/node": "^25.5.0",
-    "axios": "^1.13.6",
-    "eslint": "^10.0.3",
+    "@types/node": "^25.6.0",
+    "axios": "^1.15.0",
+    "eslint": "^10.2.0",
     "husky": "^9.1.7",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.8.1",
-    "prettier-plugin-sh": "^0.18.0",
+    "prettier": "^3.8.2",
+    "prettier-plugin-sh": "^0.18.1",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.57.0"
+    "typescript-eslint": "^8.58.1"
   }
 }

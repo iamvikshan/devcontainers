@@ -5,6 +5,14 @@
   // Optional: Override or add settings
   "customizations": {
     "vscode": {
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "zsh"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
       "extensions": [
         // Add project-specific extensions
       ]

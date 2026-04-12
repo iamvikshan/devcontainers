@@ -5,14 +5,14 @@
 # 1. Git global config (user.name and user.email)
 # 2. GitHub CLI authentication as iamvikshan
 # 3. SSH signing keys for commit verification
-# 4. Updates ~/.bashrc to clear GITHUB_TOKEN and add verification function
+# 4. Updates ~/.zshrc to clear GITHUB_TOKEN and add verification function
 # 5. Ensures all commits and pushes are attributed to iamvikshan
 #
 # Run this once to set up your development environment permanently.
 # Safe to run multiple times (idempotent).
 #
 # Usage:
-#   ./git.sh [--repo <repository-url>] [--force|--yes]
+#   ./author.sh [--repo <repository-url>] [--force|--yes]
 #
 # Options:
 #   --repo <url>       Override the target repository URL (default: https://github.com/iamvikshan/devcontainers)
@@ -22,9 +22,9 @@
 #   TARGET_REPO    Set this to override the default target repository URL
 #
 # Examples:
-#   ./git.sh
-#   ./git.sh --repo https://github.com/myorg/myrepo.git
-#   TARGET_REPO=https://github.com/myorg/myrepo.git ./git.sh
+#   ./author.sh
+#   ./author.sh --repo https://github.com/myorg/myrepo.git
+#   TARGET_REPO=https://github.com/myorg/myrepo.git ./author.sh
 
 set -euo pipefail
 
@@ -49,7 +49,7 @@ READ_TIMEOUT=60
 # These are exported so other scripts (e.g., .husky/pre-commit) can source this file
 export GIT_USER="iamvikshan"
 export GIT_EMAIL="103361575+iamvikshan@users.noreply.github.com"
-BASHRC_FILE="$HOME/.bashrc"
+ZSHRC_FILE="$HOME/.zshrc"
 MARKER_START="# iamvikshan development setup"
 MARKER_END="# End iamvikshan development setup"
 
@@ -111,12 +111,12 @@ if [[ ! "$TARGET_REPO" =~ ^(https://|git@) ]]; then
   exit 1
 fi
 
-# Function to prune SSH signing keys to enforce maximum of 5
+# Function to prune SSH signing keys to enforce maximum of 10
 # Deletes oldest keys first (by created_at timestamp)
 # Uses gh built-in jq query output as TSV (no external jq dependency)
 # Returns 0 on success, 1 on failure
 prune_ssh_signing_keys() {
-  local max_keys=5
+  local max_keys=10
 
   # Fetch all signing keys with pagination as TSV rows: created_at<TAB>id
   # NOTE: Defensive '|| FETCH_EXIT=$?' pattern prevents 'set -e' from killing the script
@@ -233,11 +233,11 @@ prune_ssh_signing_keys() {
 }
 
 # Define the canonical check_dev_setup function body using a here-doc
-# This ensures both code paths (insert after setup.sh and fallback append) use identical content
+# This ensures both code paths (insert after setup.zsh and fallback append) use identical content
 read -r -d '' FUNCTION_DEF << 'FUNCTION_EOF' || true
 # Clear GITHUB_TOKEN to use stored gh CLI credentials (GIT_USER_PLACEHOLDER) instead of existing GITHUB_TOKEN
 # This ensures all Git operations and GitHub CLI commands use GIT_USER_PLACEHOLDER credentials
-# Must be after setup.sh is sourced, as Codespace may set GITHUB_TOKEN
+# Must be after setup.zsh is sourced, as Codespace may set GITHUB_TOKEN
 # Setting to empty string works better than unset for some environments
 export GITHUB_TOKEN=""
 
@@ -261,10 +261,10 @@ check_dev_setup() {
     if [[ -z "$gh_user" || "$gh_user" != "GIT_USER_PLACEHOLDER" ]]; then
         if [[ -n "$GITHUB_TOKEN" ]]; then
             echo "⚠️  GitHub CLI is using existing GITHUB_TOKEN, not GIT_USER_PLACEHOLDER"
-            echo "   Run: ./git.sh to authenticate as GIT_USER_PLACEHOLDER"
+            echo "   Run: ./author.sh to authenticate as GIT_USER_PLACEHOLDER"
         else
             echo "⚠️  GitHub CLI is not authenticated as GIT_USER_PLACEHOLDER"
-            echo "   Run: ./git.sh to authenticate"
+            echo "   Run: ./author.sh to authenticate"
         fi
         return 1
     fi
@@ -535,8 +535,27 @@ if [[ "$HAS_SIGNING_SCOPE" != "true" ]]; then
 fi
 
 # Use consistent key name for reuse across environments
-SIGNING_KEY_PATH="$HOME/.ssh/id_ed25519_signing"
+SIGNING_KEY_PATH="$HOME/.ssh/devcontainers-id_ed25519_signing"
 SIGNING_KEY_PUB="$SIGNING_KEY_PATH.pub"
+
+# Normalize the public key to the canonical "type base64" form used by GitHub's
+# SSH signing key API. Public key files often include a trailing comment.
+NORMALIZED_SIGNING_KEY=$(awk '{print $1 " " $2}' "$SIGNING_KEY_PUB" 2> /dev/null || echo "")
+
+remote_signing_key_exists() {
+  local normalized_key="$1"
+  local remote_keys=""
+
+  if ! remote_keys=$(gh api /user/ssh_signing_keys --paginate --jq '.[] | .key' 2> /dev/null); then
+    return 1
+  fi
+
+  if printf '%s\n' "$remote_keys" | grep -qFx "$normalized_key"; then
+    return 0
+  fi
+
+  return 1
+}
 
 # Check if key already exists locally
 if [[ -f "$SIGNING_KEY_PATH" && -f "$SIGNING_KEY_PUB" ]]; then
@@ -550,7 +569,7 @@ else
   #         where interactive passphrase entry is not practical.
   # Implications:
   #   - The private key is protected only by filesystem permissions
-  #   - Anyone with read access to ~/.ssh/id_ed25519_signing can use it
+  #   - Anyone with read access to ~/.ssh/devcontainers-id_ed25519_signing can use it
   # For production/high-security environments:
   #   - Consider using a passphrase and ssh-agent for key caching
   #   - Or use hardware security keys (e.g., YubiKey)
@@ -571,32 +590,38 @@ if [[ "$HAS_SIGNING_SCOPE" != "true" ]]; then
   echo "   Then re-run this script to upload the key"
 else
   echo "Ensuring SSH signing key is added to GitHub..."
-  KEY_FINGERPRINT=$(ssh-keygen -lf "$SIGNING_KEY_PUB" 2> /dev/null | awk '{print $2}' || echo "")
-
-  # Try to add the key (will fail gracefully if already exists)
-  # NOTE: Defensive '|| ADD_EXIT_CODE=$?' pattern prevents 'set -e' from killing the script
-  ADD_EXIT_CODE=0
-  ADD_OUTPUT=$(gh ssh-key add "$SIGNING_KEY_PUB" --type signing --title "$GIT_USER signing key" 2>&1) || ADD_EXIT_CODE=$?
-
-  if [[ $ADD_EXIT_CODE -eq 0 ]]; then
-    echo "✓ SSH signing key added to GitHub"
+  if [[ -z "$NORMALIZED_SIGNING_KEY" ]]; then
+    echo "⚠️  Failed to normalize the SSH signing key"
+    echo "   Public key location: $SIGNING_KEY_PUB"
+    echo "   If the key file is corrupted, remove it and rerun this script to regenerate it"
   else
-    # Check if key is already on GitHub by verifying fingerprint in list
-    if [[ -n "$KEY_FINGERPRINT" ]] && gh api /user/ssh_signing_keys --paginate 2> /dev/null | grep -qF "$KEY_FINGERPRINT"; then
+    if remote_signing_key_exists "$NORMALIZED_SIGNING_KEY"; then
       echo "✓ SSH signing key already exists on GitHub"
     else
-      echo "⚠️  Failed to add SSH signing key to GitHub"
-      echo "   Exit code: $ADD_EXIT_CODE"
-      echo "   Output: $ADD_OUTPUT"
-      echo "   You may need to add it manually at: https://github.com/settings/keys"
-      echo "   Public key location: $SIGNING_KEY_PUB"
+      # Try to create the key through the documented REST API.
+      # NOTE: Defensive '|| ADD_EXIT_CODE=$?' pattern prevents 'set -e' from killing the script.
+      ADD_EXIT_CODE=0
+      ADD_OUTPUT=$(gh api -X POST /user/ssh_signing_keys -f key="$NORMALIZED_SIGNING_KEY" -f title="devcontainers-$GIT_USER signing key" 2>&1) || ADD_EXIT_CODE=$?
+
+      if [[ $ADD_EXIT_CODE -eq 0 ]]; then
+        echo "✓ SSH signing key added to GitHub"
+      elif remote_signing_key_exists "$NORMALIZED_SIGNING_KEY"; then
+        echo "✓ SSH signing key already exists on GitHub"
+      else
+        echo "⚠️  Failed to add SSH signing key to GitHub"
+        echo "   Exit code: $ADD_EXIT_CODE"
+        echo "   Output: $ADD_OUTPUT"
+        echo "   If the token is missing write access, refresh it with: gh auth refresh -h github.com -s write:ssh_signing_key"
+        echo "   If the key itself is stale or broken, remove it and rerun this script to regenerate it:"
+        echo "   rm -f '$SIGNING_KEY_PATH' '$SIGNING_KEY_PUB'"
+      fi
     fi
   fi
 fi
 
 # Prune remote SSH signing keys (attempt oldest-first deletion; failures are recorded for final status)
 if [[ "$HAS_SIGNING_SCOPE" = "true" ]]; then
-  echo "Pruning SSH signing keys (target max 5; failures are recorded for final status)..."
+  echo "Pruning SSH signing keys (target max 10; failures are recorded for final status)..."
   PRUNE_EXIT_CODE=0
   PRUNE_OUTPUT=$(prune_ssh_signing_keys) || PRUNE_EXIT_CODE=$?
 
@@ -699,30 +724,30 @@ else
 fi
 echo ""
 
-# Step 4: Update ~/.bashrc
-echo "Step 4: Updating ~/.bashrc..."
+# Step 4: Update ~/.zshrc
+echo "Step 4: Updating ~/.zshrc..."
 
-# Atomic update of ~/.bashrc:
+# Atomic update of ~/.zshrc:
 # 1. Read the original file
 # 2. Build complete new content in a temp file (skip old marker block, insert new block)
 # 3. Only after temp file is fully written, atomically replace original via mv
 # This prevents data loss if the script is interrupted mid-write.
 
-BASHRC_TMP="${BASHRC_FILE}.tmp.$$"
+ZSHRC_TMP="${ZSHRC_FILE}.tmp.$$"
 
 # Ensure temp file is cleaned up on exit/error
-trap 'rm -f "$BASHRC_TMP"' EXIT
+trap 'rm -f "$ZSHRC_TMP"' EXIT
 
-# Find the line number where setup.sh is sourced (to insert after it)
+# Find the line number where setup.zsh is sourced (to insert after it)
 # Use '|| true' to handle case where file doesn't exist or pattern not found
 SETUP_LINE=""
-if [[ -f "$BASHRC_FILE" ]]; then
-  SETUP_LINE=$(grep -n "source /usr/local/bin/setup.sh" "$BASHRC_FILE" 2> /dev/null | tail -1 | cut -d: -f1 || true)
+if [[ -f "$ZSHRC_FILE" ]]; then
+  SETUP_LINE=$(grep -n "source /usr/local/bin/setup.zsh" "$ZSHRC_FILE" 2> /dev/null | tail -1 | cut -d: -f1 || true)
 fi
 
-# Build the complete new ~/.bashrc content atomically
+# Build the complete new ~/.zshrc content atomically
 {
-  if [[ -f "$BASHRC_FILE" ]]; then
+  if [[ -f "$ZSHRC_FILE" ]]; then
     # Read original file, skipping any existing marker block
     # Track line numbers to insert the new block at the right position
     line_num=0
@@ -752,7 +777,7 @@ fi
       # Output the current line
       printf '%s\n' "$line"
 
-      # Insert new block after the setup.sh line if applicable
+      # Insert new block after the setup.zsh line if applicable
       if [[ -n "$SETUP_LINE" && "$line_num" = "$SETUP_LINE" && "$block_inserted" = "false" ]]; then
         echo ""
         echo "$MARKER_START"
@@ -760,7 +785,7 @@ fi
         echo "$MARKER_END"
         block_inserted=true
       fi
-    done < "$BASHRC_FILE"
+    done < "$ZSHRC_FILE"
 
     # If no SETUP_LINE or block wasn't inserted yet, append at EOF
     if [[ "$block_inserted" = "false" ]]; then
@@ -770,23 +795,23 @@ fi
       echo "$MARKER_END"
     fi
   else
-    # No existing ~/.bashrc, create fresh with just the block
+    # No existing ~/.zshrc, create fresh with just the block
     echo "$MARKER_START"
     echo "$FUNCTION_DEF"
     echo "$MARKER_END"
   fi
-} > "$BASHRC_TMP"
+} > "$ZSHRC_TMP"
 
 # Atomically replace the original file
-mv "$BASHRC_TMP" "$BASHRC_FILE"
+mv "$ZSHRC_TMP" "$ZSHRC_FILE"
 
 # Clear the trap since we successfully moved the file
 trap - EXIT
 
 if [[ -n "$SETUP_LINE" ]]; then
-  echo "✓ Updated ~/.bashrc with GITHUB_TOKEN clearing and verification function"
+  echo "✓ Updated ~/.zshrc with GITHUB_TOKEN clearing and verification function"
 else
-  echo "✓ Appended setup to ~/.bashrc"
+  echo "✓ Appended setup to ~/.zshrc"
 fi
 echo ""
 
@@ -794,7 +819,7 @@ echo ""
 echo "Step 5: Verifying final setup..."
 echo ""
 
-# Source bashrc to test the new configuration
+# Source zshrc to test the new configuration
 export GITHUB_TOKEN=""
 FINAL_GIT_USER=$(git config --global user.name)
 FINAL_GIT_EMAIL=$(git config --global user.email)
@@ -841,7 +866,7 @@ if [[ "$SETUP_COMPLETE" = "true" ]]; then
   echo "All commits will be signed with SSH key: $FINAL_SIGNING_KEY"
   echo ""
   echo "To verify your setup in a new shell, run:"
-  echo "  source ~/.bashrc"
+  echo "  source ~/.zshrc"
   echo "  check_dev_setup"
   echo ""
   exit 0

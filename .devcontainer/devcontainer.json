@@ -20,10 +20,17 @@
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "zsh"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "eamodio.gitlens",
         "oven.bun-vscode",
         "ms-azuretools.vscode-docker",
         "coderabbit.coderabbit-vscode",
@@ -34,7 +41,7 @@
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "sudo apt update && sudo apt upgrade -y && [ -f scripts/git.sh ] && chmod +x scripts/git.sh; bun install && sudo ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime && curl -fsSL https://cli.coderabbit.ai/install.sh | sh",
+  "postCreateCommand": "chmod +x scripts/dvcntnr.sh && scripts/dvcntnr.sh",
 
   // remoteUser` to `root` to connect as root.
   "remoteUser": "root",

@@ -15,6 +15,15 @@ export interface ContainerToolVersions {
   extractedAt: string
 }
 
+interface ContainerVersionsEntry {
+  toolVersions?: ToolVersions
+  toolVersionsExtractedAt?: string
+  lastUpdated?: string
+  [key: string]: unknown
+}
+
+type ContainerVersionsMap = Record<string, ContainerVersionsEntry>
+
 export class ToolVersionExtractor {
   private silent = false
 
@@ -35,8 +44,7 @@ export class ToolVersionExtractor {
   ): Promise<ToolVersions> {
     // Clean the tag to remove any 'v' prefix if present
     const cleanTag = tag.startsWith('v') ? tag.slice(1) : tag
-    const fullImageName =
-      tag === 'latest' ? `${imageName}:${tag}` : `${imageName}:${tag}`
+    const fullImageName = `${imageName}:${cleanTag}`
 
     this.log(`🔍 Extracting tool versions from ${fullImageName}...`)
 
@@ -88,8 +96,8 @@ export class ToolVersionExtractor {
     tag: string
   ): Promise<ToolVersions> {
     const versions: ToolVersions = {}
-    const fullImageName =
-      tag === 'latest' ? `${imageName}:${tag}` : `${imageName}:${tag}`
+    const cleanTag = tag.startsWith('v') ? tag.slice(1) : tag
+    const fullImageName = `${imageName}:${cleanTag}`
 
     try {
       // Extract common tool versions
@@ -97,6 +105,8 @@ export class ToolVersionExtractor {
         bun_version: 'bun --version 2>/dev/null || echo "not_installed"',
         node_version: 'node --version 2>/dev/null || echo "not_installed"',
         npm_version: 'npm --version 2>/dev/null || echo "not_installed"',
+        zsh_version:
+          'zsh --version 2>/dev/null | head -n1 | cut -d\' \' -f2 || echo "not_installed"',
         git_version:
           'git --version 2>/dev/null | cut -d\' \' -f3 || echo "not_installed"',
         curl_version:
@@ -118,7 +128,7 @@ export class ToolVersionExtractor {
       for (const [key, command] of Object.entries(commands)) {
         try {
           const result = execSync(
-            `docker run --rm ${fullImageName} bash -c "${command}"`,
+            `docker run --rm ${fullImageName} sh -lc "${command}"`,
             { encoding: 'utf-8' }
           ).trim()
 
@@ -129,7 +139,7 @@ export class ToolVersionExtractor {
           ) {
             versions[key] = result
           }
-        } catch (error) {
+        } catch {
           // Skip if command fails
         }
       }
@@ -215,9 +225,9 @@ export class ToolVersionExtractor {
 
   // Update container versions with tool version data
   updateContainerVersionsWithTools(
-    containerVersions: Record<string, any>,
+    containerVersions: ContainerVersionsMap,
     toolVersions: ContainerToolVersions[]
-  ): Record<string, any> {
+  ): ContainerVersionsMap {
     const updated = { ...containerVersions }
 
     toolVersions.forEach(toolVersion => {
@@ -304,12 +314,12 @@ export class ToolVersionExtractor {
     const cacheFile = join(process.cwd(), 'container-versions.json')
 
     try {
-      let cache: any = {}
+      let cache: ContainerVersionsMap = {}
 
       // Load existing cache
       if (existsSync(cacheFile)) {
         const content = readFileSync(cacheFile, 'utf-8')
-        cache = JSON.parse(content)
+        cache = JSON.parse(content) as ContainerVersionsMap
       }
 
       // Update each container's toolVersions

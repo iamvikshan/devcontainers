@@ -1,6 +1,7 @@
 ARG VARIANT=latest
 FROM ubuntu:${VARIANT}
 
+ARG VARIANT
 ARG USERNAME=root
 
 # Install all packages in a single layer to minimize image size
@@ -27,6 +28,7 @@ RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var
 # Install all packages and Bun in a single layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    zsh \
     git \
     sudo \
     curl \
@@ -57,32 +59,32 @@ RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && 
     echo "base_image=ubuntu:${VARIANT}" >> /usr/local/share/tool-versions.txt && \
     echo "ubuntu_version=$(lsb_release -rs 2>/dev/null || cat /etc/os-release | grep VERSION_ID | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt && \
     echo "bun_version=$(bun --version)" >> /usr/local/share/tool-versions.txt && \
+    echo "zsh_version=$(zsh --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
     echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
     echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
     echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt && \
     echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
-    echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt
+    echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt && \
+    grep -Eq '^base_image=ubuntu:[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$' /usr/local/share/tool-versions.txt
 
-# Copy the setup script and make it executable
-COPY setup.sh /usr/local/bin/setup.sh
-RUN chmod +x /usr/local/bin/setup.sh
+COPY setup.zsh /usr/local/bin/setup.zsh
+RUN chmod +x /usr/local/bin/setup.zsh
 
-# Ensure the home directory and .bashrc file exist for the specified user
 RUN if [ "${USERNAME}" != "root" ]; then \
-    mkdir -p /home/${USERNAME} && touch /home/${USERNAME}/.bashrc; \
-    fi
-
-# Append sourcing the setup script to .bashrc
-RUN if [ "${USERNAME}" != "root" ]; then \
-    echo "source /usr/local/bin/setup.sh" >> /home/${USERNAME}/.bashrc; \
+        usermod -s /bin/zsh "${USERNAME}"; \
+        HOME_DIR="/home/${USERNAME}"; \
     else \
-    echo "source /usr/local/bin/setup.sh" >> /root/.bashrc; \
+        HOME_DIR="/root"; \
+    fi && \
+    mkdir -p "${HOME_DIR}" && \
+    git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "${HOME_DIR}/.oh-my-zsh" && \
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" && \
+    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" && \
+    printf '%s\n' 'source /usr/local/bin/setup.zsh' > "${HOME_DIR}/.zshrc" && \
+    if [ "${USERNAME}" != "root" ]; then \
+        chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; \
     fi
 
-
-
-# Switch to the specified user
 USER ${USERNAME}
 
-# Set the default command to open a bash shell
-CMD ["bash"]
+CMD ["/bin/zsh"]

@@ -3,8 +3,8 @@ node_modules/
 *.nix
 *lock*
 
-# Exclude setup.sh files with complex bash arithmetic that prettier-plugin-sh can't parse
-images/**/setup.sh
+# Exclude setup.zsh files with complex shell arithmetic that prettier-plugin-sh can't parse
+images/**/setup.zsh
 
 # Exclude Dockerfiles under images due to known parser/plugin limitation
 images/**/Dockerfile

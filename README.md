@@ -10,7 +10,7 @@
 # DevContainer Configurations
 
 This repository contains reusable DevContainer configurations for different development
-environments.
+environments. All images now default to a customized Zsh + Oh My Zsh interactive shell experience.
 
 ## Available Images
 
@@ -62,7 +62,10 @@ Add your chosen image to `.devcontainer/devcontainer.json`:
   "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
     }
   },
   "postCreateCommand": "bun install"
@@ -77,7 +80,7 @@ docker run -it --rm \
   -v $(pwd):/workspace \
   -w /workspace \
   ghcr.io/iamvikshan/devcontainers/bun:latest \
-  bash
+  zsh
 
 # Run commands directly
 docker run --rm \
