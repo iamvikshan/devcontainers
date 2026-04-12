@@ -6,13 +6,13 @@ ARG VARIANT
 ARG USERNAME=root
 
 RUN apk add --no-cache \
-    zsh \
-    git \
-    sudo \
-    curl \
-    jq \
-    python3 \
-    btop
+  zsh \
+  git \
+  sudo \
+  curl \
+  jq \
+  python3 \
+  btop
 
 RUN mkdir -p /usr/local/share && \
     { \

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Exit immediately if a pipeline returns a non-zero status
-set -e
+set -euo pipefail
 
 echo "Starting environment setup..."
 
@@ -23,22 +23,42 @@ sudo ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
 echo "Installing CodeRabbit CLI..."
 curl -fsSL https://cli.coderabbit.ai/install.sh | sh
 
-# 5. Fetch hooks from the iamvikshan/atlas repository if missing
-if [ ! -d "scripts/hooks" ]; then
-  echo "Directory scripts/hooks does not exist. Fetching from GitHub..."
+# 5. Fetch hooks from the iamvikshan/atlas repository
+echo "Fetching hooks from GitHub..."
 
-  TMP_DIR=$(mktemp -d)
-  git clone --depth 1 --filter=blob:none --sparse https://github.com/iamvikshan/atlas.git "$TMP_DIR"
-  git -C "$TMP_DIR" sparse-checkout set scripts/hooks
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' INT TERM EXIT
+git clone --depth 1 --filter=blob:none --sparse https://github.com/iamvikshan/atlas.git "$TMP_DIR"
+git -C "$TMP_DIR" sparse-checkout set scripts/hooks
 
-  mkdir -p scripts/hooks
-  cp -R "$TMP_DIR/scripts/hooks/"* scripts/hooks/ 2> /dev/null || true
-  cp -R "$TMP_DIR/scripts/hooks/".* scripts/hooks/ 2> /dev/null || true
+mkdir -p scripts/hooks
+SRC="$TMP_DIR/scripts/hooks"
 
-  rm -rf "$TMP_DIR"
-  echo "Hooks successfully fetched and copied!"
+if [ ! -d "$SRC" ]; then
+  echo "ERROR: hooks directory not found in fetched repository." >&2
+  exit 1
+fi
+
+copied=0
+
+for f in "$SRC"/*; do
+  [ -e "$f" ] || continue
+  cp -R "$f" scripts/hooks/
+  copied=$((copied + 1))
+done
+
+for f in "$SRC"/.*; do
+  name="${f##*/}"
+  if [ "$name" = "." ] || [ "$name" = ".." ]; then continue; fi
+  [ -e "$f" ] || continue
+  cp -R "$f" scripts/hooks/
+  copied=$((copied + 1))
+done
+
+if [ "$copied" -eq 0 ]; then
+  echo "WARNING: source hooks directory is empty; nothing copied." >&2
 else
-  echo "scripts/hooks already exists. Skipping fetch."
+  echo "Hooks successfully fetched and copied!"
 fi
 
 echo "Setup complete!"

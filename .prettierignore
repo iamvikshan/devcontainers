@@ -7,4 +7,4 @@ node_modules/
 images/**/setup.zsh
 
 # Exclude Dockerfiles under images due to known parser/plugin limitation
-images/**/Dockerfile
+.husky/_*/*

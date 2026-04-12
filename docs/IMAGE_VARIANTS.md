@@ -6,7 +6,7 @@ This document provides detailed information about all 5 available devcontainer i
 
 | Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ubuntu-tools          |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | --------------------- |
-| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:24.04          |
+| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest         |
 | **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           | ~80 MB                |
 | **Bun Version** | 1.3.3             | 1.3.3                  | 1.3.3            | 1.3.3             | ❌                    |
 | **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v25.2.0        | ❌                    |

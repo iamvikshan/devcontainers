@@ -5,7 +5,7 @@
 # 1. Git global config (user.name and user.email)
 # 2. GitHub CLI authentication as iamvikshan
 # 3. SSH signing keys for commit verification
-# 4. Updates ~/.zshrc to clear GITHUB_TOKEN and add verification function
+# 4. Updates ~/.bashrc to clear GITHUB_TOKEN and add verification function
 # 5. Ensures all commits and pushes are attributed to iamvikshan
 #
 # Run this once to set up your development environment permanently.
@@ -49,7 +49,7 @@ READ_TIMEOUT=60
 # These are exported so other scripts (e.g., .husky/pre-commit) can source this file
 export GIT_USER="iamvikshan"
 export GIT_EMAIL="103361575+iamvikshan@users.noreply.github.com"
-ZSHRC_FILE="$HOME/.zshrc"
+BASHRC_FILE="$HOME/.bashrc"
 MARKER_START="# iamvikshan development setup"
 MARKER_END="# End iamvikshan development setup"
 
@@ -233,11 +233,11 @@ prune_ssh_signing_keys() {
 }
 
 # Define the canonical check_dev_setup function body using a here-doc
-# This ensures both code paths (insert after setup.zsh and fallback append) use identical content
+# This ensures both code paths (insert after setup.sh and fallback append) use identical content
 read -r -d '' FUNCTION_DEF << 'FUNCTION_EOF' || true
 # Clear GITHUB_TOKEN to use stored gh CLI credentials (GIT_USER_PLACEHOLDER) instead of existing GITHUB_TOKEN
 # This ensures all Git operations and GitHub CLI commands use GIT_USER_PLACEHOLDER credentials
-# Must be after setup.zsh is sourced, as Codespace may set GITHUB_TOKEN
+# Must be after setup.sh is sourced, as Codespace may set GITHUB_TOKEN
 # Setting to empty string works better than unset for some environments
 export GITHUB_TOKEN=""
 
@@ -538,10 +538,6 @@ fi
 SIGNING_KEY_PATH="$HOME/.ssh/devcontainers-id_ed25519_signing"
 SIGNING_KEY_PUB="$SIGNING_KEY_PATH.pub"
 
-# Normalize the public key to the canonical "type base64" form used by GitHub's
-# SSH signing key API. Public key files often include a trailing comment.
-NORMALIZED_SIGNING_KEY=$(awk '{print $1 " " $2}' "$SIGNING_KEY_PUB" 2> /dev/null || echo "")
-
 remote_signing_key_exists() {
   local normalized_key="$1"
   local remote_keys=""
@@ -580,6 +576,10 @@ else
   ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$SIGNING_KEY_PATH" -N "" -q
   echo "✓ SSH signing key generated: $SIGNING_KEY_PATH"
 fi
+
+# Normalize the public key to the canonical "type base64" form used by GitHub's
+# SSH signing key API. Public key files often include a trailing comment.
+NORMALIZED_SIGNING_KEY=$(awk '{print $1 " " $2}' "$SIGNING_KEY_PUB" 2> /dev/null || echo "")
 
 # Check if this key is already on GitHub and add if needed
 # Skip GitHub upload if we know the token lacks write scope (it will fail anyway)
@@ -724,30 +724,30 @@ else
 fi
 echo ""
 
-# Step 4: Update ~/.zshrc
-echo "Step 4: Updating ~/.zshrc..."
+# Step 4: Update ~/.bashrc
+echo "Step 4: Updating ~/.bashrc..."
 
-# Atomic update of ~/.zshrc:
+# Atomic update of ~/.bashrc:
 # 1. Read the original file
 # 2. Build complete new content in a temp file (skip old marker block, insert new block)
 # 3. Only after temp file is fully written, atomically replace original via mv
 # This prevents data loss if the script is interrupted mid-write.
 
-ZSHRC_TMP="${ZSHRC_FILE}.tmp.$$"
+BASHRC_TMP="${BASHRC_FILE}.tmp.$$"
 
 # Ensure temp file is cleaned up on exit/error
-trap 'rm -f "$ZSHRC_TMP"' EXIT
+trap 'rm -f "$BASHRC_TMP"' EXIT
 
-# Find the line number where setup.zsh is sourced (to insert after it)
+# Find the line number where setup.sh is sourced (to insert after it)
 # Use '|| true' to handle case where file doesn't exist or pattern not found
 SETUP_LINE=""
-if [[ -f "$ZSHRC_FILE" ]]; then
-  SETUP_LINE=$(grep -n "source /usr/local/bin/setup.zsh" "$ZSHRC_FILE" 2> /dev/null | tail -1 | cut -d: -f1 || true)
+if [[ -f "$BASHRC_FILE" ]]; then
+  SETUP_LINE=$(grep -n "source /usr/local/bin/setup.sh" "$BASHRC_FILE" 2> /dev/null | tail -1 | cut -d: -f1 || true)
 fi
 
-# Build the complete new ~/.zshrc content atomically
+# Build the complete new ~/.bashrc content atomically
 {
-  if [[ -f "$ZSHRC_FILE" ]]; then
+  if [[ -f "$BASHRC_FILE" ]]; then
     # Read original file, skipping any existing marker block
     # Track line numbers to insert the new block at the right position
     line_num=0
@@ -777,7 +777,7 @@ fi
       # Output the current line
       printf '%s\n' "$line"
 
-      # Insert new block after the setup.zsh line if applicable
+      # Insert new block after the setup.sh line if applicable
       if [[ -n "$SETUP_LINE" && "$line_num" = "$SETUP_LINE" && "$block_inserted" = "false" ]]; then
         echo ""
         echo "$MARKER_START"
@@ -785,7 +785,7 @@ fi
         echo "$MARKER_END"
         block_inserted=true
       fi
-    done < "$ZSHRC_FILE"
+    done < "$BASHRC_FILE"
 
     # If no SETUP_LINE or block wasn't inserted yet, append at EOF
     if [[ "$block_inserted" = "false" ]]; then
@@ -795,23 +795,23 @@ fi
       echo "$MARKER_END"
     fi
   else
-    # No existing ~/.zshrc, create fresh with just the block
+    # No existing ~/.bashrc, create fresh with just the block
     echo "$MARKER_START"
     echo "$FUNCTION_DEF"
     echo "$MARKER_END"
   fi
-} > "$ZSHRC_TMP"
+} > "$BASHRC_TMP"
 
 # Atomically replace the original file
-mv "$ZSHRC_TMP" "$ZSHRC_FILE"
+mv "$BASHRC_TMP" "$BASHRC_FILE"
 
 # Clear the trap since we successfully moved the file
 trap - EXIT
 
 if [[ -n "$SETUP_LINE" ]]; then
-  echo "✓ Updated ~/.zshrc with GITHUB_TOKEN clearing and verification function"
+  echo "✓ Updated ~/.bashrc with GITHUB_TOKEN clearing and verification function"
 else
-  echo "✓ Appended setup to ~/.zshrc"
+  echo "✓ Appended setup to ~/.bashrc"
 fi
 echo ""
 
@@ -819,7 +819,7 @@ echo ""
 echo "Step 5: Verifying final setup..."
 echo ""
 
-# Source zshrc to test the new configuration
+# Source bashrc to test the new configuration
 export GITHUB_TOKEN=""
 FINAL_GIT_USER=$(git config --global user.name)
 FINAL_GIT_EMAIL=$(git config --global user.email)
@@ -866,7 +866,7 @@ if [[ "$SETUP_COMPLETE" = "true" ]]; then
   echo "All commits will be signed with SSH key: $FINAL_SIGNING_KEY"
   echo ""
   echo "To verify your setup in a new shell, run:"
-  echo "  source ~/.zshrc"
+  echo "  source ~/.bashrc"
   echo "  check_dev_setup"
   echo ""
   exit 0

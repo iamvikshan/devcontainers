@@ -49,8 +49,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /tmp/* /var/tmp/* \
     && npm cache clean --force 2>/dev/null || true
 
-
-
 # Create symbolic links for Bun (for both root and non-root users)
 RUN if [ "${USERNAME}" != "root" ]; then \
     mv /root/.bun /home/${USERNAME}/.bun \
@@ -62,20 +60,20 @@ RUN if [ "${USERNAME}" != "root" ]; then \
     fi
 
 # Extract tool versions during build
-RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt && \
-    echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /usr/local/share/tool-versions.txt && \
-    echo "base_image=ubuntu:${VARIANT}" >> /usr/local/share/tool-versions.txt && \
-    echo "ubuntu_version=$(lsb_release -rs 2>/dev/null || cat /etc/os-release | grep VERSION_ID | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt && \
-    echo "bun_version=$(bun --version)" >> /usr/local/share/tool-versions.txt && \
-    echo "zsh_version=$(zsh --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
-    echo "node_version=$(node --version)" >> /usr/local/share/tool-versions.txt && \
-    echo "npm_version=$(npm --version)" >> /usr/local/share/tool-versions.txt && \
-    echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt && \
-    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
-    echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt && \
-    echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt && \
-    echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt && \
-    grep -Eq '^base_image=ubuntu:[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$' /usr/local/share/tool-versions.txt
+RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt \
+  && echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /usr/local/share/tool-versions.txt \
+  && echo "base_image=ubuntu:${VARIANT}" >> /usr/local/share/tool-versions.txt \
+  && echo "ubuntu_version=$(lsb_release -rs 2> /dev/null || cat /etc/os-release | grep VERSION_ID | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt \
+  && echo "bun_version=$(bun --version)" >> /usr/local/share/tool-versions.txt \
+  && echo "zsh_version=$(zsh --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
+  && echo "node_version=$(node --version)" >> /usr/local/share/tool-versions.txt \
+  && echo "npm_version=$(npm --version)" >> /usr/local/share/tool-versions.txt \
+  && echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt \
+  && echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
+  && echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt \
+  && echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
+  && echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt \
+  && grep -Eq '^base_image=ubuntu:[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$' /usr/local/share/tool-versions.txt
 
 COPY setup.zsh /usr/local/bin/setup.zsh
 RUN chmod +x /usr/local/bin/setup.zsh
