@@ -53,6 +53,8 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     COMMENT_LINES=$((COMMENT_LINES + 1))
     if [[ "$trimmed" == *"*/" ]]; then
       IN_BLOCK_COMMENT=false
+    elif [[ "$EXT" == "ps1" && "$trimmed" == *"#>" ]]; then
+      IN_BLOCK_COMMENT=false
     fi
     continue
   fi
@@ -104,6 +106,15 @@ while IFS= read -r line || [[ -n "$line" ]]; do
         COMMENT_LINES=$((COMMENT_LINES + 1))
       fi
       ;;
+    ps1)
+      if [[ "$trimmed" == "<#"* ]]; then
+        COMMENT_LINES=$((COMMENT_LINES + 1))
+        [[ "$trimmed" != *"#>" ]] && IN_BLOCK_COMMENT=true
+      elif [[ "$trimmed" == "#"* ]]; then
+        [[ "$trimmed" =~ ^#[[:space:]]*(Requires|region|endregion) ]] && continue
+        COMMENT_LINES=$((COMMENT_LINES + 1))
+      fi
+      ;;
   esac
 done < "$FILE_PATH"
 
@@ -117,7 +128,10 @@ RATIO=$((COMMENT_LINES * 100 / TOTAL_LINES))
 if [[ $RATIO -gt 30 ]]; then
   cat << EOF
 {
-  "additionalContext": "WARNING: ${FILE_PATH##*/} has ${RATIO}% comment density (${COMMENT_LINES}/${TOTAL_LINES} non-blank lines). Comments exceeding 30% often indicate AI slop -- restating what code obviously does. Remove comments that add no value beyond what the code communicates. JSDoc/docstrings for public APIs and directive comments are already excluded from this count."
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "WARNING: ${FILE_PATH##*/} has ${RATIO}% comment density (${COMMENT_LINES}/${TOTAL_LINES} non-blank lines). Comments exceeding 30% often indicate AI slop -- restating what code obviously does. Remove comments that add no value beyond what the code communicates. JSDoc/docstrings for public APIs and directive comments are already excluded from this count."
+  }
 }
 EOF
 fi

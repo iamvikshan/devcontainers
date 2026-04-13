@@ -24,7 +24,7 @@ MESSAGE=""
 # Only ULW and YOLO are specific enough -- AUTO excluded to prevent false positives
 # from ordinary prompts like "add auto-save" or "auto format this"
 if echo "$PROMPT" | grep -iqE '\b(ULW|YOLO)\b'; then
-  MESSAGE="Autopilot mode detected. Proceed autonomously without user stops. Auto-commit after **sentry** approval. Use task_complete when all work is done."
+  MESSAGE="Autopilot mode detected. Proceed autonomously without user stops. Auto-commit after **sentry** approval. Present final summary when all work is done."
 fi
 
 # Check for anti-patterns (case-insensitive)

@@ -6,5 +6,5 @@ node_modules/
 # Exclude setup.zsh files with complex shell arithmetic that prettier-plugin-sh can't parse
 images/**/setup.zsh
 
-# Exclude Dockerfiles under images due to known parser/plugin limitation
-.husky/_*/*
+# Exclude Husky shim internals generated under .husky/_
+.husky/_/*

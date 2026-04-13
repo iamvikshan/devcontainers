@@ -19,12 +19,12 @@
   "separateMajorMinor": true,
   "packageRules": [
     {
-      "description": "Automerge minor and patch Docker updates",
+      "description": "Match Docker minor and patch updates; automerge is inherited from the top-level config",
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
-      "description": "General NPM packages (Note: automerges production minor/patch)",
+      "description": "Label all npm package updates",
       "matchManagers": ["npm"],
       "labels": ["dependencies", "npm"]
     },
@@ -42,12 +42,12 @@
       "labels": ["dependencies", "npm", "formatting"]
     },
     {
-      "description": "GitHub Actions - automerge non-major updates",
+      "description": "Match non-major GitHub Actions updates; automerge is inherited from the top-level config",
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
     },
     {
-      "description": "Auto-merge minor and patch updates for dev deps",
+      "description": "Match dev dependency minor and patch updates; automerge is inherited from the top-level config",
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["minor", "patch"]
     },

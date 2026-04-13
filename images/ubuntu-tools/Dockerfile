@@ -52,7 +52,7 @@ RUN if [ "${USERNAME}" != "root" ]; then \
 RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt \
   && echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /usr/local/share/tool-versions.txt \
   && echo "base_image=ubuntu:${VARIANT}" >> /usr/local/share/tool-versions.txt \
-  && echo "ubuntu_version=$(cat /etc/os-release | grep VERSION_ID | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt \
+  && echo "ubuntu_version=$(grep VERSION_ID /etc/os-release | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt \
   && echo "zsh_version=$(zsh --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
   && echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt \
   && echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \

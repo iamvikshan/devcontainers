@@ -3,7 +3,7 @@
     "s": "bun scripts/changelogManager.ts --sync-only",
     "lint": "eslint",
     "check": "bun lint && tsc --noEmit",
-    "f": "(git diff --name-only --diff-filter=ACMR HEAD && git ls-files --others --exclude-standard) | grep -E '\\.(ts|tsx|js|jsx|json|css|md|mjs)$' | xargs bunx prettier --write --ignore-unknown",
+    "f": "(git diff --name-only --diff-filter=ACMR HEAD && git ls-files --others --exclude-standard) | xargs bunx prettier --write --ignore-unknown",
     "f:all": "prettier --write .",
     "f:check": "prettier --check .",
     "upd": "bun update --latest && bun f",

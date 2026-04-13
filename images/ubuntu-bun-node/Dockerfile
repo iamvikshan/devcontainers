@@ -73,7 +73,10 @@ RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt \
   && echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt \
   && echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
   && echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt \
-  && grep -Eq '^base_image=ubuntu:[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$' /usr/local/share/tool-versions.txt
+  && [ "$(tail -n +2 /usr/local/share/tool-versions.txt | wc -l)" -eq 12 ] \
+  && grep -Eq '^base_image=ubuntu:[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$' /usr/local/share/tool-versions.txt \
+  && grep -Eq '^bun_version=.+$' /usr/local/share/tool-versions.txt \
+  && grep -Eq '^node_version=.+$' /usr/local/share/tool-versions.txt
 
 COPY setup.zsh /usr/local/bin/setup.zsh
 RUN chmod +x /usr/local/bin/setup.zsh
