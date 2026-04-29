@@ -42,13 +42,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Setup Bun and install dependencies
-        uses: iamvikshan/.github/.github/actions/setup-bun@main
+        uses: iamvikshan/.github/.github/actions/setup-bun@39db0a93695e163d572a4ecbf167c96b1a6d1b72 # main
 
       - name: Release analysis
         id: release_analysis
@@ -143,7 +143,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Get version for this image
         id: version
@@ -153,10 +153,10 @@ jobs:
           echo "📦 Building ${{ matrix.image }}:v$VERSION"
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4.0.0
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4.0.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       # Login to all 3 registries
       - name: Log in to GitHub Container Registry
@@ -181,7 +181,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v6.0.0
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         with:
           images: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}
@@ -217,13 +217,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Setup Bun and install dependencies
-        uses: iamvikshan/.github/.github/actions/setup-bun@main
+        uses: iamvikshan/.github/.github/actions/setup-bun@39db0a93695e163d572a4ecbf167c96b1a6d1b72 # main
 
       - name: Cache tool versions
         run: |
