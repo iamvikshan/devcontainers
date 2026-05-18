@@ -1,6 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":dependencyDashboard", ":semanticCommits", "helpers:pinGitHubActionDigests"],
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    "helpers:pinGitHubActionDigests"
+  ],
   "reviewers": ["iamvikshan"],
   "assignees": ["iamvikshan"],
   "minimumReleaseAge": "3 days",
@@ -17,12 +22,9 @@
   "rangeStrategy": "bump",
   "separateMinorPatch": true,
   "separateMajorMinor": true,
+  "pinDigests": false
+  
   "packageRules": [
-    {
-      "description": "Match Docker minor and patch updates; automerge is inherited from the top-level config",
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["minor", "patch"]
-    },
     {
       "description": "Label all npm package updates",
       "matchManagers": ["npm"],
@@ -42,22 +44,13 @@
       "labels": ["dependencies", "npm", "formatting"]
     },
     {
-      "description": "Match non-major GitHub Actions updates; automerge is inherited from the top-level config",
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
-    },
-    {
-      "description": "Match dev dependency minor and patch updates; automerge is inherited from the top-level config",
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["minor", "patch"]
-    },
-    {
       "description": "Major version updates require manual review",
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "labels": ["dependencies", "major"]
     }
   ],
+  
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["security"]
