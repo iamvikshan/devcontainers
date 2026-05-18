@@ -4,17 +4,9 @@
 
   // Add Docker-in-Docker feature
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "moby": true,
-      "azureDnsAutoDetection": true,
-      "installDockerBuildx": true,
+    "ghcr.io/devcontainers/features/sshd:1": {
       "version": "latest",
-      "dockerDashComposeVersion": "v2"
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {
-      "installDirectlyFromGitHubRelease": true,
-      "version": "latest"
-    }
   },
 
   // Configure tool-specific properties.
@@ -23,10 +15,10 @@
       "settings": {
         "terminal.integrated.profiles.linux": {
           "zsh": {
-            "path": "zsh"
-          }
+            "path": "zsh",
+          },
         },
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
       },
       "extensions": [
         "dbaeumer.vscode-eslint",
@@ -35,18 +27,11 @@
         "ms-azuretools.vscode-docker",
         "coderabbit.coderabbit-vscode",
         "DeepScan.vscode-deepscan",
-        "WakaTime.vscode-wakatime"
-      ]
-    }
+        "WakaTime.vscode-wakatime",
+      ],
+    },
   },
 
-  // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "chmod +x scripts/dvcntnr.sh && scripts/dvcntnr.sh",
-
-  // remoteUser` to `root` to connect as root.
   "remoteUser": "root",
-
-  // Mount docker socket and enable privileged mode for Docker-in-Docker
-  "privileged": true,
-  "mounts": ["source=dind-var-lib-docker,target=/var/lib/docker,type=volume"]
+  "postCreateCommand": "apt update && apt upgrade -y && bun upgrade && ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime && curl -fsSL https://cli.coderabbit.ai/install.sh | sh && bun bs --default",
 }

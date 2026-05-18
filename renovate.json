@@ -3,8 +3,7 @@
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
-    ":semanticCommits",
-    "helpers:pinGitHubActionDigests"
+    ":semanticCommits"
   ],
   "reviewers": ["iamvikshan"],
   "assignees": ["iamvikshan"],
@@ -22,7 +21,7 @@
   "rangeStrategy": "bump",
   "separateMinorPatch": true,
   "separateMajorMinor": true,
-  "pinDigests": false
+  "pinDigests": false,
   
   "packageRules": [
     {
