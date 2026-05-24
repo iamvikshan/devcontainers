@@ -14,7 +14,7 @@ jobs:
       contents: write
     steps:
       - name: PR Agent action step
-        uses: qodo-ai/pr-agent@main
+        uses: qodo-ai/pr-agent@751af2422bef9be99fa605734c058c1c9bc1b3fa # main
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           config.model: "gemini/gemini-flash-latest"

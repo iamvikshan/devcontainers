@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Sync with GitLab
         uses: iamvikshan/gitsync@0a4344c52b90de2a6df63bfc9b2605fe2ae68c44 # v1.1.0
