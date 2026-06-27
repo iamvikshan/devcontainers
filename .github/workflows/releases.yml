@@ -358,8 +358,9 @@ jobs:
     steps:
       - name: Clean GHCR
         uses: vlaurin/action-ghcr-prune@v0.6.0
+        continue-on-error: true
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           organization: ${{ github.repository_owner }}
           container: devcontainers/${{ matrix.image }}
           keep-younger-than: 7
