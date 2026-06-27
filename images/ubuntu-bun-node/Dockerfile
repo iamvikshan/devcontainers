@@ -32,7 +32,7 @@ RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
 # Install Node.js deterministically for the correct architecture, then install formatters
 ARG TARGETARCH
-RUN ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x64" || echo "arm64") \
+RUN ARCH="$(case "$TARGETARCH" in amd64) echo x64 ;; arm64) echo arm64 ;; *) echo "Unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; esac)" \
     && NODE_TARBALL="node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
     && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_TARBALL}" \
     && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt" \
