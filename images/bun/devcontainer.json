@@ -24,13 +24,7 @@
         },
         "terminal.integrated.defaultProfile.linux": "zsh"
       },
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "GitHub.copilot",
-        "esbenp.prettier-vscode",
-        "eamodio.gitlens",
-        "oven.bun-vscode"
-      ]
+      "extensions": ["GitHub.copilot", "eamodio.gitlens", "oven.bun-vscode"]
     }
   },
 

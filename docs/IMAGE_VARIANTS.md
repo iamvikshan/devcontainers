@@ -87,14 +87,14 @@ compatibility.
 - 🚀 **Best of both worlds** - Bun speed + Node.js compatibility
 - 📦 **Full npm ecosystem** - Access to all npm packages
 - 🔧 **Latest runtimes** - Bun 1.3.3 + Node.js v22.11.0
-- 🛠️ **Development tools** - ESLint pre-installed
+- 🛠️ **Development tools** - oxlint/oxfmt pre-installed
 
 **Included Tools:**
 
 - Bun 1.3.3
 - Node.js v22.11.0
 - npm 10.9.0
-- ESLint (global)
+- oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl
 - btop (system resource monitor)
 - Alpine package manager (apk)
@@ -115,11 +115,7 @@ compatibility.
   "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oven.bun-vscode",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
-      ]
+      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -190,9 +186,9 @@ JavaScript runtimes.
 **Included Tools:**
 
 - Bun 1.3.3 (installed via script)
-- Node.js v24.5.0
-- npm 11.5.1
-- ESLint (global)
+- Node.js v25.2.0
+- npm 11.6.2
+- oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl, unzip
 - btop (system resource monitor)
 - sudo (administrative access)
@@ -214,11 +210,7 @@ JavaScript runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oven.bun-vscode",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
-      ]
+      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -237,7 +229,7 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
 - 🧰 **Tools-focused image** - Includes Python, jq, Git, curl, and btop
 - 🐧 **Ubuntu base** - Standard Ubuntu package ecosystem with apt
 - 🔐 **sudo access** - Administrative privileges for setup tasks
-- 🚫 **No JS runtime bundle** - No Bun, Node.js, npm, or ESLint preinstalled
+- 🚫 **No JS runtime bundle** - No Bun, Node.js, npm, or oxlint/oxfmt preinstalled
 
 **Included Tools:**
 

@@ -47,11 +47,7 @@ docker.io/vikshan/[image]:latest
      "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
      "customizations": {
        "vscode": {
-         "extensions": [
-           "oven.bun-vscode",
-           "esbenp.prettier-vscode",
-           "dbaeumer.vscode-eslint"
-         ],
+         "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
          "settings": {
            "terminal.integrated.defaultProfile.linux": "zsh"
          }
@@ -248,9 +244,7 @@ npm cache clean --force
 2. **Mount node_modules as volume** for better performance:
    ```json
    {
-     "mounts": [
-       "source=node_modules,target=/workspace/node_modules,type=volume"
-     ]
+     "mounts": ["source=node_modules,target=/workspace/node_modules,type=volume"]
    }
    ```
 3. **Use specific image tags** instead of `latest` for consistency

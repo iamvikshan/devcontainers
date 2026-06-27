@@ -130,7 +130,7 @@ All images include:
 - **btop** - System resource monitor
 - **Basic development utilities**
 - **oxlint** - Fast alternative to eslint (absent from _ubuntu-tools_ img)
-- **oxfmt** - prettier alterntive (absent from _ubuntu-tools_ img)
+- **oxfmt** - prettier alternative (absent from _ubuntu-tools_ img)
 
 #### Alpine-based Images (`bun`, `bun-node`)
 

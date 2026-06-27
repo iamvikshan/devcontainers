@@ -257,7 +257,7 @@ images
 - fix: update advanced-git-sync action version to v1.1.5 in sync workflow
   (18dda27)
 - fix: update GitHub Actions workflow and dependencies; upgrade checkout action
-  and sync action version. Uprade bun to v1.1.38 (10bc7cd)
+  and sync action version. Upgrade bun to v1.1.38 (10bc7cd)
 
 ## Other Changes
 
@@ -513,7 +513,7 @@ images
 - fix: update advanced-git-sync action version to v1.1.5 in sync workflow
   (18dda27)
 - fix: update GitHub Actions workflow and dependencies; upgrade checkout action
-  and sync action version. Uprade bun to v1.1.38 (10bc7cd)
+  and sync action version. Upgrade bun to v1.1.38 (10bc7cd)
 
 ## Other Changes
 
@@ -867,7 +867,7 @@ images
 - update advanced-git-sync action version to v1.1.5 in sync workflow
   ([18dda27](https://github.com/iamvikshan/devcontainers/commit/18dda275ce6dcc8d42ecfef0e62510ad056c0fc5))
 - update GitHub Actions workflow and dependencies; upgrade checkout action and
-  sync action version. Uprade bun to v1.1.38
+  sync action version. Upgrade bun to v1.1.38
   ([10bc7cd](https://github.com/iamvikshan/devcontainers/commit/10bc7cda116360c530b2d9a5a20d74a5d5983120))
 - update sync configuration and enhance release workflow steps
   ([687909c](https://github.com/iamvikshan/devcontainers/commit/687909cbbfc24578ee1f5c75ba3e0eab8427e764))

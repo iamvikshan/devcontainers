@@ -4,7 +4,7 @@
     {
       "label": "Build DevContainer",
       "type": "shell",
-      "command": "docker buildx build --pull --rm -f \"images/bun/Dockerfile\" -t workspace:latest \"images/bun\"",
+      "command": "docker buildx build --pull --rm --output type=docker -f \"images/bun/Dockerfile\" -t workspace:latest \"images/bun\"",
       "problemMatcher": []
     }
   ]
