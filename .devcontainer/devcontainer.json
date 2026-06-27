@@ -2,24 +2,14 @@
   "name": "Ubuntu + Bun + Docker",
   "image": "vikshan/ubuntu-bun:latest",
 
-  // Add Docker-in-Docker feature
   "features": {
     "ghcr.io/devcontainers/features/sshd:1": {
-      "version": "latest",
-    },
+      "version": "latest"
+    }
   },
-
-  // Configure tool-specific properties.
+  "runArgs": ["--network=host"],
   "customizations": {
     "vscode": {
-      "settings": {
-        "terminal.integrated.profiles.linux": {
-          "zsh": {
-            "path": "zsh",
-          },
-        },
-        "terminal.integrated.defaultProfile.linux": "zsh",
-      },
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
@@ -27,11 +17,13 @@
         "ms-azuretools.vscode-docker",
         "coderabbit.coderabbit-vscode",
         "DeepScan.vscode-deepscan",
-        "WakaTime.vscode-wakatime",
-      ],
-    },
+        "WakaTime.vscode-wakatime"
+      ]
+    }
   },
-
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
   "remoteUser": "root",
-  "postCreateCommand": "apt update && apt upgrade -y && bun upgrade && ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime && curl -fsSL https://cli.coderabbit.ai/install.sh | sh && bun bs --default",
+  "postCreateCommand": "bun upd && bun bs --default"
 }

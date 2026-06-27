@@ -8,7 +8,7 @@
     "lint:fix": "eslint . --fix",
     "check": "eslint . && tsgo --noEmit",
     "bs": "mkdir -p scripts && curl -sL https://raw.githubusercontent.com/iamvikshan/.github/main/scripts/bootstrap.sh > scripts/bootstrap.sh && chmod +x scripts/bootstrap.sh && scripts/bootstrap.sh",
-    "upd": "apt update && apt upgrade -y && bun upgrade && bun update --latest && bun f"
+    "upd": "sudo apt update && sudo apt upgrade -y && bun upgrade && bun update --latest && bun i && bun f"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

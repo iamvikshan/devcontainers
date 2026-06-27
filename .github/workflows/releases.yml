@@ -48,7 +48,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Setup Bun and install dependencies
-        uses: iamvikshan/.github/.github/actions/setup-bun@main
+        uses: iamvikshan/.github/.github/actions/bun@main
 
       - name: Release analysis
         id: release_analysis
@@ -223,7 +223,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Setup Bun and install dependencies
-        uses: iamvikshan/.github/.github/actions/setup-bun@main
+        uses: iamvikshan/.github/.github/actions/bun@main
 
       - name: Cache tool versions
         run: |
