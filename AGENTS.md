@@ -6,7 +6,7 @@
 - **Primary Implementation Areas**:
   - `images/*` for image Dockerfiles and shell bootstrap scripts.
   - `.devcontainer/` and `images/*/devcontainer.json` for VS Code container manifests.
-  - `scripts/*.ts` for release/version automation.
+  - `.github/actions/notes/update_docs.py` and GitHub Actions workflows for release/version automation.
   - `docs/*.md` and `README.md` for user-facing documentation.
 
 ## Tooling & Runtime Environment
@@ -20,7 +20,7 @@
 ## Code Conventions
 
 - **TypeScript**: ESM syntax, single quotes, no semicolons, 2-space indentation.
-- **Formatting Defaults**: Prettier defaults (2-space indent, tabWidth: 2). Double quotes are used for JSON/YAML.
+- **Formatting Defaults**: Formatted with `oxfmt` (using `.oxfmtrc.json` as the source of truth). Double quotes are used for JSON/YAML.
 
 ## Container-Image Conventions
 

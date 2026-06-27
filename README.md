@@ -128,7 +128,7 @@ All images include:
 - **btop** - System resource monitor
 - **Basic development utilities**
 - **oxlint** - Fast JavaScript linter (absent from _ubuntu-tools_ img)
-- **oxfmt** - prettier alternative (absent from _ubuntu-tools_ img)
+- **oxfmt** - Fast JavaScript/TypeScript formatter (absent from _ubuntu-tools_ img)
 
 #### Alpine-based Images (`bun`, `bun-node`)
 
@@ -139,7 +139,7 @@ All images include:
 #### Ubuntu-based Images (`ubuntu-bun`, `ubuntu-bun-node`)
 
 - **Bun** - Installed via script
-- **Node.js** v25.2.0 _(ubuntu-bun-node only)_
+- **Node.js** _(ubuntu-bun-node only)_
 - **npm** _(ubuntu-bun-node only)_
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)

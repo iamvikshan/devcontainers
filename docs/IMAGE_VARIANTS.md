@@ -10,8 +10,8 @@ images.
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest         |
 | **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           | ~80 MB                |
 | **Bun Version** | 1.3.3             | 1.3.3                  | 1.3.3            | 1.3.3             | ❌                    |
-| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v25.2.0        | ❌                    |
-| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 11.6.2         | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v22.11.0       | ❌                    |
+| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | Tools-only automation |
 
@@ -86,14 +86,14 @@ compatibility.
 
 - 🚀 **Best of both worlds** - Bun speed + Node.js compatibility
 - 📦 **Full npm ecosystem** - Access to all npm packages
-- 🔧 **Latest runtimes** - Bun 1.3.3 + Node.js v22.11.0
+- 🔧 **Latest runtimes** - Bun and Node.js
 - 🛠️ **Development tools** - oxlint/oxfmt pre-installed
 
 **Included Tools:**
 
 - Bun 1.3.3
-- Node.js v22.11.0
-- npm 10.9.0
+- Node.js
+- npm
 - oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl
 - btop (system resource monitor)
@@ -115,7 +115,7 @@ compatibility.
   "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "oxc.oxc-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -186,8 +186,8 @@ JavaScript runtimes.
 **Included Tools:**
 
 - Bun 1.3.3 (installed via script)
-- Node.js v25.2.0
-- npm 11.6.2
+- Node.js v22.11.0
+- npm 10.9.0
 - oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl, unzip
 - btop (system resource monitor)
@@ -210,7 +210,7 @@ JavaScript runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "oxc.oxc-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"

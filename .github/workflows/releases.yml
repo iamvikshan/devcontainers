@@ -15,6 +15,10 @@ on:
     paths:
       - 'images/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   GL_USERNAME: vikshan
   # Hardcoded repository string based on your README to ensure registry paths are perfect
@@ -68,11 +72,11 @@ jobs:
         uses: dorny/paths-filter@v3.0.2
         with:
           filters: |
-            bun: 'images/bun/**'
-            ubuntu_tools: 'images/ubuntu-tools/**'
-            bun_node: 'images/bun-node/**'
-            ubuntu_bun: 'images/ubuntu-bun/**'
-            ubuntu_bun_node: 'images/ubuntu-bun-node/**'
+            bun: "images/bun/**"
+            ubuntu_tools: "images/ubuntu-tools/**"
+            bun_node: "images/bun-node/**"
+            ubuntu_bun: "images/ubuntu-bun/**"
+            ubuntu_bun_node: "images/ubuntu-bun-node/**"
 
       - name: Construct DAG Matrices
         id: matrix
@@ -85,11 +89,23 @@ jobs:
             BASES=("bun" "ubuntu-tools")
             DERIVATIVES=("bun-node" "ubuntu-bun" "ubuntu-bun-node")
           else
-            [ "${{ steps.filter.outputs.bun }}" == "true" ] && BASES+=("bun")
-            [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] && BASES+=("ubuntu-tools")
-            [ "${{ steps.filter.outputs.bun_node }}" == "true" ] && DERIVATIVES+=("bun-node")
-            [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ] && DERIVATIVES+=("ubuntu-bun")
-            [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] && DERIVATIVES+=("ubuntu-bun-node")
+            if [ "${{ steps.filter.outputs.bun }}" == "true" ]; then
+              BASES+=("bun")
+            fi
+            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ]; then
+              BASES+=("ubuntu-tools")
+            fi
+
+            # Enqueue derivatives if their bases or they themselves changed
+            if [ "${{ steps.filter.outputs.bun }}" == "true" ] || [ "${{ steps.filter.outputs.bun_node }}" == "true" ]; then
+              DERIVATIVES+=("bun-node")
+            fi
+            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ]; then
+              DERIVATIVES+=("ubuntu-bun")
+            fi
+            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ]; then
+              DERIVATIVES+=("ubuntu-bun-node")
+            fi
           fi
 
           # Convert bash arrays to JSON strings for GitHub Actions

@@ -51,34 +51,67 @@ def update_docs():
             headers = [h.strip() for h in header_match.group(0).split('|')[2:-1]]
             
             # A. Update Size Row
+            existing_sizes = {}
+            size_match = re.search(r"\|[ \t]*\*\*Size\*\*[ \t]*\|(.*)", content)
+            if size_match:
+                parts = size_match.group(1).split('|')
+                for idx, h in enumerate(headers):
+                    if idx < len(parts):
+                        existing_sizes[h] = parts[idx].strip()
+
             size_row = "| **Size**        "
             for h in headers:
                 if h in sizes:
                     size_row += f"| ~{sizes[h]} "
+                elif h in existing_sizes:
+                    size_row += f"| {existing_sizes[h]} "
                 else:
                     size_row += "| - "
             size_row += "|"
-            content = re.sub(r"\|[ \t]*\*\*Size\*\*[ \t]*\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|", size_row, content)
+            size_pattern = r"\|[ \t]*\*\*Size\*\*[ \t]*\|" + "".join(r"[^|]+\|" for _ in range(len(headers)))
+            content = re.sub(size_pattern, size_row, content)
 
             # B. Update Bun Version Row
+            existing_buns = {}
+            bun_match = re.search(r"\|[ \t]*\*\*Bun Version\*\*[ \t]*\|(.*)", content)
+            if bun_match:
+                parts = bun_match.group(1).split('|')
+                for idx, h in enumerate(headers):
+                    if idx < len(parts):
+                        existing_buns[h] = parts[idx].strip()
+
             bun_row = "| **Bun Version** "
             for h in headers:
                 if h in versions and 'bun' in versions[h]:
                     bun_row += f"| {versions[h]['bun']} "
+                elif h in existing_buns:
+                    bun_row += f"| {existing_buns[h]} "
                 else:
                     bun_row += "| ❌ "
             bun_row += "|"
-            content = re.sub(r"\|[ \t]*\*\*Bun Version\*\*[ \t]*\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|", bun_row, content)
+            bun_pattern = r"\|[ \t]*\*\*Bun Version\*\*[ \t]*\|" + "".join(r"[^|]+\|" for _ in range(len(headers)))
+            content = re.sub(bun_pattern, bun_row, content)
 
             # C. Update Node.js Row
+            existing_nodes = {}
+            node_match = re.search(r"\|[ \t]*\*\*Node\.js\*\*[ \t]*\|(.*)", content)
+            if node_match:
+                parts = node_match.group(1).split('|')
+                for idx, h in enumerate(headers):
+                    if idx < len(parts):
+                        existing_nodes[h] = parts[idx].strip()
+
             node_row = "| **Node.js**     "
             for h in headers:
                 if h in versions and 'node' in versions[h]:
                     node_row += f"| ✅ v{versions[h]['node']} "
+                elif h in existing_nodes:
+                    node_row += f"| {existing_nodes[h]} "
                 else:
                     node_row += "| ❌ "
             node_row += "|"
-            content = re.sub(r"\|[ \t]*\*\*Node\.js\*\*[ \t]*\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|", node_row, content)
+            node_pattern = r"\|[ \t]*\*\*Node\.js\*\*[ \t]*\|" + "".join(r"[^|]+\|" for _ in range(len(headers)))
+            content = re.sub(node_pattern, node_row, content)
 
         # Update other occurrences
         for name, size in sizes.items():

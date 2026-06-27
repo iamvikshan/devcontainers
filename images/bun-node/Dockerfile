@@ -12,7 +12,7 @@ ARG BASE_TAG
 # renovate: datasource=docker depName=oven/bun
 ARG BUN_VERSION="1.1.17"
 # renovate: datasource=npm depName=oxlint
-ARG OXLINT_VERSION="0.4.3"
+ARG OXLINT_VERSION="0.7.1"
 # renovate: datasource=npm depName=oxfmt
 ARG OXFMT_VERSION="0.56.0"
 
