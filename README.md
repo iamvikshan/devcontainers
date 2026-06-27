@@ -134,7 +134,7 @@ All images include:
 
 #### Alpine-based Images (`bun`, `bun-node`)
 
-- **Bun** - Fast Typescript and JavaScript runtime
+- **Bun** - Fast TypeScript and JavaScript runtime
 - **Node.js** _(bun-node only)_
 - **npm** _(bun-node only)_
 
