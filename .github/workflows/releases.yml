@@ -162,7 +162,7 @@ jobs:
 
           # 1. Extract Size from remote manifest
           skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
-          jq '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
+Add `-r` to jq: `jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"'`
 
           # 2. Extract specific devcontainer.tool.* OCI Labels
           skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
