@@ -15,8 +15,6 @@ interactive shell experience.
 
 ## Available Images
 
-## Available Images
-
 | Image               | Size    | Base   | Bun | Node.js | Best For                  |
 | ------------------- | ------- | ------ | --- | ------- | ------------------------- |
 | **bun**             | ~64 MB  | Alpine | ✅  | ❌      | Pure Bun projects         |
@@ -129,7 +127,7 @@ All images include:
 - **curl** - HTTP requests
 - **btop** - System resource monitor
 - **Basic development utilities**
-- **oxlint** - Fast alternative to eslint (absent from _ubuntu-tools_ img)
+- **oxlint** - Fast JavaScript linter (absent from _ubuntu-tools_ img)
 - **oxfmt** - prettier alternative (absent from _ubuntu-tools_ img)
 
 #### Alpine-based Images (`bun`, `bun-node`)

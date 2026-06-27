@@ -6,6 +6,8 @@ ARG BASE_TAG="latest"
 
 FROM ghcr.io/iamvikshan/devcontainers/bun:${BASE_TAG}
 
+ARG BASE_TAG
+
 # 2. Re-declare inherited ARGs purely for Renovate tracking and Label injection
 # renovate: datasource=docker depName=oven/bun
 ARG BUN_VERSION="1.1.17"
@@ -13,10 +15,6 @@ ARG BUN_VERSION="1.1.17"
 ARG OXLINT_VERSION="0.4.3"
 # renovate: datasource=npm depName=oxfmt
 ARG OXFMT_VERSION="0.56.0"
-
-# 3. New tool ARGs for this specific derivative
-# renovate: datasource=node-version depName=node
-ARG NODE_VERSION="22.11.0"
 
 ARG USERNAME=root
 
@@ -31,7 +29,6 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="bun-node" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainers/bun:${BASE_TAG}" \
       devcontainer.tool.bun="${BUN_VERSION}" \
-      devcontainer.tool.node="${NODE_VERSION}" \
       devcontainer.tool.oxlint="${OXLINT_VERSION}" \
       devcontainer.tool.oxfmt="${OXFMT_VERSION}"
 

@@ -11,10 +11,12 @@ ARG USERNAME=root
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 2. Consolidated User Creation & Permissions
-RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \
-        useradd -m -s /bin/zsh ${USERNAME} \
-        && usermod -aG sudo ${USERNAME} \
-        && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
+RUN if [ "${USERNAME}" != "root" ]; then \
+        echo "${USERNAME}" | grep -Eq '^[a-z_][a-z0-9_-]*[$]?$' || { echo "Invalid USERNAME: ${USERNAME}" >&2; exit 1; }; \
+        if ! id -u ${USERNAME} > /dev/null 2>&1; then \
+            useradd -m -s /bin/zsh ${USERNAME}; \
+        fi \
+        && usermod -aG sudo ${USERNAME}; \
     fi
 
 # 3. OS Packages & Antigravity CLI (BuildKit Cached)
@@ -22,6 +24,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates zsh git sudo curl unzip jq python3 btop tree tmux bash \
+    && if [ "${USERNAME}" != "root" ]; then \
+        mkdir -p /etc/sudoers.d \
+        && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" \
+        && chmod 0440 "/etc/sudoers.d/${USERNAME}" \
+        && visudo -cf "/etc/sudoers.d/${USERNAME}"; \
+    fi \
     && curl -fsSL https://antigravity.google/cli/install.sh | bash \
     && mv /root/.local/bin/agy /usr/local/bin/agy \
     && rm -rf /root/.local /var/lib/apt/lists/*

@@ -44,14 +44,23 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: patch
+          dry_run: true
 
       - name: Set Final Tag
         id: tag
+        env:
+          TAG_OVERRIDE: ${{ github.event.inputs.tag_override }}
+          AUTO_TAG: ${{ steps.auto_tag.outputs.new_tag }}
         run: |
-          if [ -n "${{ github.event.inputs.tag_override }}" ]; then
-            echo "new_tag=${{ github.event.inputs.tag_override }}" >> $GITHUB_OUTPUT
+          if [ -n "$TAG_OVERRIDE" ]; then
+            if echo "$TAG_OVERRIDE" | grep -Eq '^v?[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$'; then
+              echo "new_tag=$TAG_OVERRIDE" >> $GITHUB_OUTPUT
+            else
+              echo "Error: Invalid tag override format '$TAG_OVERRIDE'" >&2
+              exit 1
+            fi
           else
-            echo "new_tag=${{ steps.auto_tag.outputs.new_tag }}" >> $GITHUB_OUTPUT
+            echo "new_tag=$AUTO_TAG" >> $GITHUB_OUTPUT
           fi
 
       - name: Detect Changes
@@ -84,10 +93,10 @@ jobs:
           fi
 
           # Convert bash arrays to JSON strings for GitHub Actions
-          printf -v BASES_JSON '["%s"]' "$(IFS='","'; echo "${BASES[*]}")"
+          BASES_JSON=$(printf '%s\n' "${BASES[@]}" | jq -R . | jq -cs .)
           [ "${#BASES[@]}" -eq 0 ] && BASES_JSON="[]"
 
-          printf -v DERIVATIVES_JSON '["%s"]' "$(IFS='","'; echo "${DERIVATIVES[*]}")"
+          DERIVATIVES_JSON=$(printf '%s\n' "${DERIVATIVES[@]}" | jq -R . | jq -cs .)
           [ "${#DERIVATIVES[@]}" -eq 0 ] && DERIVATIVES_JSON="[]"
 
           echo "bases=$BASES_JSON" >> $GITHUB_OUTPUT
@@ -159,13 +168,15 @@ jobs:
       - name: Extract Size & Tool Versions via Skopeo
         run: |
           mkdir -p metadata
+          # Wait for image to propagate to GHCR to avoid race conditions
+          sleep 5
 
           # 1. Extract Size from remote manifest
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
-Add `-r` to jq: `jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"'`
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
+          jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
 
           # 2. Extract specific devcontainer.tool.* OCI Labels
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
 
       - name: Upload Metadata
@@ -192,6 +203,9 @@ Add `-r` to jq: `jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostri
         image: ${{ fromJSON(needs.prepare.outputs.derivatives) }}
 
     steps:
+      - name: Wait for base images to propagate
+        run: sleep 10
+
       - name: Checkout
         uses: actions/checkout@v4.1.7
 
@@ -241,13 +255,15 @@ Add `-r` to jq: `jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostri
       - name: Extract Size & Tool Versions via Skopeo
         run: |
           mkdir -p metadata
+          # Wait for image to propagate to GHCR to avoid race conditions
+          sleep 5
 
           # 1. Extract Size from remote manifest
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
-          jq '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
+          jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
 
           # 2. Extract specific devcontainer.tool.* OCI Labels
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
 
       - name: Upload Metadata
@@ -277,6 +293,12 @@ Add `-r` to jq: `jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostri
         with:
           tag_name: ${{ needs.prepare.outputs.new_tag }}
 
+      - name: Upload updated README
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: updated-readme
+          path: README.md
+
   # ============================================
   # Job 5: Sync DockerHub READMEs
   # ============================================
@@ -289,8 +311,11 @@ Add `-r` to jq: `jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostri
       matrix:
         image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.7
+      - name: Download updated README
+        uses: actions/download-artifact@v4.3.4
+        with:
+          name: updated-readme
+          path: .
 
       - name: Push README to DockerHub
         uses: peter-evans/dockerhub-description@v4.0.0
@@ -304,18 +329,22 @@ Add `-r` to jq: `jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostri
   # Job 6: Standard GHCR Cleanup
   # ============================================
   cleanup:
-    name: Prune Untagged GHCR Images
+    name: Prune Untagged GHCR Images -> ${{ matrix.image }}
     needs: [build-bases, build-derivatives]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node]
     steps:
       - name: Clean GHCR
         uses: vlaurin/action-ghcr-prune@v0.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           organization: ${{ github.repository_owner }}
-          container: devcontainers
+          container: devcontainers/${{ matrix.image }}
           keep-younger-than: 7
           prune-untagged: true

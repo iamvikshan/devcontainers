@@ -4,7 +4,7 @@
 # renovate: datasource=docker depName=oven/bun
 ARG BUN_VERSION="1.1.17"
 # renovate: datasource=npm depName=oxlint
-ARG OXLINT_VERSION="0.71.0"
+ARG OXLINT_VERSION="0.7.1"
 # renovate: datasource=npm depName=oxfmt
 ARG OXFMT_VERSION="0.56.0"
 
@@ -26,9 +26,13 @@ RUN --mount=type=cache,target=/var/cache/apk \
 
 # 3. Consolidated User, Remote ZSH configuration, and Tmux setup
 RUN if [ "${USERNAME}" != "root" ]; then \
+        echo "${USERNAME}" | grep -Eq '^[a-z_][a-z0-9_-]*[$]?$' || { echo "Invalid USERNAME: ${USERNAME}" >&2; exit 1; } && \
         adduser -D -s /bin/zsh "${USERNAME}" && \
         addgroup "${USERNAME}" wheel && \
-        echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+        mkdir -p /etc/sudoers.d && \
+        echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" && \
+        chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
+        visudo -cf "/etc/sudoers.d/${USERNAME}" && \
         HOME_DIR="/home/${USERNAME}"; \
     else \
         HOME_DIR="/root"; \

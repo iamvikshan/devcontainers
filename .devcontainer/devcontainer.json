@@ -15,12 +15,10 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
+        "oxc.oxc-vscode",
         "oven.bun-vscode",
         "ms-azuretools.vscode-docker",
         "coderabbit.coderabbit-vscode",
-        "DeepScan.vscode-deepscan",
         "WakaTime.vscode-wakatime"
       ]
     }

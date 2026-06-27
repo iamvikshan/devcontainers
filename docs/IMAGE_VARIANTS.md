@@ -67,7 +67,7 @@ compatibility.
   "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -115,7 +115,7 @@ compatibility.
   "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -161,7 +161,7 @@ package ecosystem and tooling. The smallest image in our collection!
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -210,7 +210,7 @@ JavaScript runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -255,7 +255,7 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["ms-python.python", "esbenp.prettier-vscode"]
+      "extensions": ["ms-python.python", "oxc.oxc-vscode"]
     }
   }
 }
