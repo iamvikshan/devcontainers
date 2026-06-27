@@ -1,7 +1,8 @@
 # DevContainer Setup Guide
 
-This guide provides comprehensive setup instructions for all devcontainer images in this repository.
-Interactive shells default to a customized Zsh + Oh My Zsh setup, so the examples below use `zsh`.
+This guide provides comprehensive setup instructions for all devcontainer images
+in this repository. Interactive shells default to a customized Zsh + Oh My Zsh
+setup, so the examples below use `zsh`.
 
 ## 🚀 Quick Start
 
@@ -46,7 +47,11 @@ docker.io/vikshan/[image]:latest
      "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
      "customizations": {
        "vscode": {
-         "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
+         "extensions": [
+           "oven.bun-vscode",
+           "esbenp.prettier-vscode",
+           "dbaeumer.vscode-eslint"
+         ],
          "settings": {
            "terminal.integrated.defaultProfile.linux": "zsh"
          }
@@ -176,7 +181,8 @@ bun run build
 bun run script.ts
 ```
 
-> `ubuntu-tools` does not include Bun by default. Use this section only for Bun-based images.
+> `ubuntu-tools` does not include Bun by default. Use this section only for
+> Bun-based images.
 
 ### npm Commands (Node images only)
 
@@ -242,7 +248,9 @@ npm cache clean --force
 2. **Mount node_modules as volume** for better performance:
    ```json
    {
-     "mounts": ["source=node_modules,target=/workspace/node_modules,type=volume"]
+     "mounts": [
+       "source=node_modules,target=/workspace/node_modules,type=volume"
+     ]
    }
    ```
 3. **Use specific image tags** instead of `latest` for consistency
@@ -255,7 +263,8 @@ Images are automatically updated:
 - **Base image updates** trigger new builds
 - **Security patches** applied automatically
 
-Check the [CHANGELOG](../CHANGELOG.md#released-versions) for current versions and release history.
+Check the [CHANGELOG](../CHANGELOG.md#released-versions) for current versions
+and release history.
 
 ## 📚 Additional Resources
 

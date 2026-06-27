@@ -1,36 +1,30 @@
 # syntax=docker/dockerfile:1
-ARG VARIANT=alpine
-FROM oven/bun:${VARIANT}
 
-ARG VARIANT
+# 1. Define the version ARGs for Renovate to track
+# renovate: datasource=docker depName=oven/bun
+ARG BUN_VERSION="1.1.17"
+# renovate: datasource=npm depName=oxlint
+ARG OXLINT_VERSION="0.4.3"
+# renovate: datasource=npm depName=oxfmt
+ARG OXFMT_VERSION="0.56.0"
+
+# Inject the tracked Bun version into the base image
+FROM oven/bun:${BUN_VERSION}-alpine
+
+# Re-declare ARGs after FROM so they are available in the build environment
+ARG BUN_VERSION
+ARG OXLINT_VERSION
+ARG OXFMT_VERSION
 ARG USERNAME=root
 
-# 1. Install packages, generate versions tracker, and install Antigravity in ONE layer
-# Added bash (required for antigravity script), tree, and tmux.
+# 2. Install unpinned OS packages & pinned global tools (using Bun)
+# We completely removed the tool-versions.txt generation block
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --no-cache \
     zsh git sudo curl jq python3 btop tree tmux bash \
-    && mkdir -p /usr/local/share \
-    && { \
-        echo "# DevContainer Tool Versions"; \
-        echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
-        echo "base_image=oven/bun:${VARIANT}"; \
-        echo "bun_version=$(bun --version)"; \
-        echo "zsh_version=$(zsh --version | cut -d' ' -f2)"; \
-        echo "alpine_version=$(cat /etc/alpine-release)"; \
-        echo "git_version=$(git --version | cut -d' ' -f3)"; \
-        echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)"; \
-        echo "jq_version=$(jq --version | cut -d'-' -f2)"; \
-        echo "python_version=$(python3 --version | cut -d' ' -f2)"; \
-        echo "btop_version=$(btop --version | head -n1)"; \
-        echo "tree_version=$(tree --version | cut -d' ' -f2)"; \
-        echo "tmux_version=$(tmux -V | cut -d' ' -f2)"; \
-    } > /usr/local/share/tool-versions.txt \
-    && curl -fsSL https://antigravity.google/cli/install.sh | bash \
-    && mv /root/.local/bin/agy /usr/local/bin/agy \
-    && rm -rf /root/.local /root/.cache
+    && bun install -g oxlint@${OXLINT_VERSION} oxfmt@${OXFMT_VERSION}
 
-# 2. Consolidated User, Remote ZSH configuration, and Tmux setup
+# 3. Consolidated User, Remote ZSH configuration, and Tmux setup
 RUN if [ "${USERNAME}" != "root" ]; then \
         adduser -D -s /bin/zsh "${USERNAME}" && \
         addgroup "${USERNAME}" wheel && \
@@ -50,4 +44,12 @@ RUN if [ "${USERNAME}" != "root" ]; then \
     fi
 
 USER ${USERNAME}
+
+# 4. Inject Metadata for Skopeo Extraction
+LABEL org.opencontainers.image.title="bun" \
+      org.opencontainers.image.base.name="oven/bun:${BUN_VERSION}-alpine" \
+      devcontainer.tool.bun="${BUN_VERSION}" \
+      devcontainer.tool.oxlint="${OXLINT_VERSION}" \
+      devcontainer.tool.oxfmt="${OXFMT_VERSION}"
+
 CMD ["sleep", "infinity"]

@@ -9,8 +9,11 @@
 
 # DevContainer Configurations
 
-This repository contains reusable DevContainer configurations for different development
-environments. All images now default to a customized Zsh + Oh My Zsh interactive shell experience.
+This repository contains reusable DevContainer configurations for different
+development environments. All images now default to a customized Zsh + Oh My Zsh
+interactive shell experience.
+
+## Available Images
 
 ## Available Images
 
@@ -47,8 +50,8 @@ docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest
 ```
 
 > **Alternative Sources:** All images are also available on
-> [GitLab Container Registry](https://gitlab.com/vikshan/devcontainers/container_registry) and
-> [Docker Hub](https://hub.docker.com/u/vikshan)
+> [GitLab Container Registry](https://gitlab.com/vikshan/devcontainers/container_registry)
+> and [Docker Hub](https://hub.docker.com/u/vikshan)
 
 ## Usage
 
@@ -108,9 +111,12 @@ services:
 For comprehensive setup instructions and detailed information:
 
 - **[Setup Guide](docs/SETUP.md)** - Complete setup instructions for all images
-- **[Image Variants](docs/IMAGE_VARIANTS.md)** - Detailed comparison and use cases
-- **[Build Commands](docs/BUILD_COMMANDS.md)** - Building and testing images locally
-- **[Current Versions](CHANGELOG.md#released-versions)** - Latest versions, sizes, and changelogs
+- **[Image Variants](docs/IMAGE_VARIANTS.md)** - Detailed comparison and use
+  cases
+- **[Build Commands](docs/BUILD_COMMANDS.md)** - Building and testing images
+  locally
+- **[Current Versions](CHANGELOG.md#released-versions)** - Latest versions,
+  sizes, and changelogs
 
 ## Image Details
 
@@ -123,19 +129,20 @@ All images include:
 - **curl** - HTTP requests
 - **btop** - System resource monitor
 - **Basic development utilities**
+- **oxlint** - Fast alternative to eslint (absent from _ubuntu-tools_ img)
+- **oxfmt** - prettier alterntive (absent from _ubuntu-tools_ img)
 
 #### Alpine-based Images (`bun`, `bun-node`)
 
-- **Bun** 1.3.3 - Fast JavaScript runtime
-- **Node.js** v22.11.0 _(bun-node only)_
-- **npm** 10.9.0 _(bun-node only)_
-- **ESLint** _(bun-node only)_
+- **Bun** - Fast Typescript and JavaScript runtime
+- **Node.js** _(bun-node only)_
+- **npm** _(bun-node only)_
 
 #### Ubuntu-based Images (`ubuntu-bun`, `ubuntu-bun-node`)
 
-- **Bun** 1.3.3 - Installed via script
+- **Bun** - Installed via script
 - **Node.js** v25.2.0 _(ubuntu-bun-node only)_
-- **npm** 11.6.2 _(ubuntu-bun-node only)_
+- **npm** _(ubuntu-bun-node only)_
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)
 
@@ -143,14 +150,14 @@ All images include:
 
 - **Python 3** - General scripting runtime
 - **jq** - JSON processing utility
-- **No Bun, Node.js, npm, or ESLint** - Purpose-built tools-only variant
+- **No Bun, Node.js, npm, or oxlint/oxfmt** - Purpose-built tools-only variant
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)
 
 ### Building Locally
 
-Want to build or customize these images? See [`docs/BUILD_COMMANDS.md`](docs/BUILD_COMMANDS.md) for
-complete instructions.
+Want to build or customize these images? See
+[`docs/BUILD_COMMANDS.md`](docs/BUILD_COMMANDS.md) for complete instructions.
 
 ## Automated Updates
 
@@ -158,10 +165,13 @@ This repository includes automated systems to keep the devcontainers up to date:
 
 ### 🔄 Smart Release System
 
-- **Independent container versioning** - each container has its own semantic version
-- **Semantic commit analysis** - automatic version bumping based on conventional commits
+- **Independent container versioning** - each container has its own semantic
+  version
+- **Semantic commit analysis** - automatic version bumping based on conventional
+  commits
 - **Push-triggered releases** - releases created when changes are pushed to main
-- **Weekly scheduled releases** - every Sunday at 2 AM UTC for base image updates
+- **Weekly scheduled releases** - every Sunday at 2 AM UTC for base image
+  updates
 
 ### 🔍 Base Image Monitoring
 
@@ -196,6 +206,7 @@ bun run sync-sizes
 
 1. [Fork](https://gitlab.com/vikshan/devcontainers/-/forks/new) the repository
 2. Create a feature branch
-3. Submit a [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
+3. Submit a
+   [pull request](https://gitlab.com/vikshan/devcontainers/-/merge_requests/new)
 
 ![Alt](https://repobeats.axiom.co/api/embed/8d282a5449c103e135703ea0472d24444b60d064.svg 'Repobeats analytics image')

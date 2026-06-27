@@ -1,6 +1,7 @@
 # DevContainer Image Variants
 
-This document provides detailed information about all 5 available devcontainer images.
+This document provides detailed information about all 5 available devcontainer
+images.
 
 ## 📊 Images Comparison
 
@@ -31,8 +32,9 @@ This document provides detailed information about all 5 available devcontainer i
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun:latest`
 
-**Description:** Lightweight Bun development environment based on the official Alpine-based Bun
-image. Perfect for pure Bun projects that don't require Node.js compatibility.
+**Description:** Lightweight Bun development environment based on the official
+Alpine-based Bun image. Perfect for pure Bun projects that don't require Node.js
+compatibility.
 
 **Key Features:**
 
@@ -76,8 +78,9 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
 
-**Description:** Full-featured development environment with both Bun and Node.js. Ideal for projects
-that need Bun's performance with Node.js ecosystem compatibility.
+**Description:** Full-featured development environment with both Bun and
+Node.js. Ideal for projects that need Bun's performance with Node.js ecosystem
+compatibility.
 
 **Key Features:**
 
@@ -112,7 +115,11 @@ that need Bun's performance with Node.js ecosystem compatibility.
   "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+      "extensions": [
+        "oven.bun-vscode",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
     }
   },
   "postCreateCommand": "bun install"
@@ -123,8 +130,8 @@ that need Bun's performance with Node.js ecosystem compatibility.
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
 
-**Description:** Ubuntu-based Bun environment for developers who prefer Ubuntu's package ecosystem
-and tooling. The smallest image in our collection!
+**Description:** Ubuntu-based Bun environment for developers who prefer Ubuntu's
+package ecosystem and tooling. The smallest image in our collection!
 
 **Key Features:**
 
@@ -169,8 +176,9 @@ and tooling. The smallest image in our collection!
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
 
-**Description:** Complete Ubuntu-based development environment with Bun, Node.js, and npm. Best of
-both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
+**Description:** Complete Ubuntu-based development environment with Bun,
+Node.js, and npm. Best of both worlds with Ubuntu's flexibility and modern
+JavaScript runtimes.
 
 **Key Features:**
 
@@ -206,7 +214,11 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+      "extensions": [
+        "oven.bun-vscode",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
     }
   },
   "postCreateCommand": "bun install"
@@ -217,8 +229,8 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest`
 
-**Description:** Ubuntu-based tools-only environment for automation, scripting, and utility-heavy
-workflows that do not require Bun or Node.js runtimes.
+**Description:** Ubuntu-based tools-only environment for automation, scripting,
+and utility-heavy workflows that do not require Bun or Node.js runtimes.
 
 **Key Features:**
 
@@ -296,8 +308,8 @@ Do you need Bun runtime?
 
 ## 📦 Alternative Sources
 
-While we recommend using GitHub Container Registry as the primary source, all images are available
-from multiple registries:
+While we recommend using GitHub Container Registry as the primary source, all
+images are available from multiple registries:
 
 ### GitHub Container Registry (Primary)
 
@@ -317,8 +329,8 @@ registry.gitlab.com/vikshan/devcontainers/[image]:latest
 docker.io/vikshan/[image]:latest
 ```
 
-> **Note:** All registries contain identical images. Choose based on your preference or
-> organizational requirements.
+> **Note:** All registries contain identical images. Choose based on your
+> preference or organizational requirements.
 
 ## 🔄 Update Schedule
 
@@ -330,7 +342,8 @@ All images are automatically updated:
 
 ## 📈 Version History
 
-See [CHANGELOG.md](../CHANGELOG.md#released-versions) for detailed version history and changelogs.
+See [CHANGELOG.md](../CHANGELOG.md#released-versions) for detailed version
+history and changelogs.
 
 ## 🤝 Contributing
 
@@ -343,7 +356,9 @@ To contribute improvements to any image:
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/iamvikshan/devcontainers/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/iamvikshan/devcontainers/discussions)
+- **Issues**:
+  [GitHub Issues](https://github.com/iamvikshan/devcontainers/issues)
+- **Discussions**:
+  [GitHub Discussions](https://github.com/iamvikshan/devcontainers/discussions)
 - **Setup Guide**: [SETUP.md](SETUP.md)
 - **Build Guide**: [BUILD_COMMANDS.md](BUILD_COMMANDS.md)

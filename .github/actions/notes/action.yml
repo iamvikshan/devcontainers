@@ -1,0 +1,96 @@
+name: 'Finalize Release Notes'
+description: 'Downloads image metadata, updates the README sizes, prepends the CHANGELOG, and creates a GitHub Release.'
+
+inputs:
+  tag_name:
+    description: 'The tag for this release (e.g., v1.0.0)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Download Metadata Artifacts
+      uses: actions/download-artifact@v4.3.4
+      with:
+        pattern: metadata-*
+        merge-multiple: true
+        path: metadata/
+
+    - name: Build Notes, Update README & CHANGELOG
+      shell: bash
+      env:
+        NEW_TAG: ${{ inputs.tag_name }}
+        REPO: ${{ github.repository }}
+        OWNER: ${{ github.repository_owner }}
+      run: |
+        echo "## [$NEW_TAG] - $(date +'%Y-%m-%d')" > release_notes.md
+        echo "" >> release_notes.md
+        echo "All notable changes to this project are documented below. This release contains updates for the specific environments listed." >> release_notes.md
+        echo "" >> release_notes.md
+
+        echo "### Released Environments" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "| Container | Version | Date | Registry Links |" >> release_notes.md
+        echo "|---|---|---|---|" >> release_notes.md
+
+        # 1. Update README sizes and build changelog table rows
+        for size_file in metadata/*.size; do
+          if [ -f "$size_file" ]; then
+            IMG_NAME=$(basename "$size_file" .size)
+            SIZE_VAL=$(cat "$size_file")
+            
+            # Add row to release notes
+            echo "| $IMG_NAME | $NEW_TAG | $(date +'%Y-%m-%d') | [GHCR](https://ghcr.io/$REPO/$IMG_NAME:latest) · [Docker Hub](https://hub.docker.com/r/$OWNER/$IMG_NAME) |" >> release_notes.md
+            
+            # Smart replace the size in the README table inline
+            sed -i -E "s/\| \*\*$IMG_NAME\*\* \| [^|]+ \|/\| **$IMG_NAME** \| $SIZE_VAL \|/" README.md
+          fi
+        done
+
+        echo "" >> release_notes.md
+        echo "### Environment Tool Versions" >> release_notes.md
+        echo "" >> release_notes.md
+
+        # 2. Append Ubuntu Tool Versions (Read directly from Skopeo-extracted OCI labels)
+        echo "#### Ubuntu-Based Environments" >> release_notes.md
+        echo '```properties' >> release_notes.md
+        UBUNTU_FALLBACK=$(find metadata -name "ubuntu*.versions" | head -n 1)
+        if [ -f "metadata/ubuntu-bun-node.versions" ]; then
+          cat metadata/ubuntu-bun-node.versions >> release_notes.md
+        elif [ -n "$UBUNTU_FALLBACK" ]; then
+          cat "$UBUNTU_FALLBACK" >> release_notes.md
+        else
+          echo "# No Ubuntu tools updated." >> release_notes.md
+        fi
+        echo '```' >> release_notes.md
+        echo "" >> release_notes.md
+
+        # 3. Append Alpine Tool Versions (strictly targeting files without 'ubuntu' in the name)
+        echo "#### Alpine-Based Environments" >> release_notes.md
+        echo '```properties' >> release_notes.md
+        ALPINE_FALLBACK=$(find metadata -name "*.versions" ! -name "*ubuntu*" | head -n 1)
+        if [ -f "metadata/bun-node.versions" ]; then
+          cat metadata/bun-node.versions >> release_notes.md
+        elif [ -n "$ALPINE_FALLBACK" ]; then
+          cat "$ALPINE_FALLBACK" >> release_notes.md
+        else
+          echo "# No Alpine tools updated." >> release_notes.md
+        fi
+        echo '```' >> release_notes.md
+        echo "" >> release_notes.md
+
+        # 4. Prepend to CHANGELOG.md safely
+        cat release_notes.md CHANGELOG.md > temp_changelog.md && mv temp_changelog.md CHANGELOG.md
+
+    - name: Commit CHANGELOG & README
+      uses: stefanzweifel/git-auto-commit-action@v7.1.0
+      with:
+        commit_message: 'docs: update CHANGELOG and README for ${{ inputs.tag_name }} [skip ci]'
+        file_pattern: 'CHANGELOG.md README.md'
+
+    - name: Publish GitHub Release
+      uses: softprops/action-gh-release@v2.0.8
+      with:
+        tag_name: ${{ inputs.tag_name }}
+        name: Release ${{ inputs.tag_name }}
+        body_path: release_notes.md

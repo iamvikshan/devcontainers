@@ -2,136 +2,104 @@ name: Release DevContainers
 
 on:
   schedule:
-    # Run daily at 5 AM UTC to check for base image and tool updates
-    - cron: "0 5 * * *"
+    - cron: '0 0 * * 0' # Weekly forced release (Sunday at midnight)
   workflow_dispatch:
     inputs:
-      trigger_reason:
-        description: "Reason for manual trigger (optional)"
+      tag_override:
+        description: 'Override auto-tag (e.g., v1.0.5) - leave empty for auto-increment'
         required: false
-        default: ""
-        type: string
-      version:
-        description: "Override version (e.g., 0.0.5) - leave empty for auto-increment"
-        required: false
-        default: ""
+        default: ''
         type: string
   push:
     branches: [main]
+    paths:
+      - 'images/**'
 
 env:
-  GITHUB_REGISTRY: ghcr.io
-  GITLAB_REGISTRY: registry.gitlab.com
   GL_USERNAME: vikshan
+  # Hardcoded repository string based on your README to ensure registry paths are perfect
+  GHCR_BASE: ghcr.io/${{ github.repository }}
 
 jobs:
   # ============================================
-  # Job 1: Analyze what needs to be released
+  # Job 1: Auto-Tagging & Matrix Generation
   # ============================================
-  analyze:
-    name: Analyze Release
+  prepare:
+    name: Prepare Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
     outputs:
-      should_release: ${{ steps.release_analysis.outputs.should_release }}
-      release_type: ${{ steps.release_analysis.outputs.release_type }}
-      affected_containers: ${{ steps.release_analysis.outputs.affected_containers }}
-      version_map: ${{ steps.release_analysis.outputs.version_map }}
-      matrix: ${{ steps.set_matrix.outputs.matrix }}
-
+      new_tag: ${{ steps.tag.outputs.new_tag }}
+      bases: ${{ steps.matrix.outputs.bases }}
+      derivatives: ${{ steps.matrix.outputs.derivatives }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v4.1.7
+
+      - name: Auto-bump Tag
+        id: auto_tag
+        if: github.event.inputs.tag_override == ''
+        uses: mathieudutour/github-tag-action@v6.2
         with:
-          fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
 
-      - name: Setup Bun and install dependencies
-        uses: iamvikshan/.github/.github/actions/bun@main
-
-      - name: Release analysis
-        id: release_analysis
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set Final Tag
+        id: tag
         run: |
-          echo "🔍 Analyzing changes for release..."
-
-          # Determine trigger type
-          TRIGGER="push"
-          VERSION_OVERRIDE=""
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            TRIGGER="schedule"
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [[ "${{ github.event.inputs.trigger_reason }}" == *"Base image"* ]] || [[ "${{ github.event.inputs.trigger_reason }}" == *"base image"* ]]; then
-              TRIGGER="base-image-update"
-              echo "🔄 Detected base image update trigger"
-            else
-              TRIGGER="manual"
-            fi
-            if [ -n "${{ github.event.inputs.version }}" ]; then
-              VERSION_OVERRIDE="${{ github.event.inputs.version }}"
-              echo "�� Version override: $VERSION_OVERRIDE"
-            fi
-          fi
-
-          # Build command with optional version override
-          CMD="bun scripts/releaseOrchestrator.ts --trigger=$TRIGGER --workflow"
-          if [ -n "$VERSION_OVERRIDE" ]; then
-            CMD="$CMD --version=$VERSION_OVERRIDE"
-          fi
-
-          # Run release orchestrator in workflow mode
-          RESULT=$($CMD)
-          echo "📋 Release analysis result: $RESULT"
-
-          # Parse the JSON result
-          SUCCESS=$(echo "$RESULT" | jq -r '.success')
-          SHOULD_RELEASE=$(echo "$RESULT" | jq -r '.outputs.should_release')
-          RELEASE_TYPE=$(echo "$RESULT" | jq -r '.outputs.release_type')
-          AFFECTED_CONTAINERS=$(echo "$RESULT" | jq -r '.outputs.affected_containers')
-          VERSION_MAP=$(echo "$RESULT" | jq -r '.outputs.version_map')
-
-          echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
-          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-          echo "affected_containers=$AFFECTED_CONTAINERS" >> $GITHUB_OUTPUT
-          echo "version_map=$VERSION_MAP" >> $GITHUB_OUTPUT
-
-          if [ "$SUCCESS" = "true" ] && [ "$SHOULD_RELEASE" = "true" ]; then
-            echo "🚀 Release needed: $RELEASE_TYPE"
-            echo "📦 Affected containers: $AFFECTED_CONTAINERS"
+          if [ -n "${{ github.event.inputs.tag_override }}" ]; then
+            echo "new_tag=${{ github.event.inputs.tag_override }}" >> $GITHUB_OUTPUT
           else
-            if [ "$SUCCESS" = "false" ]; then
-              ERROR=$(echo "$RESULT" | jq -r '.error // "Unknown error"')
-              echo "❌ Release analysis failed: $ERROR"
-            else
-              echo "ℹ️  No release needed"
-            fi
+            echo "new_tag=${{ steps.auto_tag.outputs.new_tag }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Set build matrix
-        id: set_matrix
-        if: steps.release_analysis.outputs.should_release == 'true'
+      - name: Detect Changes
+        id: filter
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          filters: |
+            bun: 'images/bun/**'
+            ubuntu_tools: 'images/ubuntu-tools/**'
+            bun_node: 'images/bun-node/**'
+            ubuntu_bun: 'images/ubuntu-bun/**'
+            ubuntu_bun_node: 'images/ubuntu-bun-node/**'
+
+      - name: Construct DAG Matrices
+        id: matrix
         run: |
-          # Convert comma-separated containers to JSON array for matrix
-          CONTAINERS="${{ steps.release_analysis.outputs.affected_containers }}"
-          if [ -n "$CONTAINERS" ]; then
-            MATRIX=$(echo "$CONTAINERS" | jq -R 'split(",") | map(gsub("^\\s+|\\s+$"; ""))' -c)
-            echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
-            echo "📦 Build matrix: $MATRIX"
+          BASES=()
+          DERIVATIVES=()
+
+          # Force build ALL if scheduled or manually dispatched
+          if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            BASES=("bun" "ubuntu-tools")
+            DERIVATIVES=("bun-node" "ubuntu-bun" "ubuntu-bun-node")
           else
-            echo "matrix=[]" >> $GITHUB_OUTPUT
+            [ "${{ steps.filter.outputs.bun }}" == "true" ] && BASES+=("bun")
+            [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] && BASES+=("ubuntu-tools")
+            [ "${{ steps.filter.outputs.bun_node }}" == "true" ] && DERIVATIVES+=("bun-node")
+            [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ] && DERIVATIVES+=("ubuntu-bun")
+            [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] && DERIVATIVES+=("ubuntu-bun-node")
           fi
+
+          # Convert bash arrays to JSON strings for GitHub Actions
+          printf -v BASES_JSON '["%s"]' "$(IFS='","'; echo "${BASES[*]}")"
+          [ "${#BASES[@]}" -eq 0 ] && BASES_JSON="[]"
+
+          printf -v DERIVATIVES_JSON '["%s"]' "$(IFS='","'; echo "${DERIVATIVES[*]}")"
+          [ "${#DERIVATIVES[@]}" -eq 0 ] && DERIVATIVES_JSON="[]"
+
+          echo "bases=$BASES_JSON" >> $GITHUB_OUTPUT
+          echo "derivatives=$DERIVATIVES_JSON" >> $GITHUB_OUTPUT
 
   # ============================================
-  # Job 2: Build and push images (matrix)
+  # Job 2: Build Base Images First
   # ============================================
-  build:
-    name: Build ${{ matrix.image }}
-    needs: analyze
-    if: needs.analyze.outputs.should_release == 'true'
+  build-bases:
+    name: Base -> ${{ matrix.image }}
+    needs: prepare
+    if: ${{ needs.prepare.outputs.bases != '[]' && needs.prepare.outputs.bases != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -139,132 +107,215 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ${{ fromJson(needs.analyze.outputs.matrix) }}
+        image: ${{ fromJSON(needs.prepare.outputs.bases) }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v4.1.7
 
-      - name: Get version for this image
-        id: version
-        run: |
-          VERSION=$(echo '${{ needs.analyze.outputs.version_map }}' | jq -r '.["${{ matrix.image }}"] // "latest"')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Building ${{ matrix.image }}:v$VERSION"
+      - name: Set up QEMU & Buildx
+        uses: docker/setup-qemu-action@v3.2.0
+      - uses: docker/setup-buildx-action@v3.6.1
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4.1.0
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4.1.0
-
-      # Login to all 3 registries
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+      - name: Log in to Registries
+        uses: docker/login-action@v3.3.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
-
-      - name: Log in to GitLab Container Registry
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/login-action@v3.3.0
         with:
           registry: registry.gitlab.com
           username: oauth2
           password: ${{ secrets.GITLAB_TOKEN }}
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+      - uses: docker/login-action@v3.3.0
         with:
           username: ${{ env.GL_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v6.1.0
+        uses: docker/metadata-action@v5.5.1
         with:
           images: |
-            ghcr.io/${{ github.repository }}/${{ matrix.image }}
+            ${{ env.GHCR_BASE }}/${{ matrix.image }}
             registry.gitlab.com/${{ env.GL_USERNAME }}/devcontainers/${{ matrix.image }}
             ${{ env.GL_USERNAME }}/${{ matrix.image }}
           tags: |
-            type=raw,value=v${{ steps.version.outputs.version }}
+            type=raw,value=${{ needs.prepare.outputs.new_tag }}
             type=raw,value=latest
 
-      - name: Build and push
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+      - name: Build and Push
+        uses: docker/build-push-action@v6.5.0
         with:
           context: images/${{ matrix.image }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          provenance: false
+          provenance: mode=min
+
+      - name: Extract Size & Tool Versions via Skopeo
+        run: |
+          mkdir -p metadata
+
+          # 1. Extract Size from remote manifest
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
+          jq '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
+
+          # 2. Extract specific devcontainer.tool.* OCI Labels
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
+          jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
+
+      - name: Upload Metadata
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: metadata-${{ matrix.image }}
+          path: metadata/
+          retention-days: 1
 
   # ============================================
-  # Job 3: Finalize (changelog, docs, cleanup)
+  # Job 3: Build Derivative Images
   # ============================================
-  finalize:
-    name: Finalize Release
-    needs: [analyze, build]
-    if: needs.analyze.outputs.should_release == 'true'
+  build-derivatives:
+    name: Deriv -> ${{ matrix.image }}
+    needs: [prepare, build-bases]
+    if: ${{ !failure() && !cancelled() && needs.prepare.outputs.derivatives != '[]' && needs.prepare.outputs.derivatives != '' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ${{ fromJSON(needs.prepare.outputs.derivatives) }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v4.1.7
+
+      - name: Set up QEMU & Buildx
+        uses: docker/setup-qemu-action@v3.2.0
+      - uses: docker/setup-buildx-action@v3.6.1
+
+      - name: Log in to Registries
+        uses: docker/login-action@v3.3.0
         with:
-          fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/login-action@v3.3.0
+        with:
+          registry: registry.gitlab.com
+          username: oauth2
+          password: ${{ secrets.GITLAB_TOKEN }}
+      - uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ env.GL_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Setup Bun and install dependencies
-        uses: iamvikshan/.github/.github/actions/bun@main
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: |
+            ${{ env.GHCR_BASE }}/${{ matrix.image }}
+            registry.gitlab.com/${{ env.GL_USERNAME }}/devcontainers/${{ matrix.image }}
+            ${{ env.GL_USERNAME }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=${{ needs.prepare.outputs.new_tag }}
+            type=raw,value=latest
 
-      - name: Cache tool versions
+      - name: Build and Push
+        uses: docker/build-push-action@v6.5.0
+        with:
+          context: images/${{ matrix.image }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: mode=min
+
+      - name: Extract Size & Tool Versions via Skopeo
         run: |
-          echo "💾 Caching tool versions to container-versions.json..."
-          AFFECTED="${{ needs.analyze.outputs.affected_containers }}"
-          bun scripts/toolVersionExtractor.ts --local --containers="$AFFECTED" --save-to-cache || echo "⚠️ Failed to cache tool versions, continuing..."
+          mkdir -p metadata
 
-      - name: Update CHANGELOG.md
-        env:
-          VERSION_MAP: ${{ needs.analyze.outputs.version_map }}
-        run: |
-          echo "📝 Updating CHANGELOG.md with new release versions..."
-          bun scripts/changelogManager.ts --update-table --version-map="$VERSION_MAP" || echo "⚠️ Failed to update CHANGELOG.md, continuing..."
+          # 1. Extract Size from remote manifest
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
+          jq '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
 
-      - name: Update documentation
-        continue-on-error: true
-        uses: ./.github/actions/update-docs
+          # 2. Extract specific devcontainer.tool.* OCI Labels
+          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:latest | \
+          jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
+
+      - name: Upload Metadata
+        uses: actions/upload-artifact@v4.3.4
         with:
-          gitlab-token: ${{ secrets.GITLAB_TOKEN }}
-          github-token: ${{ secrets.GH_TOKEN }}
-          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
-          version-map: ${{ needs.analyze.outputs.version_map }}
-
-      - name: Cleanup untagged images
-        continue-on-error: true
-        uses: ./.github/actions/cleanup-images
-        with:
-          affected-containers: ${{ needs.analyze.outputs.affected_containers }}
-          github-token: ${{ secrets.GH_TOKEN }}
-          repository-name: ${{ github.event.repository.name }}
+          name: metadata-${{ matrix.image }}
+          path: metadata/
+          retention-days: 1
 
   # ============================================
-  # Job 4: No release needed (info only)
+  # Job 4: Finalize Changelog & Documentation
   # ============================================
-  no-release:
-    name: No Release Needed
-    needs: analyze
-    if: needs.analyze.outputs.should_release != 'true'
+  finalize:
+    name: Finalize Release Notes
+    needs: [prepare, build-bases, build-derivatives]
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Summary
-        run: |
-          echo "ℹ️  No Docker image release needed - all images are up to date"
-          echo "✅ Workflow completed successfully"
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      # Uses our custom script to handle sizes, tools, README, CHANGELOG, and GH Release
+      - name: Execute Notes Action
+        uses: ./.github/actions/notes
+        with:
+          tag_name: ${{ needs.prepare.outputs.new_tag }}
+
+  # ============================================
+  # Job 5: Sync DockerHub READMEs
+  # ============================================
+  dockerhub-sync:
+    name: Sync DockerHub -> ${{ matrix.image }}
+    needs: finalize
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      - name: Push README to DockerHub
+        uses: peter-evans/dockerhub-description@v4.0.0
+        with:
+          username: ${{ env.GL_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ env.GL_USERNAME }}/${{ matrix.image }}
+          readme-filepath: ./README.md
+
+  # ============================================
+  # Job 6: Standard GHCR Cleanup
+  # ============================================
+  cleanup:
+    name: Prune Untagged GHCR Images
+    needs: [build-bases, build-derivatives]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Clean GHCR
+        uses: vlaurin/action-ghcr-prune@v0.6.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          organization: ${{ github.repository_owner }}
+          container: devcontainers
+          keep-younger-than: 7
+          prune-untagged: true

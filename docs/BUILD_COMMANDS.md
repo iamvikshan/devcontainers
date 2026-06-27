@@ -2,7 +2,8 @@
 
 ## 🐳 Docker Setup
 
-The devcontainer includes Docker-in-Docker for building and testing images locally.
+The devcontainer includes Docker-in-Docker for building and testing images
+locally.
 
 ### Verify Docker Setup
 
@@ -245,7 +246,7 @@ docker build --no-cache -t devcontainers/bun:test images/bun
    ```bash
    # Check current sizes across local test images
    docker images --filter=reference='devcontainers/*' --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
-   
+
    # Review Docker disk usage
    docker system df -v
    ```
@@ -255,5 +256,6 @@ docker build --no-cache -t devcontainers/bun:test images/bun
 - All test images are tagged with `:test` to avoid conflicts
 - The examples tag images with `:test` to keep cleanup straightforward
 - Use `docker logs <container_id>` to debug container issues
-- Check Dockerfile changes with `docker build --progress=plain` to inspect the full output
+- Check Dockerfile changes with `docker build --progress=plain` to inspect the
+  full output
 - Images are automatically updated weekly and when base images change
