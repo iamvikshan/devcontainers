@@ -33,7 +33,12 @@ RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 # Install Node.js deterministically for the correct architecture, then install formatters
 ARG TARGETARCH
 RUN ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x64" || echo "arm64") \
-    && curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" | tar -xJ -C /usr/local --strip-components=1 \
+    && NODE_TARBALL="node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
+    && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_TARBALL}" \
+    && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt" \
+    && grep " ${NODE_TARBALL}$" SHASUMS256.txt | sha256sum -c - \
+    && tar -xJf "${NODE_TARBALL}" -C /usr/local --strip-components=1 \
+    && rm -f "${NODE_TARBALL}" SHASUMS256.txt \
     && bun install -g oxlint@${OXLINT_VERSION} oxfmt@${OXFMT_VERSION}
 
 # 5. Drop privileges
