@@ -31,8 +31,7 @@
 
 ## Container-image conventions
 
-- Each image Dockerfile writes `/usr/local/share/tool-versions.txt` during
-  build.
+- Each image Dockerfile exposes tool metadata via `devcontainer.tool.*` OCI labels during build.
 - When tool availability changes in an image, keep the tool version extraction
   block accurate.
 - Preserve non-root user handling (`USERNAME`) and passwordless sudo behavior
