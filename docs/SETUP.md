@@ -1,7 +1,8 @@
 # DevContainer Setup Guide
 
-This guide provides comprehensive setup instructions for all devcontainer images in this repository.
-Interactive shells default to a customized Zsh + Oh My Zsh setup, so the examples below use `zsh`.
+This guide provides comprehensive setup instructions for all devcontainer images
+in this repository. Interactive shells default to a customized Zsh + Oh My Zsh
+setup, so the examples below use `zsh`.
 
 ## 🚀 Quick Start
 
@@ -176,7 +177,8 @@ bun run build
 bun run script.ts
 ```
 
-> `ubuntu-tools` does not include Bun by default. Use this section only for Bun-based images.
+> `ubuntu-tools` does not include Bun by default. Use this section only for
+> Bun-based images.
 
 ### npm Commands (Node images only)
 
@@ -255,7 +257,8 @@ Images are automatically updated:
 - **Base image updates** trigger new builds
 - **Security patches** applied automatically
 
-Check the [CHANGELOG](../CHANGELOG.md#released-versions) for current versions and release history.
+Check the [CHANGELOG](../CHANGELOG.md#released-versions) for current versions
+and release history.
 
 ## 📚 Additional Resources
 

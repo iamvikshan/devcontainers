@@ -1,6 +1,7 @@
 # DevContainer Image Variants
 
-This document provides detailed information about all 5 available devcontainer images.
+This document provides detailed information about all 5 available devcontainer
+images.
 
 ## 📊 Images Comparison
 
@@ -9,8 +10,8 @@ This document provides detailed information about all 5 available devcontainer i
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest         |
 | **Size**        | ~133 MB           | ~227 MB                | ~94 MB           | ~166 MB           | ~80 MB                |
 | **Bun Version** | 1.3.3             | 1.3.3                  | 1.3.3            | 1.3.3             | ❌                    |
-| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v25.2.0        | ❌                    |
-| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 11.6.2         | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v22.11.0       | ❌                    |
+| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | Tools-only automation |
 
@@ -31,8 +32,9 @@ This document provides detailed information about all 5 available devcontainer i
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun:latest`
 
-**Description:** Lightweight Bun development environment based on the official Alpine-based Bun
-image. Perfect for pure Bun projects that don't require Node.js compatibility.
+**Description:** Lightweight Bun development environment based on the official
+Alpine-based Bun image. Perfect for pure Bun projects that don't require Node.js
+compatibility.
 
 **Key Features:**
 
@@ -65,7 +67,7 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
   "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -76,22 +78,23 @@ image. Perfect for pure Bun projects that don't require Node.js compatibility.
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
 
-**Description:** Full-featured development environment with both Bun and Node.js. Ideal for projects
-that need Bun's performance with Node.js ecosystem compatibility.
+**Description:** Full-featured development environment with both Bun and
+Node.js. Ideal for projects that need Bun's performance with Node.js ecosystem
+compatibility.
 
 **Key Features:**
 
 - 🚀 **Best of both worlds** - Bun speed + Node.js compatibility
 - 📦 **Full npm ecosystem** - Access to all npm packages
-- 🔧 **Latest runtimes** - Bun 1.3.3 + Node.js v22.11.0
-- 🛠️ **Development tools** - ESLint pre-installed
+- 🔧 **Latest runtimes** - Bun and Node.js
+- 🛠️ **Development tools** - oxlint/oxfmt pre-installed
 
 **Included Tools:**
 
 - Bun 1.3.3
-- Node.js v22.11.0
-- npm 10.9.0
-- ESLint (global)
+- Node.js
+- npm
+- oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl
 - btop (system resource monitor)
 - Alpine package manager (apk)
@@ -112,7 +115,7 @@ that need Bun's performance with Node.js ecosystem compatibility.
   "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -123,8 +126,8 @@ that need Bun's performance with Node.js ecosystem compatibility.
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
 
-**Description:** Ubuntu-based Bun environment for developers who prefer Ubuntu's package ecosystem
-and tooling. The smallest image in our collection!
+**Description:** Ubuntu-based Bun environment for developers who prefer Ubuntu's
+package ecosystem and tooling. The smallest image in our collection!
 
 **Key Features:**
 
@@ -158,7 +161,7 @@ and tooling. The smallest image in our collection!
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -169,8 +172,9 @@ and tooling. The smallest image in our collection!
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
 
-**Description:** Complete Ubuntu-based development environment with Bun, Node.js, and npm. Best of
-both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
+**Description:** Complete Ubuntu-based development environment with Bun,
+Node.js, and npm. Best of both worlds with Ubuntu's flexibility and modern
+JavaScript runtimes.
 
 **Key Features:**
 
@@ -182,9 +186,9 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
 **Included Tools:**
 
 - Bun 1.3.3 (installed via script)
-- Node.js v24.5.0
-- npm 11.5.1
-- ESLint (global)
+- Node.js v22.11.0
+- npm 10.9.0
+- oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl, unzip
 - btop (system resource monitor)
 - sudo (administrative access)
@@ -206,7 +210,7 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["oven.bun-vscode", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
   "postCreateCommand": "bun install"
@@ -217,15 +221,15 @@ both worlds with Ubuntu's flexibility and modern JavaScript runtimes.
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest`
 
-**Description:** Ubuntu-based tools-only environment for automation, scripting, and utility-heavy
-workflows that do not require Bun or Node.js runtimes.
+**Description:** Ubuntu-based tools-only environment for automation, scripting,
+and utility-heavy workflows that do not require Bun or Node.js runtimes.
 
 **Key Features:**
 
 - 🧰 **Tools-focused image** - Includes Python, jq, Git, curl, and btop
 - 🐧 **Ubuntu base** - Standard Ubuntu package ecosystem with apt
 - 🔐 **sudo access** - Administrative privileges for setup tasks
-- 🚫 **No JS runtime bundle** - No Bun, Node.js, npm, or ESLint preinstalled
+- 🚫 **No JS runtime bundle** - No Bun, Node.js, npm, or oxlint/oxfmt preinstalled
 
 **Included Tools:**
 
@@ -251,7 +255,7 @@ workflows that do not require Bun or Node.js runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["ms-python.python", "esbenp.prettier-vscode"]
+      "extensions": ["ms-python.python", "oxc.oxc-vscode"]
     }
   }
 }
@@ -296,8 +300,8 @@ Do you need Bun runtime?
 
 ## 📦 Alternative Sources
 
-While we recommend using GitHub Container Registry as the primary source, all images are available
-from multiple registries:
+While we recommend using GitHub Container Registry as the primary source, all
+images are available from multiple registries:
 
 ### GitHub Container Registry (Primary)
 
@@ -317,8 +321,8 @@ registry.gitlab.com/vikshan/devcontainers/[image]:latest
 docker.io/vikshan/[image]:latest
 ```
 
-> **Note:** All registries contain identical images. Choose based on your preference or
-> organizational requirements.
+> **Note:** All registries contain identical images. Choose based on your
+> preference or organizational requirements.
 
 ## 🔄 Update Schedule
 
@@ -330,7 +334,8 @@ All images are automatically updated:
 
 ## 📈 Version History
 
-See [CHANGELOG.md](../CHANGELOG.md#released-versions) for detailed version history and changelogs.
+See [CHANGELOG.md](../CHANGELOG.md#released-versions) for detailed version
+history and changelogs.
 
 ## 🤝 Contributing
 
@@ -343,7 +348,9 @@ To contribute improvements to any image:
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/iamvikshan/devcontainers/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/iamvikshan/devcontainers/discussions)
+- **Issues**:
+  [GitHub Issues](https://github.com/iamvikshan/devcontainers/issues)
+- **Discussions**:
+  [GitHub Discussions](https://github.com/iamvikshan/devcontainers/discussions)
 - **Setup Guide**: [SETUP.md](SETUP.md)
 - **Build Guide**: [BUILD_COMMANDS.md](BUILD_COMMANDS.md)

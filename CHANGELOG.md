@@ -1,6 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project and devcontainer images will be documented in this file.
+
+---
 
 ## [0.0.4] - 2025-12-02
 
@@ -34,8 +36,8 @@ All notable changes to this project will be documented in this file.
 
 ## Other Changes
 
-- release: 0.0.1 - roll back and implement manual release override functionality and update
-  changelog format
+- release: 0.0.1 - roll back and implement manual release override functionality
+  and update changelog format
   ([5d82204](https://github.com/iamvikshan/devcontainers/commit/5d82204a9158b2e21b7215be4ddd9fe05b400ccb))
 
 ---
@@ -53,10 +55,11 @@ All notable changes to this project will be documented in this file.
 
 - fix: consolidate version tracking and optimize release workflow
   ([fd3d8bc](https://github.com/iamvikshan/devcontainers/commit/fd3d8bce896e733879d0852f72d06494b76fd7c8))
-- fix: setup script for improved readability and consistency; update package.json dependencies;
-  enhance build-all-images script with better error handling and logging; add GitHub Actions for
-  building, cleaning up, and tagging container images; implement scripts for extracting tool
-  versions and cleaning untagged images; ensure Docker setup verification is robust and
+- fix: setup script for improved readability and consistency; update
+  package.json dependencies; enhance build-all-images script with better error
+  handling and logging; add GitHub Actions for building, cleaning up, and
+  tagging container images; implement scripts for extracting tool versions and
+  cleaning untagged images; ensure Docker setup verification is robust and
   user-friendly.
   ([700d7a6](https://github.com/iamvikshan/devcontainers/commit/700d7a6c933475adbb5de52aa1b26a73eb294e91))
 - fix: resolve untagged images and missing Gitpod containers in documentation
@@ -64,8 +67,8 @@ All notable changes to this project will be documented in this file.
 
 ## Other Changes
 
-- release: 0.0.1 - roll back and implement manual release override functionality and update
-  changelog format
+- release: 0.0.1 - roll back and implement manual release override functionality
+  and update changelog format
   ([5d82204](https://github.com/iamvikshan/devcontainers/commit/5d82204a9158b2e21b7215be4ddd9fe05b400ccb))
 
 ## [0.0.1] - 2025-10-18
@@ -83,21 +86,26 @@ All notable changes to this project will be documented in this file.
   ([9aa6709](https://github.com/iamvikshan/devcontainers/commit/9aa67092335a6a9f7e0e8a96b87985d4cdd82979))
 - fix: consolidate version tracking and optimize release workflow
   ([fd3d8bc](https://github.com/iamvikshan/devcontainers/commit/fd3d8bce896e733879d0852f72d06494b76fd7c8))
-- fix: setup script for improved readability and consistency; update package.json dependencies;
-  enhance build-all-images script with better error handling and logging; add GitHub Actions for
-  building, cleaning up, and tagging container images; implement scripts for extracting tool
-  versions and cleaning untagged images; ensure Docker setup verification is robust and
+- fix: setup script for improved readability and consistency; update
+  package.json dependencies; enhance build-all-images script with better error
+  handling and logging; add GitHub Actions for building, cleaning up, and
+  tagging container images; implement scripts for extracting tool versions and
+  cleaning untagged images; ensure Docker setup verification is robust and
   user-friendly.
   ([700d7a6](https://github.com/iamvikshan/devcontainers/commit/700d7a6c933475adbb5de52aa1b26a73eb294e91))
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
   ([798074f](https://github.com/iamvikshan/devcontainers/commit/798074fda7df081ad6e7259498bbc344e620561e))
 - fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node
   ([e28d899](https://github.com/iamvikshan/devcontainers/commit/e28d89945aad9557d1ad1a56746289433c1a5d74))
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
   ([52a2747](https://github.com/iamvikshan/devcontainers/commit/52a2747fdde5cfe5b1502ec50ab7ef22b6531314))
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
   ([f1c0de4](https://github.com/iamvikshan/devcontainers/commit/f1c0de447ffe3d3131eaf1f970e20a43fe9a8e3d))
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
   ([bd9078a](https://github.com/iamvikshan/devcontainers/commit/bd9078a30b74a21604d7e3fe5325f6e3f51b23e0))
 - fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node
   ([e127627](https://github.com/iamvikshan/devcontainers/commit/e127627471cc091180e0608abb3c5b6b9f7358bb))
@@ -106,8 +114,8 @@ All notable changes to this project will be documented in this file.
 
 ## Other Changes
 
-- release: 0.0.1 - roll back and implement manual release override functionality and update
-  changelog format
+- release: 0.0.1 - roll back and implement manual release override functionality
+  and update changelog format
   ([5d82204](https://github.com/iamvikshan/devcontainers/commit/5d82204a9158b2e21b7215be4ddd9fe05b400ccb))
 - docs: update documentation for release v2.0.0
   ([c098a72](https://github.com/iamvikshan/devcontainers/commit/c098a723e995a56c321f416a057d328c3d303a62))
@@ -127,8 +135,8 @@ All notable changes to this project will be documented in this file.
 | ubuntu-bun      | v0.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun)                |
 | ubuntu-bun-node | v0.0.1 (latest) | 2025-10-18   | [GitHub](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest) · [GitLab](https://registry.gitlab.com/vikshan/devcontainers/ubuntu-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node) |
 
-> **Note:** The "(latest)" marker indicates the version currently tagged as `:latest` in all
-> registries.
+> **Note:** The "(latest)" marker indicates the version currently tagged as
+> `:latest` in all registries.
 
 ---
 
@@ -157,7 +165,8 @@ All notable changes to this project will be documented in this file.
 - Security patches and bug fixes from upstream
 - Improved compatibility and performance
 
-**Impact:** Patch release - DevContainers will be rebuilt with updated base images
+**Impact:** Patch release - DevContainers will be rebuilt with updated base
+images
 
 ---
 
@@ -178,66 +187,82 @@ All notable changes to this project will be documented in this file.
 
 - feat: Add Gitpod-specific DevContainer images for Bun and Node.js (3a7c300)
 - feat: Implement release orchestration and version management scripts (41016db)
-- feat!: Implement centralized registry client for Docker Hub, GHCR, and GitLab (0b833d5)
-- feat: let's start over, shall we? update release workflows to prevent redundant triggers and
-  enhance sync operations (5aba3ef)
+- feat!: Implement centralized registry client for Docker Hub, GHCR, and GitLab
+  (0b833d5)
+- feat: let's start over, shall we? update release workflows to prevent
+  redundant triggers and enhance sync operations (5aba3ef)
 
 ## Bug Fixes
 
 - fix: consolidate version tracking and optimize release workflow (fd3d8bc)
-- fix: setup script for improved readability and consistency; update package.json dependencies;
-  enhance build-all-images script with better error handling and logging; add GitHub Actions for
-  building, cleaning up, and tagging container images; implement scripts for extracting tool
-  versions and cleaning untagged images; ensure Docker setup verification is robust and
+- fix: setup script for improved readability and consistency; update
+  package.json dependencies; enhance build-all-images script with better error
+  handling and logging; add GitHub Actions for building, cleaning up, and
+  tagging container images; implement scripts for extracting tool versions and
+  cleaning untagged images; ensure Docker setup verification is robust and
   user-friendly. (700d7a6)
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (798074f)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (798074f)
 - fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node (e28d899)
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (52a2747)
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (f1c0de4)
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (bd9078a)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (52a2747)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (f1c0de4)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (bd9078a)
 - fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node (e127627)
-- fix: resolve untagged images and missing Gitpod containers in documentation (e9fe715)
-- fix: update advanced-git-sync action version and improve SSH startup script in gitpod Dockerfiles
-  (6b33e3f)
-- fix: update Dockerfiles to include SSH server and configure settings for improved access (ea95c30)
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (9296340)
-- fix: add remote pull before pushing documentation changes and tags to avoid conflicts (b0e3d4c)
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (a717021)
+- fix: resolve untagged images and missing Gitpod containers in documentation
+  (e9fe715)
+- fix: update advanced-git-sync action version and improve SSH startup script in
+  gitpod Dockerfiles (6b33e3f)
+- fix: update Dockerfiles to include SSH server and configure settings for
+  improved access (ea95c30)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (9296340)
+- fix: add remote pull before pushing documentation changes and tags to avoid
+  conflicts (b0e3d4c)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (a717021)
 - fix: update base images for bun,bun-node,gitpod-bun,gitpod-bun-node (65d85bb)
 - fix: Enhance base image check and release workflows (02baa52)
 - fix: update base images for bun, bun-node (f19798f)
 - fix: update base images for bun, bun-node (55537b6)
 - fix: update base images for ubuntu-bun, ubuntu-bun-node (6cfd75e)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (ab3155f)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (5bb948e)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (0b5bffa)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (2bf890e)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (e375dd4)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (ab3155f)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (5bb948e)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (0b5bffa)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (2bf890e)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (e375dd4)
 - fix: update base images for bun, bun-node (abe2d81)
-- fix: update image sizes in documentation and streamline action configurations (3f29d11)
-- fix: update documentation commit message and streamline push process for versioning (5a90d62)
-- fix: update README and action configurations to include Docker Hub support and streamline
-  container registry authentication (3163fbb)
-- fix: streamline Docker image build process by combining build and push steps for GitHub and GitLab
-  registries (0b8c065)
-- fix: update GitHub Actions for documentation updates and remove GitLab integration (ba02651)
-- fix: update README files with new image sizes and enhance GitHub Actions for documentation updates
-  (f47e47b)
+- fix: update image sizes in documentation and streamline action configurations
+  (3f29d11)
+- fix: update documentation commit message and streamline push process for
+  versioning (5a90d62)
+- fix: update README and action configurations to include Docker Hub support and
+  streamline container registry authentication (3163fbb)
+- fix: streamline Docker image build process by combining build and push steps
+  for GitHub and GitLab registries (0b8c065)
+- fix: update GitHub Actions for documentation updates and remove GitLab
+  integration (ba02651)
+- fix: update README files with new image sizes and enhance GitHub Actions for
+  documentation updates (f47e47b)
 - fix: update sync configuration and enhance release workflow steps (687909c)
-- fix: implement image size updater script and update README files with new sizes (e6c2811)
-- fix: update advanced-git-sync action version to v1.1.5 in sync workflow (18dda27)
-- fix: update GitHub Actions workflow and dependencies; upgrade checkout action and sync action
-  version. Uprade bun to v1.1.38 (10bc7cd)
+- fix: implement image size updater script and update README files with new
+  sizes (e6c2811)
+- fix: update advanced-git-sync action version to v1.1.5 in sync workflow
+  (18dda27)
+- fix: update GitHub Actions workflow and dependencies; upgrade checkout action
+  and sync action version. Upgrade bun to v1.1.38 (10bc7cd)
 
 ## Other Changes
 
-- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#36) (07af88f)
+- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#36)
+  (07af88f)
 - chore: streamline tool version extraction script in release workflow (df3ef63)
 - chore: Refactor version management to changelog management (f874a69)
 - docs: update documentation for release v1.1.5 (3e9edd4)
@@ -250,20 +275,24 @@ All notable changes to this project will be documented in this file.
 - chore(release): 1.1.4 [skip ci] (fc9ab4d)
 - chore(release): 1.1.3 [skip ci] (efd4322)
 - chore: enhance logging functionality and add silent mode support (18fefed)
-- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#32) (b2e4933)
+- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#32)
+  (b2e4933)
 - chore(release): 1.1.2 [skip ci] (14dcf85)
 - chore(release): 1.1.2 [skip ci] (d9ab672)
 - chore: update advanced-git-sync action to version 1.4.2 (8908b95)
-- chore: update setup actions to use Bun and upgrade advanced-git-sync version (67dee93)
-- chore: improve pre-release check and version prediction scripts for better workflow integration
-  (44920b5)
-- chore: enhance release workflow with pre-release checks and version prediction (6217251)
+- chore: update setup actions to use Bun and upgrade advanced-git-sync version
+  (67dee93)
+- chore: improve pre-release check and version prediction scripts for better
+  workflow integration (44920b5)
+- chore: enhance release workflow with pre-release checks and version prediction
+  (6217251)
 - Release 1.1.2 [skip ci] (fd9ceca)
 - Release 1.1.2 [skip ci] (58779bc)
 - Release 1.1.2 [skip ci] (6454123)
 - Release 1.1.2 [skip ci] (4e439b1)
 - Release 1.1.2 [skip ci] (10bfd3c)
-- chore: enable token persistence for checkout and improve git push handling (e39c2f9)
+- chore: enable token persistence for checkout and improve git push handling
+  (e39c2f9)
 - Release 1.1.2 [skip ci] (d9ef26f)
 - Release 1.1.2 [skip ci] (ebd0db8)
 - chore: bump actions/checkout (#28) (3dcb12d)
@@ -293,19 +322,24 @@ All notable changes to this project will be documented in this file.
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (f9a043a)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (8efdb63)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (cf479f3)
-- chore: migrate from versions.json to VERSIONS.md for version management (1767e05)
-- chore: update workflows to trigger release with reason input and log trigger details (1d29a02)
-- chore: update sync configuration and GitHub Actions workflow for improved syncing and permissions
-  (7d621a6)
-- chore: update Docker update schedule to daily and upgrade sync action version (445ac4d)
+- chore: migrate from versions.json to VERSIONS.md for version management
+  (1767e05)
+- chore: update workflows to trigger release with reason input and log trigger
+  details (1d29a02)
+- chore: update sync configuration and GitHub Actions workflow for improved
+  syncing and permissions (7d621a6)
+- chore: update Docker update schedule to daily and upgrade sync action version
+  (445ac4d)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (e52540f)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (a3822ca)
 - Release 1.1.0 [skip ci] (98bc36f)
-- ✨ feat: fix GitHub Actions token issues and optimize version management (a2be3a8)
+- ✨ feat: fix GitHub Actions token issues and optimize version management
+  (a2be3a8)
 - Release 1.0.4 [skip ci] (f5cd167)
 - chore(deps-dev): bump @types/node from 22.16.5 to 24.1.0 (#22) (9609880)
 - Merge pull request #18 from
-  iamvikshan/dependabot/npm_and_yarn/conventional-changelog-conventionalcommits-9.1.0 (8570805)
+  iamvikshan/dependabot/npm_and_yarn/conventional-changelog-conventionalcommits-9.1.0
+  (8570805)
 - Release 1.0.3 [skip ci] (f700fbe)
 - Release 1.0.3 [skip ci] (2df4456)
 - Release 1.0.2 [skip ci] (6325b60)
@@ -314,15 +348,15 @@ All notable changes to this project will be documented in this file.
 - Release 1.0.0 [skip ci] (56ecffd)
 - Update and rename gl-sync.yml to sync.yml (4c40196)
 - Update gl-sync.yml (8b8267b)
-- chore: update GitHub Actions workflows and sync configuration; enhance release process and improve
-  README badges (8ad8372)
+- chore: update GitHub Actions workflows and sync configuration; enhance release
+  process and improve README badges (8ad8372)
 - Release 1.0.0 [skip ci] (b1d0dc1)
-- chore: update CLA workflow to use consistent GitHub token; refine release workflow triggers and
-  update changelog (e4ab6ad)
+- chore: update CLA workflow to use consistent GitHub token; refine release
+  workflow triggers and update changelog (e4ab6ad)
 - Release 1.0.0 [skip ci] (89fcea2)
 - Release 1.0.0 [skip ci] (4b88988)
-- chore: update container images and README with accurate sizes; adjust GitHub Actions for token
-  consistency (e078146)
+- chore: update container images and README with accurate sizes; adjust GitHub
+  Actions for token consistency (e078146)
 - Release 1.0.0 [skip ci] (7166661)
 
 ## [1.1.5] - 2025-09-24
@@ -338,9 +372,10 @@ All notable changes to this project will be documented in this file.
 
 ## Bug Fixes
 
-- fix: update advanced-git-sync action version and improve SSH startup script in gitpod Dockerfiles
-  (6b33e3f)
-- fix: update Dockerfiles to include SSH server and configure settings for improved access (ea95c30)
+- fix: update advanced-git-sync action version and improve SSH startup script in
+  gitpod Dockerfiles (6b33e3f)
+- fix: update Dockerfiles to include SSH server and configure settings for
+  improved access (ea95c30)
 
 ## [1.1.4] - 2025-09-17
 
@@ -357,8 +392,8 @@ All notable changes to this project will be documented in this file.
 
 ## Bug Fixes
 
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (9296340)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (9296340)
 
 ## [1.1.3] - 2025-09-16
 
@@ -375,7 +410,8 @@ All notable changes to this project will be documented in this file.
 
 ## Bug Fixes
 
-- fix: add remote pull before pushing documentation changes and tags to avoid conflicts (b0e3d4c)
+- fix: add remote pull before pushing documentation changes and tags to avoid
+  conflicts (b0e3d4c)
 
 ## [1.1.2] - 2025-09-16
 
@@ -392,8 +428,8 @@ All notable changes to this project will be documented in this file.
 
 ## Bug Fixes
 
-- fix: update base images for ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node
-  (a717021)
+- fix: update base images for
+  ubuntu-bun,ubuntu-bun-node,gitpod-ubuntu-bun,gitpod-ubuntu-bun-node (a717021)
 
 ## [1.1.1] - 2025-09-15
 
@@ -437,9 +473,10 @@ All notable changes to this project will be documented in this file.
 ## Features
 
 - feat: Implement release orchestration and version management scripts (41016db)
-- feat!: Implement centralized registry client for Docker Hub, GHCR, and GitLab (0b833d5)
-- feat: let's start over, shall we? update release workflows to prevent redundant triggers and
-  enhance sync operations (5aba3ef)
+- feat!: Implement centralized registry client for Docker Hub, GHCR, and GitLab
+  (0b833d5)
+- feat: let's start over, shall we? update release workflows to prevent
+  redundant triggers and enhance sync operations (5aba3ef)
 
 ## Bug Fixes
 
@@ -447,46 +484,60 @@ All notable changes to this project will be documented in this file.
 - fix: update base images for bun, bun-node (f19798f)
 - fix: update base images for bun, bun-node (55537b6)
 - fix: update base images for ubuntu-bun, ubuntu-bun-node (6cfd75e)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (ab3155f)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (5bb948e)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (0b5bffa)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (2bf890e)
-- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node (e375dd4)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (ab3155f)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (5bb948e)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (0b5bffa)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (2bf890e)
+- fix: update base images for bun, bun-node, ubuntu-bun, ubuntu-bun-node
+  (e375dd4)
 - fix: update base images for bun, bun-node (abe2d81)
-- fix: update image sizes in documentation and streamline action configurations (3f29d11)
-- fix: update documentation commit message and streamline push process for versioning (5a90d62)
-- fix: update README and action configurations to include Docker Hub support and streamline
-  container registry authentication (3163fbb)
-- fix: streamline Docker image build process by combining build and push steps for GitHub and GitLab
-  registries (0b8c065)
-- fix: update GitHub Actions for documentation updates and remove GitLab integration (ba02651)
-- fix: update README files with new image sizes and enhance GitHub Actions for documentation updates
-  (f47e47b)
+- fix: update image sizes in documentation and streamline action configurations
+  (3f29d11)
+- fix: update documentation commit message and streamline push process for
+  versioning (5a90d62)
+- fix: update README and action configurations to include Docker Hub support and
+  streamline container registry authentication (3163fbb)
+- fix: streamline Docker image build process by combining build and push steps
+  for GitHub and GitLab registries (0b8c065)
+- fix: update GitHub Actions for documentation updates and remove GitLab
+  integration (ba02651)
+- fix: update README files with new image sizes and enhance GitHub Actions for
+  documentation updates (f47e47b)
 - fix: update sync configuration and enhance release workflow steps (687909c)
-- fix: implement image size updater script and update README files with new sizes (e6c2811)
-- fix: update advanced-git-sync action version to v1.1.5 in sync workflow (18dda27)
-- fix: update GitHub Actions workflow and dependencies; upgrade checkout action and sync action
-  version. Uprade bun to v1.1.38 (10bc7cd)
+- fix: implement image size updater script and update README files with new
+  sizes (e6c2811)
+- fix: update advanced-git-sync action version to v1.1.5 in sync workflow
+  (18dda27)
+- fix: update GitHub Actions workflow and dependencies; upgrade checkout action
+  and sync action version. Upgrade bun to v1.1.38 (10bc7cd)
 
 ## Other Changes
 
 - chore(release): 1.1.4 [skip ci] (fc9ab4d)
 - chore(release): 1.1.3 [skip ci] (efd4322)
 - chore: enhance logging functionality and add silent mode support (18fefed)
-- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#32) (b2e4933)
+- chore: bump OpenSaucedHub/advanced-git-sync in the github-actions group (#32)
+  (b2e4933)
 - chore(release): 1.1.2 [skip ci] (14dcf85)
 - chore(release): 1.1.2 [skip ci] (d9ab672)
 - chore: update advanced-git-sync action to version 1.4.2 (8908b95)
-- chore: update setup actions to use Bun and upgrade advanced-git-sync version (67dee93)
-- chore: improve pre-release check and version prediction scripts for better workflow integration
-  (44920b5)
-- chore: enhance release workflow with pre-release checks and version prediction (6217251)
+- chore: update setup actions to use Bun and upgrade advanced-git-sync version
+  (67dee93)
+- chore: improve pre-release check and version prediction scripts for better
+  workflow integration (44920b5)
+- chore: enhance release workflow with pre-release checks and version prediction
+  (6217251)
 - Release 1.1.2 [skip ci] (fd9ceca)
 - Release 1.1.2 [skip ci] (58779bc)
 - Release 1.1.2 [skip ci] (6454123)
 - Release 1.1.2 [skip ci] (4e439b1)
 - Release 1.1.2 [skip ci] (10bfd3c)
-- chore: enable token persistence for checkout and improve git push handling (e39c2f9)
+- chore: enable token persistence for checkout and improve git push handling
+  (e39c2f9)
 - Release 1.1.2 [skip ci] (d9ef26f)
 - Release 1.1.2 [skip ci] (ebd0db8)
 - chore: bump actions/checkout (#28) (3dcb12d)
@@ -516,19 +567,24 @@ All notable changes to this project will be documented in this file.
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (f9a043a)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (8efdb63)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (cf479f3)
-- chore: migrate from versions.json to VERSIONS.md for version management (1767e05)
-- chore: update workflows to trigger release with reason input and log trigger details (1d29a02)
-- chore: update sync configuration and GitHub Actions workflow for improved syncing and permissions
-  (7d621a6)
-- chore: update Docker update schedule to daily and upgrade sync action version (445ac4d)
+- chore: migrate from versions.json to VERSIONS.md for version management
+  (1767e05)
+- chore: update workflows to trigger release with reason input and log trigger
+  details (1d29a02)
+- chore: update sync configuration and GitHub Actions workflow for improved
+  syncing and permissions (7d621a6)
+- chore: update Docker update schedule to daily and upgrade sync action version
+  (445ac4d)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (e52540f)
 - chore: update versions and sizes for release 1.1.0 [skip-sync] (a3822ca)
 - Release 1.1.0 [skip ci] (98bc36f)
-- ✨ feat: fix GitHub Actions token issues and optimize version management (a2be3a8)
+- ✨ feat: fix GitHub Actions token issues and optimize version management
+  (a2be3a8)
 - Release 1.0.4 [skip ci] (f5cd167)
 - chore(deps-dev): bump @types/node from 22.16.5 to 24.1.0 (#22) (9609880)
 - Merge pull request #18 from
-  iamvikshan/dependabot/npm_and_yarn/conventional-changelog-conventionalcommits-9.1.0 (8570805)
+  iamvikshan/dependabot/npm_and_yarn/conventional-changelog-conventionalcommits-9.1.0
+  (8570805)
 - Release 1.0.3 [skip ci] (f700fbe)
 - Release 1.0.3 [skip ci] (2df4456)
 - Release 1.0.2 [skip ci] (6325b60)
@@ -537,15 +593,15 @@ All notable changes to this project will be documented in this file.
 - Release 1.0.0 [skip ci] (56ecffd)
 - Update and rename gl-sync.yml to sync.yml (4c40196)
 - Update gl-sync.yml (8b8267b)
-- chore: update GitHub Actions workflows and sync configuration; enhance release process and improve
-  README badges (8ad8372)
+- chore: update GitHub Actions workflows and sync configuration; enhance release
+  process and improve README badges (8ad8372)
 - Release 1.0.0 [skip ci] (b1d0dc1)
-- chore: update CLA workflow to use consistent GitHub token; refine release workflow triggers and
-  update changelog (e4ab6ad)
+- chore: update CLA workflow to use consistent GitHub token; refine release
+  workflow triggers and update changelog (e4ab6ad)
 - Release 1.0.0 [skip ci] (89fcea2)
 - Release 1.0.0 [skip ci] (4b88988)
-- chore: update container images and README with accurate sizes; adjust GitHub Actions for token
-  consistency (e078146)
+- chore: update container images and README with accurate sizes; adjust GitHub
+  Actions for token consistency (e078146)
 - Release 1.0.0 [skip ci] (7166661)
 
 ## [1.1.4](https://github.com/iamvikshan/devcontainers/compare/v1.1.3...v1.1.4) (2025-08-27)
@@ -718,8 +774,8 @@ All notable changes to this project will be documented in this file.
 
 ## ✨ New Features
 
-- [`a2be3a8`](https://github.com/iamvikshan/devcontainers/commit/a2be3a8) feat: fix GitHub Actions
-  token issues and optimize version management
+- [`a2be3a8`](https://github.com/iamvikshan/devcontainers/commit/a2be3a8) feat:
+  fix GitHub Actions token issues and optimize version management
 
 ## [1.1.0](https://github.com/iamvikshan/devcontainers/compare/v1.0.4...v1.1.0) (2025-08-01)
 
@@ -747,13 +803,13 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- streamline Docker image build process by combining build and push steps for GitHub and GitLab
-  registries
+- streamline Docker image build process by combining build and push steps for
+  GitHub and GitLab registries
   ([0b8c065](https://github.com/iamvikshan/devcontainers/commit/0b8c065ecb196182bd4ae218118bce00ba0b3795))
 - update documentation commit message and streamline push process for versioning
   ([5a90d62](https://github.com/iamvikshan/devcontainers/commit/5a90d6274c75a7669a0d26155e9fa24172960a08))
-- update README and action configurations to include Docker Hub support and streamline container
-  registry authentication
+- update README and action configurations to include Docker Hub support and
+  streamline container registry authentication
   ([3163fbb](https://github.com/iamvikshan/devcontainers/commit/3163fbb4edb1d5820e82c9979789a253bc234fe8))
 
 # [v1.0.3](https://github.com/iamvikshan/devcontainers/compare/v1.0.2...v1.0.3) (2024-12-08)
@@ -762,8 +818,8 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- streamline Docker image build process by combining build and push steps for GitHub and GitLab
-  registries
+- streamline Docker image build process by combining build and push steps for
+  GitHub and GitLab registries
   ([0b8c065](https://github.com/iamvikshan/devcontainers/commit/0b8c065ecb196182bd4ae218118bce00ba0b3795))
 
 # [v1.0.2](https://github.com/iamvikshan/devcontainers/compare/v1.0.1...v1.0.2) (2024-12-08)
@@ -781,7 +837,8 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- update README files with new image sizes and enhance GitHub Actions for documentation updates
+- update README files with new image sizes and enhance GitHub Actions for
+  documentation updates
   ([f47e47b](https://github.com/iamvikshan/devcontainers/commit/f47e47b31b5059a4a3015675e876a7010eeec0ac))
 
 # v1.0.0 (2024-12-07)
@@ -790,17 +847,18 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
-- let's start over, shall we? update release workflows to prevent redundant triggers and enhance
-  sync operations
+- let's start over, shall we? update release workflows to prevent redundant
+  triggers and enhance sync operations
   ([5aba3ef](https://github.com/iamvikshan/devcontainers/commit/5aba3ef22af4f11d7767f4c6de4876ad3c50d147))
 
-* DevContainer configurations for Bun and Node.js, including package management and CI workflows
+* DevContainer configurations for Bun and Node.js, including package management
+  and CI workflows
 * sync operations
 * Remove default Gitpod bun, all now use oven/bun image. Added setup.sh.
 * Remove unnecessary release scopes from semantic-release configuration
 * Update configuration files and add Prettier support
-* Update semantic-release configuration and add new plugins for improved versioning and release
-  notes
+* Update semantic-release configuration and add new plugins for improved
+  versioning and release notes
 
 ### Bug Fixes
 
@@ -808,32 +866,44 @@ All notable changes to this project will be documented in this file.
   ([e6c2811](https://github.com/iamvikshan/devcontainers/commit/e6c2811ff805e7677f67cd99144e5ff6d1a81238))
 - update advanced-git-sync action version to v1.1.5 in sync workflow
   ([18dda27](https://github.com/iamvikshan/devcontainers/commit/18dda275ce6dcc8d42ecfef0e62510ad056c0fc5))
-- update GitHub Actions workflow and dependencies; upgrade checkout action and sync action version.
-  Uprade bun to v1.1.38
+- update GitHub Actions workflow and dependencies; upgrade checkout action and
+  sync action version. Upgrade bun to v1.1.38
   ([10bc7cd](https://github.com/iamvikshan/devcontainers/commit/10bc7cda116360c530b2d9a5a20d74a5d5983120))
 - update sync configuration and enhance release workflow steps
   ([687909c](https://github.com/iamvikshan/devcontainers/commit/687909cbbfc24578ee1f5c75ba3e0eab8427e764))
 
-* Add GitLab plugin to semantic-release configuration and streamline CI environment handling
+* Add GitLab plugin to semantic-release configuration and streamline CI
+  environment handling
 * Add Husky pre-commit hook and update README with image sizes
 * Change default username to root in Dockerfiles for bun and ubuntu environments
-* enhance branch syncing by checking for updates before pushing to GitLab and GitHub to avoid
+* enhance branch syncing by checking for updates before pushing to GitLab and
+  GitHub to avoid
 * infinite loop
-* Enhance GitLab release configuration with buildx setup and improved error handling
-* enhance GitLab sync and release workflows with tag existence check and README updates
-* Enhance semantic-release configuration and improve error handling in GitLab release process
+* Enhance GitLab release configuration with buildx setup and improved error
+  handling
+* enhance GitLab sync and release workflows with tag existence check and README
+  updates
+* Enhance semantic-release configuration and improve error handling in GitLab
+  release process
 * preinstall curl and open-ssh
-* Refactor GitLab release configuration for improved versioning and error handling
-* remove GH_TOKEN from environment setup and clean up unused GHCR visibility functions
+* Refactor GitLab release configuration for improved versioning and error
+  handling
+* remove GH_TOKEN from environment setup and clean up unused GHCR visibility
+  functions
 * Remove Husky pre-commit hook and update image size handling in README
 * Remove outdated GitLab sync workflows and update GitHub sync configuration
 * Remove package-lock.json from .gitignore
-* Replace git-sync.yml with gitlab-sync.yml for improved synchronization with GitLab
-* Update DevContainer Dockerfile to use Gitpod base image and streamline environment setup
-* Update Dockerfiles to install OpenSSH client and curl, and configure SSH server for TCP forwarding
+* Replace git-sync.yml with gitlab-sync.yml for improved synchronization with
+  GitLab
+* Update DevContainer Dockerfile to use Gitpod base image and streamline
+  environment setup
+* Update Dockerfiles to install OpenSSH client and curl, and configure SSH
+  server for TCP forwarding
 * Update GitHub sync configuration and enhance semantic-release setup
-* update GitHub/Gitlab sync workflow and update image size handling in release workflows
+* update GitHub/Gitlab sync workflow and update image size handling in release
+  workflows
 * update GitLab API endpoint and correct image sizes in README files
 * Update GitLab release configuration for buildx setup and disable TLS
-* update GitLab sync workflow to include GITLAB_TOKEN and enhance size retrieval for images
+* update GitLab sync workflow to include GITLAB_TOKEN and enhance size retrieval
+  for images
 * update username and split long action workflow
