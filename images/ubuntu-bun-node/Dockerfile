@@ -17,11 +17,6 @@ ARG BASE_TAG
 
 # renovate: datasource=node-version depName=node
 ARG NODE_VERSION="22.11.0"
-# renovate: datasource=npm depName=oxlint
-ARG OXLINT_VERSION="0.4.3"
-# renovate: datasource=npm depName=oxfmt
-ARG OXFMT_VERSION="0.56.0"
-
 ARG USERNAME=root
 
 # 4. Elevate to root to copy binaries and install Node + global tools
@@ -40,8 +35,7 @@ RUN ARCH="$(case "$TARGETARCH" in amd64) echo x64 ;; arm64) echo arm64 ;; *) ech
     && grep " ${NODE_TARBALL}$" SHASUMS256.txt > node_checksum.txt \
     && sha256sum -c node_checksum.txt \
     && tar -xJf "${NODE_TARBALL}" -C /usr/local --strip-components=1 \
-    && rm -f "${NODE_TARBALL}" SHASUMS256.txt node_checksum.txt \
-    && bun install -g oxlint@${OXLINT_VERSION} oxfmt@${OXFMT_VERSION}
+    && rm -f "${NODE_TARBALL}" SHASUMS256.txt node_checksum.txt
 
 # 5. Drop privileges
 USER ${USERNAME}
@@ -50,8 +44,6 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="ubuntu-bun-node" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainers/ubuntu-tools:${BASE_TAG}" \
       devcontainer.tool.bun="${BUN_VERSION}" \
-      devcontainer.tool.node="${NODE_VERSION}" \
-      devcontainer.tool.oxlint="${OXLINT_VERSION}" \
-      devcontainer.tool.oxfmt="${OXFMT_VERSION}"
+      devcontainer.tool.node="${NODE_VERSION}"
 
 CMD ["sleep", "infinity"]

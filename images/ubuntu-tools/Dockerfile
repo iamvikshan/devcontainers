@@ -23,14 +23,14 @@ RUN if [ "${USERNAME}" != "root" ]; then \
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates zsh git sudo curl unzip jq python3 btop tree tmux bash \
+    ca-certificates zsh git sudo curl unzip xz-utils jq btop tree \
     && if [ "${USERNAME}" != "root" ]; then \
         mkdir -p /etc/sudoers.d \
         && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" \
         && chmod 0440 "/etc/sudoers.d/${USERNAME}" \
         && visudo -cf "/etc/sudoers.d/${USERNAME}"; \
     fi \
-    && curl -fsSL https://antigravity.google/cli/install.sh | bash \
+    && curl -fsSL https://antigravity.google/cli/install.sh | sh \
     && mv /root/.local/bin/agy /usr/local/bin/agy \
     && rm -rf /root/.local /var/lib/apt/lists/*
 
@@ -41,7 +41,6 @@ RUN HOME_DIR=$(if [ "${USERNAME}" = "root" ]; then echo "/root"; else echo "/hom
     && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" \
     && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" \
     && curl -fsSL https://raw.githubusercontent.com/iamvikshan/.github/refs/heads/main/scripts/universal.zshrc -o "${HOME_DIR}/.zshrc" \
-    && echo 'set-option -g default-shell /bin/zsh' > "${HOME_DIR}/.tmux.conf" \
     && if [ "${USERNAME}" != "root" ]; then chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; fi
 
 USER ${USERNAME}

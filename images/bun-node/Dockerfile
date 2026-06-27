@@ -11,10 +11,6 @@ ARG BASE_TAG
 # 2. Re-declare inherited ARGs purely for Renovate tracking and Label injection
 # renovate: datasource=docker depName=oven/bun
 ARG BUN_VERSION="1.1.17"
-# renovate: datasource=npm depName=oxlint
-ARG OXLINT_VERSION="0.7.1"
-# renovate: datasource=npm depName=oxfmt
-ARG OXFMT_VERSION="0.56.0"
 
 ARG USERNAME=root
 
@@ -28,8 +24,6 @@ USER ${USERNAME}
 # 5. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="bun-node" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainers/bun:${BASE_TAG}" \
-      devcontainer.tool.bun="${BUN_VERSION}" \
-      devcontainer.tool.oxlint="${OXLINT_VERSION}" \
-      devcontainer.tool.oxfmt="${OXFMT_VERSION}"
+      devcontainer.tool.bun="${BUN_VERSION}"
 
 CMD ["sleep", "infinity"]

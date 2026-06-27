@@ -15,19 +15,13 @@ FROM ghcr.io/iamvikshan/devcontainers/ubuntu-tools:${BASE_TAG}
 ARG BUN_VERSION
 ARG BASE_TAG
 
-# renovate: datasource=npm depName=oxlint
-ARG OXLINT_VERSION="0.4.3"
-# renovate: datasource=npm depName=oxfmt
-ARG OXFMT_VERSION="0.56.0"
-
 ARG USERNAME=root
 
 # 4. Elevate to root to copy binaries and install global tools
 USER root
 
 COPY --from=bun_source /usr/local/bin/bun /usr/local/bin/bun
-RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx \
-    && bun install -g oxlint@${OXLINT_VERSION} oxfmt@${OXFMT_VERSION}
+RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
 # 5. Drop privileges
 USER ${USERNAME}
@@ -35,8 +29,6 @@ USER ${USERNAME}
 # 6. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="ubuntu-bun" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainers/ubuntu-tools:${BASE_TAG}" \
-      devcontainer.tool.bun="${BUN_VERSION}" \
-      devcontainer.tool.oxlint="${OXLINT_VERSION}" \
-      devcontainer.tool.oxfmt="${OXFMT_VERSION}"
+      devcontainer.tool.bun="${BUN_VERSION}"
 
 CMD ["sleep", "infinity"]

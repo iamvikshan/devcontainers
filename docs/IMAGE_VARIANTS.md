@@ -87,14 +87,12 @@ compatibility.
 - 🚀 **Best of both worlds** - Bun speed + Node.js compatibility
 - 📦 **Full npm ecosystem** - Access to all npm packages
 - 🔧 **Latest runtimes** - Bun and Node.js
-- 🛠️ **Development tools** - oxlint/oxfmt pre-installed
 
 **Included Tools:**
 
 - Bun 1.3.3
 - Node.js
 - npm
-- oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl
 - btop (system resource monitor)
 - Alpine package manager (apk)
@@ -188,7 +186,6 @@ JavaScript runtimes.
 - Bun 1.3.3 (installed via script)
 - Node.js v22.11.0
 - npm 10.9.0
-- oxlint/oxfmt (linting and formatting)
 - Git, SSH client, curl, unzip
 - btop (system resource monitor)
 - sudo (administrative access)
@@ -226,14 +223,13 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
 
 **Key Features:**
 
-- 🧰 **Tools-focused image** - Includes Python, jq, Git, curl, and btop
+- 🧰 **Tools-focused image** - Includes jq, Git, curl, and btop
 - 🐧 **Ubuntu base** - Standard Ubuntu package ecosystem with apt
 - 🔐 **sudo access** - Administrative privileges for setup tasks
-- 🚫 **No JS runtime bundle** - No Bun, Node.js, npm, or oxlint/oxfmt preinstalled
+- 🚫 **No JS runtime bundle** - No Bun, Node.js, or npm preinstalled
 
 **Included Tools:**
 
-- Python 3
 - jq
 - Git, SSH client, curl, unzip
 - btop (system resource monitor)
@@ -243,7 +239,6 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
 **Perfect For:**
 
 - Automation scripts and CI utilities
-- Python-first tooling workflows
 - JSON/data transformation tasks
 - Projects requiring a minimal tools baseline
 
@@ -255,7 +250,7 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
   "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest",
   "customizations": {
     "vscode": {
-      "extensions": ["ms-python.python", "oxc.oxc-vscode"]
+      "extensions": ["oxc.oxc-vscode"]
     }
   }
 }

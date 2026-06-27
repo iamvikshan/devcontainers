@@ -207,7 +207,12 @@ jobs:
   build-derivatives:
     name: Deriv -> ${{ matrix.image }}
     needs: [prepare, build-bases]
-    if: ${{ !failure() && !cancelled() && needs.prepare.outputs.derivatives != '[]' && needs.prepare.outputs.derivatives != '' }}
+    if: |
+      always() &&
+      !cancelled() &&
+      needs.prepare.outputs.derivatives != '[]' &&
+      needs.prepare.outputs.derivatives != '' &&
+      (needs.build-bases.result == 'success' || needs.build-bases.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -294,7 +299,12 @@ jobs:
   finalize:
     name: Finalize Release Notes
     needs: [prepare, build-bases, build-derivatives]
-    if: ${{ !failure() && !cancelled() && (needs.prepare.outputs.bases != '[]' || needs.prepare.outputs.derivatives != '[]') }}
+    if: |
+      always() &&
+      !cancelled() &&
+      (needs.prepare.outputs.bases != '[]' || needs.prepare.outputs.derivatives != '[]') &&
+      (needs.build-bases.result == 'success' || needs.build-bases.result == 'skipped') &&
+      (needs.build-derivatives.result == 'success' || needs.build-derivatives.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: write

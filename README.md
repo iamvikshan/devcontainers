@@ -127,8 +127,6 @@ All images include:
 - **curl** - HTTP requests
 - **btop** - System resource monitor
 - **Basic development utilities**
-- **oxlint** - Fast JavaScript linter (absent from _ubuntu-tools_ img)
-- **oxfmt** - Fast JavaScript/TypeScript formatter (absent from _ubuntu-tools_ img)
 
 #### Alpine-based Images (`bun`, `bun-node`)
 
@@ -146,9 +144,8 @@ All images include:
 
 #### Ubuntu tools-only Image (`ubuntu-tools`)
 
-- **Python 3** - General scripting runtime
 - **jq** - JSON processing utility
-- **No Bun, Node.js, npm, or oxlint/oxfmt** - Purpose-built tools-only variant
+- **No Bun, Node.js, or npm** - Purpose-built tools-only variant
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)
 
