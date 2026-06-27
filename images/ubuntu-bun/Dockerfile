@@ -17,7 +17,7 @@ ARG BASE_TAG
 # renovate: datasource=npm depName=oxlint
 ARG OXLINT_VERSION="0.4.3"
 # renovate: datasource=npm depName=oxfmt
-ARG OXFMT_VERSION="0.4.3"
+ARG OXFMT_VERSION="0.56.0"
 
 ARG USERNAME=root
 
