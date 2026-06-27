@@ -24,7 +24,7 @@
         },
         "terminal.integrated.defaultProfile.linux": "zsh"
       },
-      "extensions": ["GitHub.copilot", "eamodio.gitlens", "oven.bun-vscode"]
+      "extensions": ["GitHub.copilot", "eamodio.gitlens", "oven.bun-vscode", "oxc.oxc-vscode"]
     }
   },
 
