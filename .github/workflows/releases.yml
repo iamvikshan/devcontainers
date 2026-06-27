@@ -263,7 +263,7 @@ jobs:
   finalize:
     name: Finalize Release Notes
     needs: [prepare, build-bases, build-derivatives]
-    if: ${{ !failure() && !cancelled() }}
+    if: ${{ !failure() && !cancelled() && (needs.prepare.outputs.bases != '[]' || needs.prepare.outputs.derivatives != '[]') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
