@@ -10,7 +10,7 @@ ARG BASE_TAG
 
 # 2. Re-declare inherited ARGs purely for Renovate tracking and Label injection
 # renovate: datasource=docker depName=oven/bun
-ARG BUN_VERSION="1.1.45"
+ARG BUN_VERSION="1.3.14"
 
 ARG USERNAME=root
 

@@ -2,7 +2,7 @@
 
 # 1. Define the version ARGs for Renovate to track
 # renovate: datasource=docker depName=oven/bun
-ARG BUN_VERSION="1.1.45"
+ARG BUN_VERSION="1.3.14"
 
 # Inject the tracked Bun version into the base image
 FROM oven/bun:${BUN_VERSION}-alpine

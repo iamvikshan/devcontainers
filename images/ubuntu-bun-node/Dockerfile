@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=oven/bun
-ARG BUN_VERSION="1.1.45"
+ARG BUN_VERSION="1.3.14"
 # renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainers/ubuntu-tools
 ARG BASE_TAG="latest"
 
