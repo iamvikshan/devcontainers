@@ -10,11 +10,11 @@ setup, so the examples below use `zsh`.
 
 | Image               | Base     | Tools                  | Size    | Use Case                      |
 | ------------------- | -------- | ---------------------- | ------- | ----------------------------- |
-| **bun**             | oven/bun | Bun, Git               | ~133 MB | Bun-only projects             |
-| **bun-node**        | oven/bun | Bun, Node.js, npm, Git | ~239 MB | Full-stack with Bun + Node.js |
-| **ubuntu-bun**      | Ubuntu   | Bun, Git               | ~131 MB | Ubuntu-based Bun development  |
-| **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git | ~201 MB | Ubuntu-based full-stack       |
-| **ubuntu-tools**    | Ubuntu   | Python, jq, Git, curl  | ~80 MB  | Tools-only automation         |
+| **bun**             | oven/bun | Bun, Git               | ~57 MB | Bun-only projects             |
+| **bun-node**        | oven/bun | Bun, Node.js, npm, Git | ~75 MB | Full-stack with Bun + Node.js |
+| **ubuntu-bun**      | Ubuntu   | Bun, Git               | ~163 MB | Ubuntu-based Bun development  |
+| **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git | ~215 MB | Ubuntu-based full-stack       |
+| **ubuntu-tools**    | Ubuntu   | Python, jq, Git, curl  | ~129 MB | Tools-only automation         |
 
 ### 2. Registry Options
 

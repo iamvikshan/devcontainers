@@ -1,3 +1,31 @@
+## [v0.0.1] - 2026-06-28
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| bun-node | v0.0.1 | 2026-06-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node) |
+| bun | v0.0.1 | 2026-06-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/bun) |
+| ubuntu-bun-node | v0.0.1 | 2026-06-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node) |
+| ubuntu-bun | v0.0.1 | 2026-06-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun) |
+| ubuntu-tools | v0.0.1 | 2026-06-28 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-tools) |
+
+### Environment Tool Versions
+
+#### Ubuntu-Based Environments
+```properties
+bun=1.1.17
+node=22.11.0
+ubuntu=26.04
+```
+
+#### Alpine-Based Environments
+```properties
+bun=1.1.17
+```
+
 # Changelog
 
 All notable changes to this project and devcontainer images will be documented in this file.
