@@ -195,7 +195,7 @@ jobs:
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
 
       - name: Upload Metadata
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: metadata-${{ matrix.image }}
           path: metadata/
@@ -287,7 +287,7 @@ jobs:
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
 
       - name: Upload Metadata
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: metadata-${{ matrix.image }}
           path: metadata/
@@ -320,7 +320,7 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload updated README
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: updated-readme
           path: README.md
