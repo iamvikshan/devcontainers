@@ -16,7 +16,7 @@ ARG BUN_VERSION
 ARG BASE_TAG
 
 # renovate: datasource=node-version depName=node
-ARG NODE_VERSION="22.11.0"
+ARG NODE_VERSION="24.18.0"
 ARG USERNAME=root
 
 # 4. Elevate to root to copy binaries and install Node + global tools
