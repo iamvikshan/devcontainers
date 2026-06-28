@@ -8,9 +8,9 @@ images.
 | Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ubuntu-tools          |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest         |
-| **Size**        | ~57 MB | ~75 MB | ~163 MB | ~215 MB | ~129 MB |
-| **Bun Version** | 1.1.17 | 1.1.17 | 1.1.17 | 1.1.17 | ❌ |
-| **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v22.11.0 | ❌ |
+| **Size**        | ~57 MB | ~82 MB | ~162 MB | ~219 MB | ~129 MB |
+| **Bun Version** | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | ❌ |
+| **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v24.18.0 | ❌ |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | Tools-only automation |
@@ -23,8 +23,8 @@ images.
 - **Full-Stack Projects** → `bun-node` or `ubuntu-bun-node`
 - **Need Ubuntu Packages** → `ubuntu-bun` or `ubuntu-bun-node`
 - **Need Ubuntu Tools Without JS Runtimes** → `ubuntu-tools`
-- **Smallest Size** → `ubuntu-bun` (163 MB)
-- **Most Features** → `bun-node` (75 MB)
+- **Smallest Size** → `ubuntu-bun` (162 MB)
+- **Most Features** → `bun-node` (82 MB)
 
 ## 🐳 Image Details
 
@@ -74,7 +74,7 @@ compatibility.
 }
 ```
 
-### 2. bun-node (~75 MB)
+### 2. bun-node (~82 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
 
@@ -120,7 +120,7 @@ compatibility.
 }
 ```
 
-### 3. ubuntu-bun (~163 MB)
+### 3. ubuntu-bun (~162 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
 
@@ -166,7 +166,7 @@ package ecosystem and tooling. The smallest image in our collection!
 }
 ```
 
-### 4. ubuntu-bun-node (~215 MB)
+### 4. ubuntu-bun-node (~219 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
 
@@ -277,10 +277,10 @@ Do you need Bun runtime?
 **Smallest to Largest:**
 
 1. **ubuntu-tools** (~129 MB) - Tools-focused baseline
-2. **ubuntu-bun** (~163 MB) - Most efficient Ubuntu Bun option
+2. **ubuntu-bun** (~162 MB) - Most efficient Ubuntu Bun option
 3. **bun** (~57 MB) - Most efficient Bun runtime option
-4. **ubuntu-bun-node** (~215 MB) - Balanced Ubuntu full-stack option
-5. **bun-node** (~75 MB) - Full-featured but larger
+4. **ubuntu-bun-node** (~219 MB) - Balanced Ubuntu full-stack option
+5. **bun-node** (~82 MB) - Full-featured but larger
 
 ### Compatibility Matrix
 
