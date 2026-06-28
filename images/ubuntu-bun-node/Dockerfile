@@ -1,101 +1,49 @@
-ARG VARIANT=latest
-FROM ubuntu:${VARIANT}
+# syntax=docker/dockerfile:1
 
-ARG VARIANT
+# renovate: datasource=docker depName=oven/bun
+ARG BUN_VERSION="1.3.14"
+# renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainers/ubuntu-tools
+ARG BASE_TAG="latest"
+
+# 1. Define Bun Source for Multi-Stage Copy
+FROM oven/bun:${BUN_VERSION}-alpine AS bun_source
+
+# 2. Base Image Tracking
+FROM ghcr.io/iamvikshan/devcontainers/ubuntu-tools:${BASE_TAG}
+
+# 3. Re-declare ARGs for Renovate tracking and Label injection
+ARG BUN_VERSION
+ARG BASE_TAG
+
+# renovate: datasource=node-version depName=node
+ARG NODE_VERSION="24.18.0"
 ARG USERNAME=root
-ARG NPM_GLOBAL=/usr/local/share/npm-global
 
-# Add NPM global to PATH.
-ENV PATH=${NPM_GLOBAL}/bin:/usr/local/bun/bin:${PATH}
+# 4. Elevate to root to copy binaries and install Node + global tools
+USER root
 
-# Install all packages in a single layer to minimize image size
-ENV DEBIAN_FRONTEND=noninteractive
+# Copy Bun binary and symlink bunx
+COPY --from=bun_source /usr/local/bin/bun /usr/local/bin/bun
+RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
-# Create the user if it doesn't exist (this step is not needed for root user)
-RUN if [ "${USERNAME}" != "root" ] && ! id -u ${USERNAME} > /dev/null 2>&1; then \
-    useradd -m ${USERNAME}; \
-    fi
+# Install Node.js deterministically for the correct architecture, then install formatters
+ARG TARGETARCH
+RUN ARCH="$(case "$TARGETARCH" in amd64) echo x64 ;; arm64) echo arm64 ;; *) echo "Unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; esac)" \
+    && NODE_TARBALL="node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
+    && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_TARBALL}" \
+    && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt" \
+    && grep " ${NODE_TARBALL}$" SHASUMS256.txt > node_checksum.txt \
+    && sha256sum -c node_checksum.txt \
+    && tar -xJf "${NODE_TARBALL}" -C /usr/local --strip-components=1 \
+    && rm -f "${NODE_TARBALL}" SHASUMS256.txt node_checksum.txt
 
-# Add the user to the sudo group (this step is not needed for root user)
-RUN if [ "${USERNAME}" != "root" ]; then \
-    usermod -aG sudo ${USERNAME}; \
-    fi
-
-# Configure sudoers to allow passwordless sudo (this step is not needed for root user)
-RUN if [ "${USERNAME}" != "root" ]; then \
-    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
-    fi
-
-# Ensure necessary directories have the correct permissions
-RUN mkdir -p /var/lib/apt/lists/partial && chown -R ${USERNAME}:${USERNAME} /var/lib/apt/lists
-
-# Install all packages, Node.js, Bun, and ESLint in a single layer
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    zsh \
-    git \
-    sudo \
-    curl \
-    unzip \
-    jq \
-    python3 \
-    btop \
-    && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
-    && apt-get install -y nodejs \
-    && curl -fsSL https://bun.sh/install | bash \
-    && if [ "${USERNAME}" != "root" ]; then npm install -g eslint; fi \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean \
-    && rm -rf /tmp/* /var/tmp/* \
-    && npm cache clean --force 2>/dev/null || true
-
-# Create symbolic links for Bun (for both root and non-root users)
-RUN if [ "${USERNAME}" != "root" ]; then \
-    mv /root/.bun /home/${USERNAME}/.bun \
-    && ln -s /home/${USERNAME}/.bun/bin/bun /usr/local/bin/bun \
-    && ln -s /home/${USERNAME}/.bun/bin/bunx /usr/local/bin/bunx; \
-    else \
-    ln -s /root/.bun/bin/bun /usr/local/bin/bun \
-    && ln -s /root/.bun/bin/bunx /usr/local/bin/bunx; \
-    fi
-
-# Extract tool versions during build
-RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt \
-  && echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /usr/local/share/tool-versions.txt \
-  && echo "base_image=ubuntu:${VARIANT}" >> /usr/local/share/tool-versions.txt \
-  && echo "ubuntu_version=$(lsb_release -rs 2> /dev/null || cat /etc/os-release | grep VERSION_ID | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt \
-  && echo "bun_version=$(bun --version)" >> /usr/local/share/tool-versions.txt \
-  && echo "zsh_version=$(zsh --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "node_version=$(node --version)" >> /usr/local/share/tool-versions.txt \
-  && echo "npm_version=$(npm --version)" >> /usr/local/share/tool-versions.txt \
-  && echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt \
-  && echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt \
-  && [ "$(tail -n +2 /usr/local/share/tool-versions.txt | wc -l)" -eq 12 ] \
-  && grep -Eq '^base_image=ubuntu:[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$' /usr/local/share/tool-versions.txt \
-  && grep -Eq '^bun_version=.+$' /usr/local/share/tool-versions.txt \
-  && grep -Eq '^node_version=.+$' /usr/local/share/tool-versions.txt
-
-COPY setup.zsh /usr/local/bin/setup.zsh
-RUN chmod +x /usr/local/bin/setup.zsh
-
-RUN if [ "${USERNAME}" != "root" ]; then \
-        usermod -s /bin/zsh "${USERNAME}"; \
-        HOME_DIR="/home/${USERNAME}"; \
-    else \
-        HOME_DIR="/root"; \
-    fi && \
-    mkdir -p "${HOME_DIR}" && \
-    git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "${HOME_DIR}/.oh-my-zsh" && \
-    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" && \
-    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" && \
-    printf '%s\n' 'source /usr/local/bin/setup.zsh' > "${HOME_DIR}/.zshrc" && \
-    if [ "${USERNAME}" != "root" ]; then \
-        chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; \
-    fi
-
+# 5. Drop privileges
 USER ${USERNAME}
 
-CMD ["/bin/zsh"]
+# 6. Inject Metadata for Skopeo Extraction
+LABEL org.opencontainers.image.title="ubuntu-bun-node" \
+      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainers/ubuntu-tools:${BASE_TAG}" \
+      devcontainer.tool.bun="${BUN_VERSION}" \
+      devcontainer.tool.node="${NODE_VERSION}"
+
+CMD ["sleep", "infinity"]

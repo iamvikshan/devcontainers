@@ -1,85 +1,53 @@
-ARG VARIANT=latest
-FROM ubuntu:${VARIANT}
+# syntax=docker/dockerfile:1
 
-ARG VARIANT
+# renovate: datasource=docker depName=ubuntu
+ARG UBUNTU_VERSION="26.04"
+
+FROM ubuntu:${UBUNTU_VERSION}
+
+# Re-declare ARGs after FROM
+ARG UBUNTU_VERSION
 ARG USERNAME=root
-
-# Install all packages in a single layer to minimize image size
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Validate USERNAME build arg for non-root users
+# 2. Consolidated User Creation & Permissions
 RUN if [ "${USERNAME}" != "root" ]; then \
-    echo "${USERNAME}" | grep -Eq '^[a-z_][a-z0-9_-]*[$]?$' || { echo "Invalid USERNAME build arg: ${USERNAME}" >&2; exit 1; }; \
+        echo "${USERNAME}" | grep -Eq '^[a-z_][a-z0-9_-]*[$]?$' || { echo "Invalid USERNAME: ${USERNAME}" >&2; exit 1; }; \
+        if ! id -u ${USERNAME} > /dev/null 2>&1; then \
+            useradd -m -s /bin/zsh ${USERNAME}; \
+        fi \
+        && usermod -aG sudo ${USERNAME}; \
     fi
 
-# Create the user if it doesn't exist (this step is not needed for root user)
-RUN if [ "${USERNAME}" != "root" ] && ! id -u "${USERNAME}" > /dev/null 2>&1; then \
-    useradd -m "${USERNAME}"; \
-    fi
+# 3. OS Packages & Antigravity CLI (BuildKit Cached)
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates zsh git sudo curl unzip xz-utils jq btop tree \
+    && if [ "${USERNAME}" != "root" ]; then \
+        mkdir -p /etc/sudoers.d \
+        && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" \
+        && chmod 0440 "/etc/sudoers.d/${USERNAME}" \
+        && visudo -cf "/etc/sudoers.d/${USERNAME}"; \
+    fi \
+    && curl -fsSL https://antigravity.google/cli/install.sh | sh \
+    && mv /root/.local/bin/agy /usr/local/bin/agy \
+    && rm -rf /root/.local /var/lib/apt/lists/*
 
-# Add the user to the sudo group (this step is not needed for root user)
-RUN if [ "${USERNAME}" != "root" ]; then \
-    usermod -aG sudo "${USERNAME}"; \
-    fi
+# 4. Remote ZSH Configuration & Tmux Injection
+RUN HOME_DIR=$(if [ "${USERNAME}" = "root" ]; then echo "/root"; else echo "/home/${USERNAME}"; fi) \
+    && mkdir -p "${HOME_DIR}" \
+    && git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "${HOME_DIR}/.oh-my-zsh" \
+    && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" \
+    && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" \
+    && curl -fsSL https://raw.githubusercontent.com/iamvikshan/.github/refs/heads/main/scripts/universal.zshrc -o "${HOME_DIR}/.zshrc" \
+    && if [ "${USERNAME}" != "root" ]; then chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; fi
 
-# Ensure necessary directories have the correct permissions
-RUN mkdir -p /var/lib/apt/lists/partial
-
-# Install all required tools in a single layer and clean package/cache artifacts
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  ca-certificates \
-  zsh \
-  git \
-  sudo \
-  curl \
-  unzip \
-  jq \
-  python3 \
-  btop \
-  && rm -rf /var/lib/apt/lists/* \
-  && apt-get clean \
-  && rm -rf /tmp/* /var/tmp/*
-
-# Configure sudoers to allow passwordless sudo (this step is not needed for root user)
-RUN if [ "${USERNAME}" != "root" ]; then \
-    mkdir -p /etc/sudoers.d && \
-    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" && \
-    chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
-    visudo -cf "/etc/sudoers.d/${USERNAME}"; \
-    fi
-
-# Extract tool versions during build
-RUN echo "# DevContainer Tool Versions" > /usr/local/share/tool-versions.txt \
-  && echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /usr/local/share/tool-versions.txt \
-  && echo "base_image=ubuntu:${VARIANT}" >> /usr/local/share/tool-versions.txt \
-  && echo "ubuntu_version=$(grep VERSION_ID /etc/os-release | cut -d'=' -f2 | tr -d '\"')" >> /usr/local/share/tool-versions.txt \
-  && echo "zsh_version=$(zsh --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "git_version=$(git --version | cut -d' ' -f3)" >> /usr/local/share/tool-versions.txt \
-  && echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "jq_version=$(jq --version | cut -d'-' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "python_version=$(python3 --version | cut -d' ' -f2)" >> /usr/local/share/tool-versions.txt \
-  && echo "btop_version=$(btop --version | head -n1)" >> /usr/local/share/tool-versions.txt \
-  && grep -Eq '^base_image=ubuntu:[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$' /usr/local/share/tool-versions.txt
-
-COPY setup.zsh /usr/local/bin/setup.zsh
-RUN chmod +x /usr/local/bin/setup.zsh
-
-RUN if [ "${USERNAME}" != "root" ]; then \
-        usermod -s /bin/zsh "${USERNAME}"; \
-        HOME_DIR="/home/${USERNAME}"; \
-    else \
-        HOME_DIR="/root"; \
-    fi && \
-    mkdir -p "${HOME_DIR}" && \
-    git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "${HOME_DIR}/.oh-my-zsh" && \
-    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" && \
-    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" && \
-    printf '%s\n' 'source /usr/local/bin/setup.zsh' > "${HOME_DIR}/.zshrc" && \
-    if [ "${USERNAME}" != "root" ]; then \
-        chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; \
-    fi
-
-# Switch to the specified user
 USER ${USERNAME}
 
-CMD ["/bin/zsh"]
+# 5. Inject Metadata for Skopeo Extraction
+LABEL org.opencontainers.image.title="ubuntu-tools" \
+      org.opencontainers.image.base.name="ubuntu:${UBUNTU_VERSION}" \
+      devcontainer.tool.ubuntu="${UBUNTU_VERSION}"
+
+CMD ["sleep", "infinity"]

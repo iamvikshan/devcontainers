@@ -1,52 +1,49 @@
-# Alpine-based Dockerfile for minimal image with Bun runtime
-ARG VARIANT=alpine
-FROM oven/bun:${VARIANT}
+# syntax=docker/dockerfile:1
 
-ARG VARIANT
+# 1. Define the version ARGs for Renovate to track
+# renovate: datasource=docker depName=oven/bun
+ARG BUN_VERSION="1.3.14"
+
+# Inject the tracked Bun version into the base image
+FROM oven/bun:${BUN_VERSION}-alpine
+
+# Re-declare ARGs after FROM so they are available in the build environment
+ARG BUN_VERSION
 ARG USERNAME=root
 
-RUN apk add --no-cache \
-  zsh \
-  git \
-  sudo \
-  curl \
-  jq \
-  python3 \
-  btop
+# 2. Install unpinned OS packages & pinned global tools (using Bun)
+# We completely removed the tool-versions.txt generation block
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk add --no-cache \
+    zsh git sudo curl jq btop tree
 
-RUN mkdir -p /usr/local/share && \
-    { \
-    echo "# DevContainer Tool Versions"; \
-    echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
-    echo "base_image=oven/bun:${VARIANT}"; \
-    echo "bun_version=$(bun --version)"; \
-    echo "zsh_version=$(zsh --version | cut -d' ' -f2)"; \
-    echo "alpine_version=$(cat /etc/alpine-release)"; \
-    echo "git_version=$(git --version | cut -d' ' -f3)"; \
-    echo "curl_version=$(curl --version | head -n1 | cut -d' ' -f2)"; \
-    echo "jq_version=$(jq --version | cut -d'-' -f2)"; \
-    echo "python_version=$(python3 --version | cut -d' ' -f2)"; \
-    echo "btop_version=$(btop --version | head -n1)"; \
-    } > /usr/local/share/tool-versions.txt
-
-COPY setup.zsh /usr/local/bin/setup.zsh
-RUN chmod +x /usr/local/bin/setup.zsh
-
+# 3. Consolidated User, Remote ZSH configuration, and Tmux setup
 RUN if [ "${USERNAME}" != "root" ]; then \
+        echo "${USERNAME}" | grep -Eq '^[a-z_][a-z0-9_-]*[$]?$' || { echo "Invalid USERNAME: ${USERNAME}" >&2; exit 1; } && \
         adduser -D -s /bin/zsh "${USERNAME}" && \
         addgroup "${USERNAME}" wheel && \
-        echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+        mkdir -p /etc/sudoers.d && \
+        echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" && \
+        chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
+        visudo -cf "/etc/sudoers.d/${USERNAME}" && \
         HOME_DIR="/home/${USERNAME}"; \
     else \
         HOME_DIR="/root"; \
     fi && \
+    mkdir -p "${HOME_DIR}" && \
     git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "${HOME_DIR}/.oh-my-zsh" && \
     git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" && \
     git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" && \
-    printf '%s\n' 'source /usr/local/bin/setup.zsh' > "${HOME_DIR}/.zshrc" && \
+    curl -fsSL https://raw.githubusercontent.com/iamvikshan/.github/refs/heads/main/scripts/universal.zshrc -o "${HOME_DIR}/.zshrc" && \
     if [ "${USERNAME}" != "root" ]; then \
         chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; \
     fi
 
 USER ${USERNAME}
-CMD ["/bin/zsh"]
+
+# 4. Inject Metadata for Skopeo Extraction
+LABEL org.opencontainers.image.title="bun" \
+      org.opencontainers.image.base.name="oven/bun:${BUN_VERSION}-alpine" \
+      devcontainer.tool.bun="${BUN_VERSION}"
+
+CMD ["sleep", "infinity"]

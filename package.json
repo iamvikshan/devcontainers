@@ -1,26 +1,12 @@
 {
   "scripts": {
-    "s": "bun scripts/changelogManager.ts --sync-only",
     "prepare": "test -d .git && husky || true",
-    "f": "(git diff --name-only --diff-filter=ACMR HEAD && git ls-files --others --exclude-standard) | xargs bunx prettier --write --ignore-unknown",
-    "f:all": "prettier --write .",
-    "f:check": "prettier --check .",
-    "lint:fix": "eslint . --fix",
-    "check": "eslint . && tsgo --noEmit",
+    "f": "oxfmt --write .",
+    "f:check": "oxfmt --check .",
     "bs": "mkdir -p scripts && curl -sL https://raw.githubusercontent.com/iamvikshan/.github/main/scripts/bootstrap.sh > scripts/bootstrap.sh && chmod +x scripts/bootstrap.sh && scripts/bootstrap.sh",
-    "upd": "apt update && apt upgrade -y && bun upgrade && bun update --latest && bun f"
+    "upd": "sudo apt update && sudo apt upgrade -y && bun upgrade && bun update --latest && bun i && bun f"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/eslint__js": "^9.14.0",
-    "@types/node": "^25.9.3",
-    "axios": "^1.18.0",
-    "eslint": "^10.5.0",
-    "husky": "^9.1.7",
-    "node-fetch": "^3.3.2",
-    "prettier": "^3.8.4",
-    "prettier-plugin-sh": "^0.18.1",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.1"
+    "oxfmt": "^0.56.0"
   }
 }

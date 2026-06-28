@@ -1,0 +1,76 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":dependencyDashboard", ":semanticCommits"],
+  "reviewers": ["iamvikshan"],
+  "assignees": ["iamvikshan"],
+  "minimumReleaseAge": "3 days",
+  "semanticCommitType": "chore",
+  "baseBranchPatterns": ["main"],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 5,
+  "labels": ["dependencies"],
+  "schedule": ["before 4am every weekday"],
+  "timezone": "Africa/Nairobi",
+  "dependencyDashboardApproval": false,
+  "rebaseWhen": "conflicted",
+  "rangeStrategy": "bump",
+  "separateMinorPatch": true,
+  "separateMajorMinor": true,
+  "pinDigests": false,
+
+  "customManagers": [
+    {
+      "description": "Update tool versions defined as ARGs in Dockerfiles",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>[a-zA-Z0-9.-]+)\\s*depName=(?<depName>[^\\s]+)(?:\\s+versioning=(?<versioning>[a-zA-Z0-9.-]+))?\\n(?:ENV|ARG)\\s+[A-Z0-9_]+_VERSION=\"(?<currentValue>[^\"]+)\""
+      ]
+    }
+  ],
+
+  "packageRules": [
+    {
+      "description": "Major version updates require manual review (Overridden by Docker rule below)",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["major"]
+    },
+    {
+      "description": "Oxfmt configuration (replaces Prettier)",
+      "groupName": "oxfmt",
+      "labels": ["formatter", "oxfmt"],
+      "matchPackageNames": [
+        "/^oxfmt/",
+        "/^@oxfmt//",
+        "/^eslint-plugin-oxfmt$/"
+      ]
+    },
+    {
+      "description": "Group and automerge all Docker bases and Container tool updates",
+      "matchFileNames": ["**/Dockerfile", "images/**/Dockerfile"],
+      "groupName": "docker-environments",
+      "labels": ["docker", "environments", "automerge"],
+      "automerge": true,
+      "minimumReleaseAge": "0 days"
+    },
+    {
+      "description": "Ensure GitHub Actions use tags instead of SHA digests",
+      "matchManagers": ["github-actions"],
+      "pinDigests": false
+    }
+  ],
+
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "minimumReleaseAge": "0 days",
+    "schedule": ["before 4am on monday"]
+  },
+  "osvVulnerabilityAlerts": true
+}
