@@ -344,7 +344,7 @@ jobs:
           path: .
 
       - name: Push README to DockerHub
-        uses: peter-evans/dockerhub-description@v4.0.0
+        uses: peter-evans/dockerhub-description@v4.0.2
         with:
           username: ${{ env.GL_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
