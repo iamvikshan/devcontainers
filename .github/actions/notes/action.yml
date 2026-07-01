@@ -90,7 +90,7 @@ runs:
 
     - name: 'Commit CHANGELOG, README & Docs'
       id: auto_commit
-      uses: stefanzweifel/git-auto-commit-action@v7.1.0
+      uses: stefanzweifel/git-auto-commit-action@v7.2.0
       with:
         commit_message: 'docs: update CHANGELOG, README, and variants documentation for ${{ inputs.tag_name }} [skip ci]'
         file_pattern: 'CHANGELOG.md README.md docs/IMAGE_VARIANTS.md docs/SETUP.md'
