@@ -19,9 +19,9 @@ interactive shell experience.
 | ------------------- | ------- | ------ | --- | ------- | ------------------------- |
 | **bun** | 57 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
 | **bun-node** | 82 MB | Alpine | ✅  | ✅      | Full-stack development    |
-| **ubuntu-bun** | 162 MB | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
-| **ubuntu-bun-node** | 219 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
-| **ubuntu-tools** | 129 MB | Ubuntu | ❌  | ❌      | Tools-only automation     |
+| **ubuntu-bun** | 160 MB | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
+| **ubuntu-bun-node** | 217 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
+| **ubuntu-tools** | 127 MB | Ubuntu | ❌  | ❌      | Tools-only automation     |
 
 ### 🎯 Choose Your Image
 

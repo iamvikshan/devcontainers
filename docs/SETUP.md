@@ -12,9 +12,9 @@ setup, so the examples below use `zsh`.
 | ------------------- | -------- | ---------------------- | ------- | ----------------------------- |
 | **bun**             | oven/bun | Bun, Git               | ~57 MB | Bun-only projects             |
 | **bun-node**        | oven/bun | Bun, Node.js, npm, Git | ~82 MB | Full-stack with Bun + Node.js |
-| **ubuntu-bun**      | Ubuntu   | Bun, Git               | ~162 MB | Ubuntu-based Bun development  |
-| **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git | ~219 MB | Ubuntu-based full-stack       |
-| **ubuntu-tools**    | Ubuntu   | Python, jq, Git, curl  | ~129 MB | Tools-only automation         |
+| **ubuntu-bun**      | Ubuntu   | Bun, Git               | ~160 MB | Ubuntu-based Bun development  |
+| **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git | ~217 MB | Ubuntu-based full-stack       |
+| **ubuntu-tools**    | Ubuntu   | Python, jq, Git, curl  | ~127 MB | Tools-only automation         |
 
 ### 2. Registry Options
 
