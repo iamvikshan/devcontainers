@@ -127,6 +127,8 @@ def update_docs():
                 content = re.sub(r"Smallest size - Only [0-9]+ MB!", f"Smallest size - Only {size}!", content)
             elif name == 'ubuntu-bun-node':
                 content = re.sub(r"Balanced size - Feature-rich at only [0-9]+ MB", f"Balanced size - Feature-rich at only {size}", content)
+            elif name == 'ubuntu-bun-ai':
+                content = re.sub(r"AI additions - Custom taste workspace at only [0-9]+ MB", f"AI additions - Custom taste workspace at only {size}", content)
 
         with open('docs/IMAGE_VARIANTS.md', 'w') as fh:
             fh.write(content)

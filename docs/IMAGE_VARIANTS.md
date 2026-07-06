@@ -5,15 +5,15 @@ images.
 
 ## 📊 Images Comparison
 
-| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ubuntu-tools          |
-| --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | --------------------- |
-| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest         |
-| **Size**        | ~57 MB | ~82 MB | ~160 MB | ~217 MB | ~127 MB |
-| **Bun Version** | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | ❌ |
-| **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v24.18.0 | ❌ |
-| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                    |
-| **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)          |
-| **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | Tools-only automation |
+| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ubuntu-bun-ai     | ubuntu-tools          |
+| --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
+| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest     | ubuntu:latest         |
+| **Size**        | ~57 MB            | ~82 MB                 | ~160 MB          | ~217 MB           | ~160 MB           | ~127 MB               |
+| **Bun Version** | 1.3.14            | 1.3.14                 | 1.3.14           | 1.3.14            | 1.3.14            | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.18.0       | ❌ (Bun proxy)    | ❌                    |
+| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                | ❌                    |
+| **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)      | Ubuntu (apt)          |
+| **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | AI & custom tools | Tools-only automation |
 
 ## 🎯 Image Selection Guide
 
@@ -214,7 +214,50 @@ JavaScript runtimes.
 }
 ```
 
-### 5. ubuntu-tools (~127 MB)
+### 5. ubuntu-bun-ai (~160 MB)
+
+**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-ai:latest`
+
+**Description:** Ubuntu-based Bun environment configured for personal AI development, complete with coderabbit CLI and antigravity CLI (agy). It also routes Node.js command execution to Bun.
+
+**Key Features:**
+
+- 🤖 **AI-augmented** - Built-in coderabbit CLI and antigravity CLI
+- ⚡ **Node Checkmate** - Seamlessly redirects node commands to bun
+- 📦 **Ubuntu packages** - Full access to apt repositories
+- 🔐 **sudo access** - Administrative privileges
+
+**Included Tools:**
+
+- Bun (glibc build)
+- CodeRabbit CLI
+- Antigravity CLI (agy)
+- Node.js command compatibility redirection
+- Git, SSH client, curl, unzip
+- btop (system resource monitor)
+- sudo (administrative access)
+
+**Perfect For:**
+
+- Personal AI assistant coding workflows
+- Projects using CodeRabbit & Antigravity tools
+- General Ubuntu-based Bun development
+
+**Example Configuration:**
+
+```json
+{
+  "name": "AI Bun Workspace",
+  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-ai:latest",
+  "customizations": {
+    "vscode": {
+      "extensions": ["oven.bun-vscode", "oxc.oxc-vscode", "coderabbit.coderabbit-vscode"]
+    }
+  }
+}
+```
+
+### 6. ubuntu-tools (~127 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest`
 

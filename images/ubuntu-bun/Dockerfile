@@ -5,8 +5,8 @@ ARG BUN_VERSION="1.3.14"
 # renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainers/ubuntu-tools
 ARG BASE_TAG="latest"
 
-# 1. Define Bun Source for Multi-Stage Copy
-FROM oven/bun:${BUN_VERSION}-alpine AS bun_source
+# 1. Define Bun Source for Multi-Stage Copy (using glibc-compatible slim image)
+FROM oven/bun:${BUN_VERSION}-slim AS bun_source
 
 # 2. Base Image Tracking
 FROM ghcr.io/iamvikshan/devcontainers/ubuntu-tools:${BASE_TAG}

@@ -30,9 +30,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         && chmod 0440 "/etc/sudoers.d/${USERNAME}" \
         && visudo -cf "/etc/sudoers.d/${USERNAME}"; \
     fi \
-    && curl -fsSL https://antigravity.google/cli/install.sh | sh \
-    && mv /root/.local/bin/agy /usr/local/bin/agy \
-    && rm -rf /root/.local /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # 4. Remote ZSH Configuration & Tmux Injection
 RUN HOME_DIR=$(if [ "${USERNAME}" = "root" ]; then echo "/root"; else echo "/home/${USERNAME}"; fi) \

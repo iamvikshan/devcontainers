@@ -22,9 +22,7 @@
     {
       "description": "Update tool versions defined as ARGs in Dockerfiles",
       "customType": "regex",
-      "managerFilePatterns": [
-        "/(^|/)Dockerfile$/"
-      ],
+      "managerFilePatterns": ["/(^|/)Dockerfile$/"],
       "matchStrings": [
         "#\\s*renovate:\\s*datasource=(?<datasource>[a-zA-Z0-9.-]+)\\s*depName=(?<depName>[^\\s]+)(?:\\s+versioning=(?<versioning>[a-zA-Z0-9.-]+))?\\n(?:ENV|ARG)\\s+[A-Z0-9_]+_VERSION=\"(?<currentValue>[^\"]+)\""
       ]
@@ -42,11 +40,7 @@
       "description": "Oxfmt configuration (replaces Prettier)",
       "groupName": "oxfmt",
       "labels": ["formatter", "oxfmt"],
-      "matchPackageNames": [
-        "/^oxfmt/",
-        "/^@oxfmt//",
-        "/^eslint-plugin-oxfmt$/"
-      ]
+      "matchPackageNames": ["/^oxfmt/", "/^@oxfmt//", "/^eslint-plugin-oxfmt$/"]
     },
     {
       "description": "Group and automerge all Docker bases and Container tool updates",
