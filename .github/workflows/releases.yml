@@ -169,7 +169,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v6.1.0
+        uses: docker/metadata-action@v6.2.0
         with:
           images: |
             ${{ env.GHCR_BASE }}/${{ matrix.image }}
@@ -261,7 +261,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v6.1.0
+        uses: docker/metadata-action@v6.2.0
         with:
           images: |
             ${{ env.GHCR_BASE }}/${{ matrix.image }}
@@ -344,7 +344,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v6.1.0
+        uses: docker/metadata-action@v6.2.0
         with:
           images: |
             ${{ env.GHCR_BASE }}/ubuntu-bun-ai
