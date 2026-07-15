@@ -78,7 +78,7 @@ jobs:
             bun_node: "images/bun-node/**"
             ubuntu_bun: "images/ubuntu-bun/**"
             ubuntu_bun_node: "images/ubuntu-bun-node/**"
-            ubuntu_bun_ai: "images/agents/**"
+            agents: "images/agents/**"
 
       - name: Construct DAG Matrices
         id: matrix
@@ -110,7 +110,7 @@ jobs:
               DERIVATIVES+=("ubuntu-bun-node")
             fi
             
-            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_ai }}" == "true" ]; then
+            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
               AI_CHANGED="true"
             else
               AI_CHANGED="false"

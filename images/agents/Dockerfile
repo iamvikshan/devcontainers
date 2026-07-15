@@ -34,7 +34,7 @@ RUN npm install -g openwiki omniroute \
 USER ${USERNAME}
 
 # Inject Metadata for Skopeo Extraction
-LABEL org.opencontainers.image.title="ai-harness" \
+LABEL org.opencontainers.image.title="ai-agents" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}" \
       devcontainer.tool.coderabbit="latest" \
       devcontainer.tool.agy="latest" \
