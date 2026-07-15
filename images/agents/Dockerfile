@@ -19,13 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Pruned OpenCode and Hermes: OmniRoute natively routes to their free upstream models without needing local CLI wrappers.
 RUN curl -fsSL https://cli.coderabbit.ai/install.sh | bash \
     && mv /root/.local/bin/coderabbit /usr/local/bin/coderabbit \
-    && curl -fsSL https://antigravity.google/cli/install.sh | sh \
-    && mv /root/.local/bin/agy /usr/local/bin/agy \
-    && curl -fsSL https://claude.ai/install.sh | bash \
-    && rm -rf /root/.local /root/.cache /tmp/*
 
 # 3. Install npm global tools requiring native C++ SQLite bindings (OpenWiki and omniroute)
-RUN npm install -g openwiki omniroute \
+RUN npm install -g openwiki omniroute @anthropic-ai/claude-code \
     && npm cache clean --force \
     && rm -rf /root/.npm /tmp/*
 
@@ -36,7 +32,6 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="ai-agents" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}" \
       devcontainer.tool.coderabbit="latest" \
-      devcontainer.tool.agy="latest" \
       devcontainer.tool.claudecode="latest" \
       devcontainer.tool.omniroute="latest" \
       devcontainer.tool.openwiki="latest"
