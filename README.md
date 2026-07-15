@@ -21,7 +21,7 @@ interactive shell experience.
 | **bun-node**        | 82 MB  | Alpine | ✅  | ✅             | Full-stack development    |
 | **ubuntu-bun**      | 160 MB | Ubuntu | ✅  | ❌             | Ubuntu-based Bun projects |
 | **ubuntu-bun-node** | 217 MB | Ubuntu | ✅  | ✅             | Ubuntu full-stack         |
-| **ai**              | 160 MB | Ubuntu | ✅  | ❌ (Bun proxy) | Personal AI workspace     |
+| **agents**          | 160 MB | Ubuntu | ✅  | ✅             | Personal AI workspace     |
 | **ubuntu-tools**    | 127 MB | Ubuntu | ❌  | ❌             | Tools-only automation     |
 
 ### 🎯 Choose Your Image
@@ -41,12 +41,12 @@ Need Bun runtime?
 ### 📦 Quick Start
 
 ```bash
-docker pull ghcr.io/iamvikshan/devcontainers/bun:latest
-docker pull ghcr.io/iamvikshan/devcontainers/bun-node:latest
-docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest
-docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest
-docker pull ghcr.io/iamvikshan/devcontainers/ai:latest
-docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest
+docker pull ghcr.io/iamvikshan/devcontainer/bun:latest
+docker pull ghcr.io/iamvikshan/devcontainer/bun-node:latest
+docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-bun:latest
+docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest
+docker pull ghcr.io/iamvikshan/devcontainer/agents:latest
+docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-tools:latest
 ```
 
 > **Alternative Sources:** All images are also available on
@@ -62,7 +62,7 @@ Add your chosen image to `.devcontainer/devcontainer.json`:
 ```json
 {
   "name": "My Bun Project",
-  "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/bun:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"],
@@ -82,14 +82,14 @@ Add your chosen image to `.devcontainer/devcontainer.json`:
 docker run -it --rm \
   -v $(pwd):/workspace \
   -w /workspace \
-  ghcr.io/iamvikshan/devcontainers/bun:latest \
+  ghcr.io/iamvikshan/devcontainer/bun:latest \
   zsh
 
 # Run commands directly
 docker run --rm \
   -v $(pwd):/workspace \
   -w /workspace \
-  ghcr.io/iamvikshan/devcontainers/bun:latest \
+  ghcr.io/iamvikshan/devcontainer/bun:latest \
   bun install
 ```
 
@@ -99,7 +99,7 @@ docker run --rm \
 version: '3.8'
 services:
   dev:
-    image: ghcr.io/iamvikshan/devcontainers/bun:latest
+    image: ghcr.io/iamvikshan/devcontainer/bun:latest
     volumes:
       - .:/workspace
     working_dir: /workspace

@@ -14,7 +14,7 @@ setup, so the examples below use `zsh`.
 | **bun-node**        | oven/bun | Bun, Node.js, npm, Git    | ~82 MB  | Full-stack with Bun + Node.js |
 | **ubuntu-bun**      | Ubuntu   | Bun, Git                  | ~160 MB | Ubuntu-based Bun development  |
 | **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git    | ~217 MB | Ubuntu-based full-stack       |
-| **ai**              | Ubuntu   | Bun, agy, CodeRabbit, Git | ~160 MB | Personal AI workspace         |
+| **agents**          | Ubuntu   | Bun, agy, CodeRabbit, Git | ~160 MB | Personal AI workspace         |
 | **ubuntu-tools**    | Ubuntu   | Python, jq, Git, curl     | ~127 MB | Tools-only automation         |
 
 ### 2. Registry Options
@@ -23,10 +23,10 @@ Choose your preferred registry:
 
 ```bash
 # GitHub Container Registry (Recommended)
-ghcr.io/iamvikshan/devcontainers/[image]:latest
+ghcr.io/iamvikshan/devcontainer/[image]:latest
 
 # GitLab Container Registry
-registry.gitlab.com/vikshan/devcontainers/[image]:latest
+registry.gitlab.com/vikshan/devcontainers/devcontainer/[image]:latest
 
 # Docker Hub
 docker.io/vikshan/[image]:latest
@@ -45,7 +45,7 @@ docker.io/vikshan/[image]:latest
    ```json
    {
      "name": "My Project",
-     "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
+     "image": "ghcr.io/iamvikshan/devcontainer/bun:latest",
      "customizations": {
        "vscode": {
          "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
@@ -69,14 +69,14 @@ docker.io/vikshan/[image]:latest
 docker run -it --rm \
   -v $(pwd):/workspace \
   -w /workspace \
-  ghcr.io/iamvikshan/devcontainers/bun:latest \
+  ghcr.io/iamvikshan/devcontainer/bun:latest \
   zsh
 
 # Run specific commands
 docker run --rm \
   -v $(pwd):/workspace \
   -w /workspace \
-  ghcr.io/iamvikshan/devcontainers/bun:latest \
+  ghcr.io/iamvikshan/devcontainer/bun:latest \
   bun install
 ```
 
@@ -86,7 +86,7 @@ docker run --rm \
 version: '3.8'
 services:
   dev:
-    image: ghcr.io/iamvikshan/devcontainers/bun:latest
+    image: ghcr.io/iamvikshan/devcontainer/bun:latest
     volumes:
       - .:/workspace
     working_dir: /workspace

@@ -5,12 +5,12 @@ images.
 
 ## 📊 Images Comparison
 
-| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ai                | ubuntu-tools          |
+| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | agents            | ubuntu-tools          |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest     | ubuntu:latest         |
-| **Size**        | ~57 MB | ~82 MB | ~117 MB | ~173 MB | ~200 MB | ~82 MB |
-| **Bun Version** | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | ❌ |
-| **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v24.18.0 | ❌ (Bun proxy) | ❌ |
+| **Size**        | ~57 MB            | ~82 MB                 | ~117 MB          | ~173 MB           | ~200 MB           | ~82 MB                |
+| **Bun Version** | 1.3.14            | 1.3.14                 | 1.3.14           | 1.3.14            | 1.3.14            | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.18.0       | ❌ (Bun proxy)    | ❌                    |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | AI & custom tools | Tools-only automation |
@@ -30,7 +30,7 @@ images.
 
 ### 1. bun (~57 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainer/bun:latest`
 
 **Description:** Lightweight Bun development environment based on the official
 Alpine-based Bun image. Perfect for pure Bun projects that don't require Node.js
@@ -64,7 +64,7 @@ compatibility.
 ```json
 {
   "name": "Pure Bun Project",
-  "image": "ghcr.io/iamvikshan/devcontainers/bun:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/bun:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
@@ -76,7 +76,7 @@ compatibility.
 
 ### 2. bun-node (~82 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/bun-node:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainer/bun-node:latest`
 
 **Description:** Full-featured development environment with both Bun and
 Node.js. Ideal for projects that need Bun's performance with Node.js ecosystem
@@ -110,7 +110,7 @@ compatibility.
 ```json
 {
   "name": "Full-Stack Project",
-  "image": "ghcr.io/iamvikshan/devcontainers/bun-node:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/bun-node:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
@@ -122,7 +122,7 @@ compatibility.
 
 ### 3. ubuntu-bun (~117 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubuntu-bun:latest`
 
 **Description:** Ubuntu-based Bun environment for developers who prefer Ubuntu's
 package ecosystem and tooling. The smallest image in our collection!
@@ -156,7 +156,7 @@ package ecosystem and tooling. The smallest image in our collection!
 ```json
 {
   "name": "Ubuntu Bun Project",
-  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/ubuntu-bun:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
@@ -168,7 +168,7 @@ package ecosystem and tooling. The smallest image in our collection!
 
 ### 4. ubuntu-bun-node (~173 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest`
 
 **Description:** Complete Ubuntu-based development environment with Bun,
 Node.js, and npm. Best of both worlds with Ubuntu's flexibility and modern
@@ -204,7 +204,7 @@ JavaScript runtimes.
 ```json
 {
   "name": "Ubuntu Full-Stack Project",
-  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oven.bun-vscode", "oxc.oxc-vscode"]
@@ -214,9 +214,9 @@ JavaScript runtimes.
 }
 ```
 
-### 5. ai (~160 MB)
+### 5. agents (~160 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ai:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainer/agents:latest`
 
 **Description:** Ubuntu-based Bun environment configured for personal AI development, complete with coderabbit CLI and antigravity CLI (agy). It also routes Node.js command execution to Bun.
 
@@ -248,7 +248,7 @@ JavaScript runtimes.
 ```json
 {
   "name": "AI Bun Workspace",
-  "image": "ghcr.io/iamvikshan/devcontainers/ai:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/agents:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oven.bun-vscode", "oxc.oxc-vscode", "coderabbit.coderabbit-vscode"]
@@ -259,7 +259,7 @@ JavaScript runtimes.
 
 ### 6. ubuntu-tools (~82 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubuntu-tools:latest`
 
 **Description:** Ubuntu-based tools-only environment for automation, scripting,
 and utility-heavy workflows that do not require Bun or Node.js runtimes.
@@ -290,7 +290,7 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
 ```json
 {
   "name": "Tools Workspace",
-  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/ubuntu-tools:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oxc.oxc-vscode"]
@@ -344,13 +344,13 @@ images are available from multiple registries:
 ### GitHub Container Registry (Primary)
 
 ```bash
-ghcr.io/iamvikshan/devcontainers/[image]:latest
+ghcr.io/iamvikshan/devcontainer/[image]:latest
 ```
 
 ### GitLab Container Registry
 
 ```bash
-registry.gitlab.com/vikshan/devcontainers/[image]:latest
+registry.gitlab.com/vikshan/devcontainers/devcontainer/[image]:latest
 ```
 
 ### Docker Hub

@@ -1,6 +1,6 @@
 {
   "name": "Ubuntu + Bun + Docker",
-  "image": "ghcr.io/iamvikshan/devcontainers/ai:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/agents:latest",
 
   "features": {
     "ghcr.io/devcontainers/features/sshd:1": {
