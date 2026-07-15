@@ -18,12 +18,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # 2. Install native binaries via pipe-to-sh (CodeRabbit)
 RUN curl -fsSL https://cli.coderabbit.ai/install.sh | bash \
     && mv /root/.local/bin/coderabbit /usr/local/bin/coderabbit \
+    && curl -fsSL https://antigravity.google/cli/install.sh | sh \
+    && mv /root/.local/bin/agy /usr/local/bin/agy \
     && rm -rf /root/.local /root/.cache /tmp/*
 
-# 3. Install npm global tools requiring native C++ SQLite bindings (OpenWiki and omniroute)
-RUN npm install -g openwiki omniroute @anthropic-ai/claude-code \
+RUN npm install -g openwiki omniroute \
+    && apk del .build-deps \
     && npm cache clean --force \
-    && rm -rf /root/.npm /tmp/*
+    && rm -rf /root/.npm /tmp/* /var/cache/apk/*
+
+RUN bun install -g opencode-ai \
+    && rm -rf /root/.bun/install/cache /tmp/*
+
 
 # Drop privileges back to the standard non-root user
 USER ${USERNAME}
@@ -32,7 +38,8 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="ai-agents" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}" \
       devcontainer.tool.coderabbit="latest" \
-      devcontainer.tool.claudecode="latest" \
+      devcontainer.tool.opencode="latest" \
+      devcontainer.tool.agy="latest" \
       devcontainer.tool.omniroute="latest" \
       devcontainer.tool.openwiki="latest"
 

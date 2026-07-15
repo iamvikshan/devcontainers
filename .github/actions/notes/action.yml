@@ -36,22 +36,16 @@ runs:
         echo "| Container | Version | Date | Registry Links |" >> release_notes.md
         echo "|---|---|---|---|" >> release_notes.md
 
-        # Gather comma-separated list of built images for downstream docs scoping
         CHANGED_IMAGES=""
 
-        # 1. Update README sizes and build changelog table rows ONLY for built images
         for size_file in metadata/*.size; do
           if [ -f "$size_file" ]; then
             IMG_NAME=$(basename "$size_file" .size)
             SIZE_VAL=$(cat "$size_file")
             
-            # Append cleanly to changed images list without leading commas
             CHANGED_IMAGES="${CHANGED_IMAGES:+$CHANGED_IMAGES,}$IMG_NAME"
             
-            # Add row to release notes with versioned tag links
             echo "| $IMG_NAME | $NEW_TAG | $(date +'%Y-%m-%d') | [GHCR](https://ghcr.io/$OWNER/devcontainer/$IMG_NAME:$NEW_TAG) · [Docker Hub](https://hub.docker.com/r/vikshan/$IMG_NAME:$NEW_TAG) |" >> release_notes.md
-            
-            # Smart replace the size in the README table inline
             sed -i -E "s/\|[[:space:]]*\*\*$IMG_NAME\*\*[[:space:]]*\|[[:space:]]*[^|]+[[:space:]]*\|/\| **$IMG_NAME** \| $SIZE_VAL \|/" README.md
           fi
         done
@@ -60,8 +54,6 @@ runs:
         echo "### Environment Tool Versions" >> release_notes.md
         echo "" >> release_notes.md
 
-        # 2. Dynamically output tool versions ONLY for images present in metadata
-        # Eliminates hardcoded Ubuntu/Alpine sections and "No tools updated" noise
         for ver_file in metadata/*.versions; do
           if [ -f "$ver_file" ]; then
             IMG_NAME=$(basename "$ver_file" .versions)
@@ -73,13 +65,14 @@ runs:
           fi
         done
 
-        # 3. Prepend to CHANGELOG.md safely (touch ensures no crash on missing file)
         touch CHANGELOG.md
         cat release_notes.md CHANGELOG.md > temp_changelog.md && mv temp_changelog.md CHANGELOG.md
 
-        # 4. Update variants and setup documentation scoped strictly to changed images
         export CHANGED_IMAGES="$CHANGED_IMAGES"
         bun run .github/actions/notes/update_docs.ts --images="$CHANGED_IMAGES"
+
+        git config pull.rebase true
+        git pull --rebase --autostash origin main || true
 
     - name: 'Commit CHANGELOG, README & Docs'
       id: auto_commit
@@ -88,7 +81,6 @@ runs:
         commit_message: 'docs: update CHANGELOG, README, and variants documentation for ${{ inputs.tag_name }} [skip ci]'
         file_pattern: 'CHANGELOG.md README.md docs/IMAGE_VARIANTS.md docs/SETUP.md'
         repository: .
-        token: ${{ inputs.github_token }}
         commit_user_name: 'iamvikshan'
         commit_user_email: 'vixshan@gmail.com'
         commit_author: 'iamvikshan <vixshan@gmail.com>'
@@ -101,7 +93,6 @@ runs:
         body_path: release_notes.md
         token: ${{ inputs.github_token }}
 
-    # Upload only if generated so downstream DockerHub sync has access to it
     - name: Upload README Artifact for DockerHub Sync
       uses: actions/upload-artifact@v7.0.1
       with:

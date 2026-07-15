@@ -439,7 +439,7 @@ jobs:
           path: metadata/
           retention-days: 1
 
-  # ============================================
+# ============================================
   # Job 4: Finalize Changelog & Documentation
   # ============================================
   finalize:
@@ -458,11 +458,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.0
+        with:
+          ref: ${{ github.ref_name }} 
+          fetch-depth: 0              
 
       - name: Setup bun
         uses: iamvikshan/.github/.github/actions/bun@main   
     
-      # Uses our custom script to handle sizes, tools, README, CHANGELOG, and GH Release
       - name: Execute Notes Action
         uses: ./.github/actions/notes
         with:
