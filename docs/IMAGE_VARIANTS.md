@@ -8,9 +8,9 @@ images.
 | Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | agents            | ubuntu-tools          |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest     | ubuntu:latest         |
-| **Size**        | ~57 MB            | ~82 MB                 | ~117 MB          | ~173 MB           | ~200 MB           | ~82 MB                |
-| **Bun Version** | 1.3.14            | 1.3.14                 | 1.3.14           | 1.3.14            | 1.3.14            | ❌                    |
-| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.18.0       | ❌ (Bun proxy)    | ❌                    |
+| **Size**        | ~57 MB | ~82 MB | ~117 MB | ~173 MB | ~2283 MB | ~82 MB |
+| **Bun Version** | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | ❌ |
+| **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v24.18.0 | ✅ v24.18.0 | ❌ |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | AI & custom tools | Tools-only automation |
@@ -214,7 +214,7 @@ JavaScript runtimes.
 }
 ```
 
-### 5. agents (~160 MB)
+### 5. agents (~2283 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/agents:latest`
 
