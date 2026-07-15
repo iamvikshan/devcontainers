@@ -103,7 +103,7 @@ runs:
 
     # Upload only if generated so downstream DockerHub sync has access to it
     - name: Upload README Artifact for DockerHub Sync
-      uses: actions/upload-artifact@v8.0.1
+      uses: actions/upload-artifact@v7.0.1
       with:
         name: updated-readme
         path: README.md
