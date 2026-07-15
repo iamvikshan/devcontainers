@@ -96,6 +96,9 @@ runs:
         file_pattern: 'CHANGELOG.md README.md docs/IMAGE_VARIANTS.md docs/SETUP.md'
         repository: .
         token: ${{ inputs.github_token }}
+        commit_user_name: 'iamvikshan'
+        commit_user_email: 'vixshan@gmail.com'
+        commit_author: 'iamvikshan <vixshan@gmail.com>'
 
     - name: 'Publish GitHub Release'
       uses: softprops/action-gh-release@v3.0.1

@@ -5,7 +5,7 @@ images.
 
 ## 📊 Images Comparison
 
-| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ubuntu-bun-ai     | ubuntu-tools          |
+| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | ai                | ubuntu-tools          |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest     | ubuntu:latest         |
 | **Size**        | ~57 MB | ~82 MB | ~117 MB | ~173 MB | ~200 MB | ~82 MB |
@@ -214,9 +214,9 @@ JavaScript runtimes.
 }
 ```
 
-### 5. ubuntu-bun-ai (~200 MB)
+### 5. ai (~160 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ubuntu-bun-ai:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainers/ai:latest`
 
 **Description:** Ubuntu-based Bun environment configured for personal AI development, complete with coderabbit CLI and antigravity CLI (agy). It also routes Node.js command execution to Bun.
 
@@ -248,7 +248,7 @@ JavaScript runtimes.
 ```json
 {
   "name": "AI Bun Workspace",
-  "image": "ghcr.io/iamvikshan/devcontainers/ubuntu-bun-ai:latest",
+  "image": "ghcr.io/iamvikshan/devcontainers/ai:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oven.bun-vscode", "oxc.oxc-vscode", "coderabbit.coderabbit-vscode"]

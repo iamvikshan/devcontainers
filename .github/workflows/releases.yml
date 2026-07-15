@@ -78,7 +78,7 @@ jobs:
             bun_node: "images/bun-node/**"
             ubuntu_bun: "images/ubuntu-bun/**"
             ubuntu_bun_node: "images/ubuntu-bun-node/**"
-            ubuntu_bun_ai: "images/ubuntu-bun-ai/**"
+            ubuntu_bun_ai: "images/ai/**"
 
       - name: Construct DAG Matrices
         id: matrix
@@ -308,7 +308,7 @@ jobs:
   # Job 3.5: Build AI/Taste Custom Image
   # ============================================
   build-ai:
-    name: AI -> ubuntu-bun-ai
+    name: AI -> ai
     needs: [prepare, build-derivatives]
     if: |
       always() &&
@@ -348,9 +348,9 @@ jobs:
         uses: docker/metadata-action@v6.2.0
         with:
           images: |
-            ${{ env.GHCR_BASE }}/ubuntu-bun-ai
-            registry.gitlab.com/${{ env.GL_USERNAME }}/devcontainers/ubuntu-bun-ai
-            ${{ env.GL_USERNAME }}/ubuntu-bun-ai
+            ${{ env.GHCR_BASE }}/ai
+            registry.gitlab.com/${{ env.GL_USERNAME }}/devcontainers/ai
+            ${{ env.GL_USERNAME }}/ai
           tags: |
             type=raw,value=${{ needs.prepare.outputs.new_tag }}
             type=raw,value=latest
@@ -358,7 +358,7 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v7.3.0
         with:
-          context: images/ubuntu-bun-ai
+          context: images/ai
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -373,17 +373,17 @@ jobs:
           sleep 10
 
           # 1. Extract Size from remote manifest
-          skopeo inspect docker://${{ env.GHCR_BASE }}/ubuntu-bun-ai:${{ needs.prepare.outputs.new_tag }} | \
-          jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/ubuntu-bun-ai.size
+          skopeo inspect docker://${{ env.GHCR_BASE }}/ai:${{ needs.prepare.outputs.new_tag }} | \
+          jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/ai.size
 
           # 2. Extract specific devcontainer.tool.* OCI Labels
-          skopeo inspect docker://${{ env.GHCR_BASE }}/ubuntu-bun-ai:${{ needs.prepare.outputs.new_tag }} | \
-          jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/ubuntu-bun-ai.versions
+          skopeo inspect docker://${{ env.GHCR_BASE }}/ai:${{ needs.prepare.outputs.new_tag }} | \
+          jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/ai.versions
 
       - name: Upload Metadata
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: metadata-ubuntu-bun-ai
+          name: metadata-ai
           path: metadata/
           retention-days: 1
 
@@ -414,12 +414,6 @@ jobs:
           tag_name: ${{ needs.prepare.outputs.new_tag }}
           github_token: ${{ secrets.GH_TOKEN }}
 
-      - name: Upload updated README
-        uses: actions/upload-artifact@v7.0.1
-        with:
-          name: updated-readme
-          path: README.md
-
   # ============================================
   # Job 5: Sync DockerHub READMEs
   # ============================================
@@ -430,7 +424,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node, ubuntu-bun-ai]
+        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node, ai]
     steps:
       - name: Download updated README
         uses: actions/download-artifact@v8.0.1
@@ -459,7 +453,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node, ubuntu-bun-ai]
+        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node, ai]
     steps:
       - name: Clean GHCR
         uses: vlaurin/action-ghcr-prune@v0.6.0

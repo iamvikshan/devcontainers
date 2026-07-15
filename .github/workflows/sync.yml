@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7.0.0
+        with:
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Sync with GitLab
         uses: iamvikshan/gitsync@v1.1.0
