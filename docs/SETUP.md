@@ -15,7 +15,7 @@ setup, so the examples below use `zsh`.
 | **ubuntu-bun**      | Ubuntu   | Bun, Git                  | ~117 MB | Ubuntu-based Bun development  |
 | **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git    | ~173 MB | Ubuntu-based full-stack       |
 | **agents**          | Ubuntu   | Bun, agy, CodeRabbit, Git | ~2283 MB | Personal AI workspace         |
-| **ubuntu-tools**    | Ubuntu   | Python, jq, Git, curl     | ~82 MB | Tools-only automation         |
+| **ubuntu**    | Ubuntu   | Python, jq, Git, curl     | ~82 MB | Tools-only automation         |
 
 ### 2. Registry Options
 
@@ -135,7 +135,7 @@ Recommended extensions for each image type:
 - `ms-vscode.vscode-typescript-next` - TypeScript support
 - `bradlc.vscode-tailwindcss` - Tailwind CSS support
 
-#### Tools-only Image (ubuntu-tools)
+#### Tools-only Image (ubuntu)
 
 - `ms-python.python` - Python support
 - `ms-toolsai.jupyter` - Optional notebook workflows
@@ -178,7 +178,7 @@ bun run build
 bun run script.ts
 ```
 
-> `ubuntu-tools` does not include Bun by default. Use this section only for
+> `ubuntu` does not include Bun by default. Use this section only for
 > Bun-based images.
 
 ### npm Commands (Node images only)
@@ -196,7 +196,7 @@ npm run dev
 npm run build
 ```
 
-> `ubuntu-tools` does not include Node.js or npm by default.
+> `ubuntu` does not include Node.js or npm by default.
 
 ## 🐛 Troubleshooting
 

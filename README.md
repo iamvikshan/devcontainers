@@ -22,7 +22,7 @@ interactive shell experience.
 | **ubuntu-bun** | 117 MB | Ubuntu | ✅  | ❌             | Ubuntu-based Bun projects |
 | **ubuntu-bun-node** | 173 MB | Ubuntu | ✅  | ✅             | Ubuntu full-stack         |
 | **agents** | 2283 MB | Ubuntu | ✅  | ✅             | Personal AI workspace     |
-| **ubuntu-tools** | 82 MB | Ubuntu | ❌  | ❌             | Tools-only automation     |
+| **ubuntu** | 82 MB | Ubuntu | ❌  | ❌             | Tools-only automation     |
 
 ### 🎯 Choose Your Image
 
@@ -35,7 +35,7 @@ Need Bun runtime?
 │  └─ No  → Need Ubuntu base?
 │     ├─ Yes → ubuntu-bun
 │     └─ No  → bun
-└─ No  → ubuntu-tools
+└─ No  → ubuntu
 ```
 
 ### 📦 Quick Start
@@ -46,7 +46,7 @@ docker pull ghcr.io/iamvikshan/devcontainer/bun-node:latest
 docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-bun:latest
 docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest
 docker pull ghcr.io/iamvikshan/devcontainer/agents:latest
-docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-tools:latest
+docker pull ghcr.io/iamvikshan/devcontainer/ubuntu:latest
 ```
 
 > **Alternative Sources:** All images are also available on
@@ -144,7 +144,7 @@ All images include:
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)
 
-#### Ubuntu tools-only Image (`ubuntu-tools`)
+#### Ubuntu tools-only Image (`ubuntu`)
 
 - **jq** - JSON processing utility
 - **No Bun, Node.js, or npm** - Purpose-built tools-only variant

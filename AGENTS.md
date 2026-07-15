@@ -6,7 +6,7 @@
 - **Primary Implementation Areas**:
   - `images/*` for image Dockerfiles and shell bootstrap scripts.
   - `.devcontainer/` and `images/*/devcontainer.json` for VS Code container manifests.
-  - `.github/actions/notes/update_docs.py` and GitHub Actions workflows for release/version automation.
+  - `.github/actions/notes/update_docs.ts` and GitHub Actions workflows for release/version automation.
   - `docs/*.md` and `README.md` for user-facing documentation.
 
 ## Tooling & Runtime Environment

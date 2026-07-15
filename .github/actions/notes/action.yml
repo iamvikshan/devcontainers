@@ -36,11 +36,17 @@ runs:
         echo "| Container | Version | Date | Registry Links |" >> release_notes.md
         echo "|---|---|---|---|" >> release_notes.md
 
-        # 1. Update README sizes and build changelog table rows
+        # Gather comma-separated list of built images for downstream docs scoping
+        CHANGED_IMAGES=""
+
+        # 1. Update README sizes and build changelog table rows ONLY for built images
         for size_file in metadata/*.size; do
           if [ -f "$size_file" ]; then
             IMG_NAME=$(basename "$size_file" .size)
             SIZE_VAL=$(cat "$size_file")
+            
+            # Append cleanly to changed images list without leading commas
+            CHANGED_IMAGES="${CHANGED_IMAGES:+$CHANGED_IMAGES,}$IMG_NAME"
             
             # Add row to release notes with versioned tag links
             echo "| $IMG_NAME | $NEW_TAG | $(date +'%Y-%m-%d') | [GHCR](https://ghcr.io/$OWNER/devcontainer/$IMG_NAME:$NEW_TAG) · [Docker Hub](https://hub.docker.com/r/vikshan/$IMG_NAME:$NEW_TAG) |" >> release_notes.md
@@ -54,39 +60,26 @@ runs:
         echo "### Environment Tool Versions" >> release_notes.md
         echo "" >> release_notes.md
 
-        # 2. Append Ubuntu Tool Versions (Read directly from Skopeo-extracted OCI labels)
-        echo "#### Ubuntu-Based Environments" >> release_notes.md
-        echo '```properties' >> release_notes.md
-        UBUNTU_FALLBACK=$(find metadata -name "ubuntu*.versions" | head -n 1)
-        if [ -f "metadata/ubuntu-bun-node.versions" ]; then
-          cat metadata/ubuntu-bun-node.versions >> release_notes.md
-        elif [ -n "$UBUNTU_FALLBACK" ]; then
-          cat "$UBUNTU_FALLBACK" >> release_notes.md
-        else
-          echo "# No Ubuntu tools updated." >> release_notes.md
-        fi
-        echo '```' >> release_notes.md
-        echo "" >> release_notes.md
+        # 2. Dynamically output tool versions ONLY for images present in metadata
+        # Eliminates hardcoded Ubuntu/Alpine sections and "No tools updated" noise
+        for ver_file in metadata/*.versions; do
+          if [ -f "$ver_file" ]; then
+            IMG_NAME=$(basename "$ver_file" .versions)
+            echo "#### \`$IMG_NAME\` Environment" >> release_notes.md
+            echo '```properties' >> release_notes.md
+            cat "$ver_file" >> release_notes.md
+            echo '```' >> release_notes.md
+            echo "" >> release_notes.md
+          fi
+        done
 
-        # 3. Append Alpine Tool Versions (strictly targeting files without 'ubuntu' in the name)
-        echo "#### Alpine-Based Environments" >> release_notes.md
-        echo '```properties' >> release_notes.md
-        ALPINE_FALLBACK=$(find metadata -name "*.versions" ! -name "*ubuntu*" | head -n 1)
-        if [ -f "metadata/bun-node.versions" ]; then
-          cat metadata/bun-node.versions >> release_notes.md
-        elif [ -n "$ALPINE_FALLBACK" ]; then
-          cat "$ALPINE_FALLBACK" >> release_notes.md
-        else
-          echo "# No Alpine tools updated." >> release_notes.md
-        fi
-        echo '```' >> release_notes.md
-        echo "" >> release_notes.md
-
-        # 4. Prepend to CHANGELOG.md safely
+        # 3. Prepend to CHANGELOG.md safely (touch ensures no crash on missing file)
+        touch CHANGELOG.md
         cat release_notes.md CHANGELOG.md > temp_changelog.md && mv temp_changelog.md CHANGELOG.md
 
-        # 5. Update variants and setup documentation
-        python3 .github/actions/notes/update_docs.py
+        # 4. Update variants and setup documentation scoped strictly to changed images
+        export CHANGED_IMAGES="$CHANGED_IMAGES"
+        bun run .github/actions/notes/update_docs.ts --images="$CHANGED_IMAGES"
 
     - name: 'Commit CHANGELOG, README & Docs'
       id: auto_commit
@@ -107,3 +100,11 @@ runs:
         name: '${{ inputs.tag_name }}'
         body_path: release_notes.md
         token: ${{ inputs.github_token }}
+
+    # Upload only if generated so downstream DockerHub sync has access to it
+    - name: Upload README Artifact for DockerHub Sync
+      uses: actions/upload-artifact@v8.0.1
+      with:
+        name: updated-readme
+        path: README.md
+        retention-days: 1

@@ -38,6 +38,7 @@ jobs:
       bases: ${{ steps.matrix.outputs.bases }}
       derivatives: ${{ steps.matrix.outputs.derivatives }}
       ai_changed: ${{ steps.matrix.outputs.ai_changed }}
+      all_built_images: ${{ steps.matrix.outputs.all_built_images }} # <-- ADDED DYNAMIC MATRIX OUTPUT
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.0
@@ -74,7 +75,7 @@ jobs:
         with:
           filters: |
             bun: "images/bun/**"
-            ubuntu_tools: "images/ubuntu-tools/**"
+            ubuntu: "images/ubuntu/**" # <-- RENAMED FROM ubuntu_tools
             bun_node: "images/bun-node/**"
             ubuntu_bun: "images/ubuntu-bun/**"
             ubuntu_bun_node: "images/ubuntu-bun-node/**"
@@ -88,29 +89,29 @@ jobs:
 
           # Force build ALL if scheduled or manually dispatched
           if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            BASES=("bun" "ubuntu-tools")
+            BASES=("bun" "ubuntu")
             DERIVATIVES=("bun-node" "ubuntu-bun" "ubuntu-bun-node")
             AI_CHANGED="true"
           else
             if [ "${{ steps.filter.outputs.bun }}" == "true" ]; then
               BASES+=("bun")
             fi
-            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ]; then
-              BASES+=("ubuntu-tools")
+            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ]; then
+              BASES+=("ubuntu")
             fi
 
             # Enqueue derivatives if their bases or they themselves changed
             if [ "${{ steps.filter.outputs.bun }}" == "true" ] || [ "${{ steps.filter.outputs.bun_node }}" == "true" ]; then
               DERIVATIVES+=("bun-node")
             fi
-            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ]; then
+            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ]; then
               DERIVATIVES+=("ubuntu-bun")
             fi
-            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ]; then
+            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ]; then
               DERIVATIVES+=("ubuntu-bun-node")
             fi
             
-            if [ "${{ steps.filter.outputs.ubuntu_tools }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
+            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
               AI_CHANGED="true"
             else
               AI_CHANGED="false"
@@ -124,9 +125,18 @@ jobs:
           DERIVATIVES_JSON=$(printf '%s\n' "${DERIVATIVES[@]}" | jq -R . | jq -cs .)
           [ "${#DERIVATIVES[@]}" -eq 0 ] && DERIVATIVES_JSON="[]"
 
+          # Combine all triggered images into a single list for downstream syncs
+          ALL_BUILT=("${BASES[@]}" "${DERIVATIVES[@]}")
+          if [ "$AI_CHANGED" == "true" ]; then
+            ALL_BUILT+=("agents")
+          fi
+          ALL_BUILT_JSON=$(printf '%s\n' "${ALL_BUILT[@]}" | jq -R . | jq -cs .)
+          [ "${#ALL_BUILT[@]}" -eq 0 ] && ALL_BUILT_JSON="[]"
+
           echo "bases=$BASES_JSON" >> $GITHUB_OUTPUT
           echo "derivatives=$DERIVATIVES_JSON" >> $GITHUB_OUTPUT
           echo "ai_changed=$AI_CHANGED" >> $GITHUB_OUTPUT
+          echo "all_built_images=$ALL_BUILT_JSON" >> $GITHUB_OUTPUT # <-- EXPORT COMBINED LIST
 
   # ============================================
   # Job 2: Build Base Images First
@@ -187,6 +197,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BASE_TAG=${{ needs.prepare.outputs.new_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: mode=min
@@ -194,15 +206,27 @@ jobs:
       - name: Extract Size & Tool Versions via Skopeo
         run: |
           mkdir -p metadata
-          # Wait for image to propagate to GHCR to avoid race conditions
-          sleep 5
+          IMAGE_URL="docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }}"
+
+          # Retry up to 5 times with exponential backoff to handle GHCR CDN lag safely
+          for i in {1..5}; do
+            if skopeo inspect "$IMAGE_URL" > /dev/null 2>&1; then
+              break
+            fi
+            echo "Manifest not ready yet, retrying in $((i * 3))s..."
+            sleep $((i * 3))
+            if [ $i -eq 5 ]; then
+              echo "Error: Timed out waiting for manifest to propagate to GHCR." >&2
+              exit 1
+            fi
+          done
 
           # 1. Extract Size from remote manifest
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
+          skopeo inspect "$IMAGE_URL" | \
           jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
 
           # 2. Extract specific devcontainer.tool.* OCI Labels
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
+          skopeo inspect "$IMAGE_URL" | \
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
 
       - name: Upload Metadata
@@ -235,7 +259,7 @@ jobs:
 
     steps:
       - name: Wait for base images to propagate
-        run: sleep 10
+        run: sleep 5
 
       - name: Checkout
         uses: actions/checkout@v7.0.0
@@ -279,6 +303,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BASE_TAG=${{ needs.prepare.outputs.new_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: mode=min
@@ -286,15 +312,27 @@ jobs:
       - name: Extract Size & Tool Versions via Skopeo
         run: |
           mkdir -p metadata
-          # Wait for image to propagate to GHCR to avoid race conditions
-          sleep 5
+          IMAGE_URL="docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }}"
+
+          # Retry up to 5 times with exponential backoff to handle GHCR CDN lag safely
+          for i in {1..5}; do
+            if skopeo inspect "$IMAGE_URL" > /dev/null 2>&1; then
+              break
+            fi
+            echo "Manifest not ready yet, retrying in $((i * 3))s..."
+            sleep $((i * 3))
+            if [ $i -eq 5 ]; then
+              echo "Error: Timed out waiting for manifest to propagate to GHCR." >&2
+              exit 1
+            fi
+          done
 
           # 1. Extract Size from remote manifest
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
+          skopeo inspect "$IMAGE_URL" | \
           jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/${{ matrix.image }}.size
 
           # 2. Extract specific devcontainer.tool.* OCI Labels
-          skopeo inspect docker://${{ env.GHCR_BASE }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_tag }} | \
+          skopeo inspect "$IMAGE_URL" | \
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
 
       - name: Upload Metadata
@@ -362,6 +400,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BASE_TAG=${{ needs.prepare.outputs.new_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: mode=min
@@ -369,15 +409,27 @@ jobs:
       - name: Extract Size & Tool Versions via Skopeo
         run: |
           mkdir -p metadata
-          # Wait for image to propagate to GHCR to avoid race conditions
-          sleep 10
+          IMAGE_URL="docker://${{ env.GHCR_BASE }}/agents:${{ needs.prepare.outputs.new_tag }}"
+
+          # Retry up to 5 times with exponential backoff to handle GHCR CDN lag safely
+          for i in {1..5}; do
+            if skopeo inspect "$IMAGE_URL" > /dev/null 2>&1; then
+              break
+            fi
+            echo "Manifest not ready yet, retrying in $((i * 3))s..."
+            sleep $((i * 3))
+            if [ $i -eq 5 ]; then
+              echo "Error: Timed out waiting for manifest to propagate to GHCR." >&2
+              exit 1
+            fi
+          done
 
           # 1. Extract Size from remote manifest
-          skopeo inspect docker://${{ env.GHCR_BASE }}/agents:${{ needs.prepare.outputs.new_tag }} | \
+          skopeo inspect "$IMAGE_URL" | \
           jq -r '[.LayersData[] | .Size] | add / 1048576 | floor | tostring + " MB"' > metadata/agents.size
 
           # 2. Extract specific devcontainer.tool.* OCI Labels
-          skopeo inspect docker://${{ env.GHCR_BASE }}/agents:${{ needs.prepare.outputs.new_tag }} | \
+          skopeo inspect "$IMAGE_URL" | \
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/agents.versions
 
       - name: Upload Metadata
@@ -407,6 +459,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.0
 
+      - name: Setup bun
+        uses: iamvikshan/.github/.github/actions/bun@main   
+    
       # Uses our custom script to handle sizes, tools, README, CHANGELOG, and GH Release
       - name: Execute Notes Action
         uses: ./.github/actions/notes
@@ -419,12 +474,13 @@ jobs:
   # ============================================
   dockerhub-sync:
     name: Sync DockerHub -> ${{ matrix.image }}
-    needs: finalize
+    needs: [prepare, finalize] # <-- ADDED prepare TO PREVENT EXPRESSION EVALUATION FAILURES
+    if: ${{ needs.prepare.outputs.all_built_images != '[]' && needs.prepare.outputs.all_built_images != '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node, agents]
+        image: ${{ fromJSON(needs.prepare.outputs.all_built_images) }} # <-- REPLACED HARDCODED LIST
     steps:
       - name: Download updated README
         uses: actions/download-artifact@v8.0.1
@@ -445,15 +501,15 @@ jobs:
   # ============================================
   cleanup:
     name: Prune Untagged GHCR Images -> ${{ matrix.image }}
-    needs: [build-bases, build-derivatives, build-agents]
-    if: ${{ always() }}
+    needs: [prepare, build-bases, build-derivatives, build-agents] # <-- ADDED prepare TO PREVENT EXPRESSION EVALUATION FAILURES
+    if: ${{ always() && needs.prepare.outputs.all_built_images != '[]' && needs.prepare.outputs.all_built_images != '' }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
     strategy:
       fail-fast: false
       matrix:
-        image: [bun, bun-node, ubuntu-tools, ubuntu-bun, ubuntu-bun-node, agents]
+        image: ${{ fromJSON(needs.prepare.outputs.all_built_images) }} # <-- REPLACED HARDCODED LIST
     steps:
       - name: Clean GHCR
         uses: vlaurin/action-ghcr-prune@v0.6.0
@@ -464,3 +520,4 @@ jobs:
           container: devcontainer/${{ matrix.image }}
           keep-younger-than: 7
           prune-untagged: true
+          

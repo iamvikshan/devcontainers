@@ -20,7 +20,7 @@ docker version
 # Build every image from the repository root
 set -e
 
-for image in bun bun-node ubuntu-bun ubuntu-bun-node ubuntu-tools; do
+for image in bun bun-node ubuntu-bun ubuntu-bun-node ubuntu; do
   docker build -t "devcontainers/${image}:test" "images/${image}"
 done
 ```
@@ -40,8 +40,8 @@ docker build -t devcontainers/ubuntu-bun:test images/ubuntu-bun
 # Build ubuntu-bun-node image
 docker build -t devcontainers/ubuntu-bun-node:test images/ubuntu-bun-node
 
-# Build ubuntu-tools image
-docker build -t devcontainers/ubuntu-tools:test images/ubuntu-tools
+# Build ubuntu image
+docker build -t devcontainers/ubuntu:test images/ubuntu
 ```
 
 ## 🔧 Manual Docker Commands
@@ -73,7 +73,7 @@ docker build -t devcontainers/ubuntu-bun-node:test images/ubuntu-bun-node
 ### Ubuntu-Tools Image
 
 ```bash
-docker build -t devcontainers/ubuntu-tools:test images/ubuntu-tools
+docker build -t devcontainers/ubuntu:test images/ubuntu
 ```
 
 ## 🧪 Testing Built Images
@@ -93,8 +93,8 @@ docker run --rm devcontainers/ubuntu-bun:test echo "Hello from Ubuntu+Bun!"
 # Test ubuntu-bun-node image
 docker run --rm devcontainers/ubuntu-bun-node:test echo "Hello from Ubuntu+Bun+Node!"
 
-# Test ubuntu-tools image
-docker run --rm devcontainers/ubuntu-tools:test echo "Hello from Ubuntu tools!"
+# Test ubuntu image
+docker run --rm devcontainers/ubuntu:test echo "Hello from Ubuntu tools!"
 ```
 
 ### Test Installed Tools
@@ -110,9 +110,9 @@ docker run --rm devcontainers/bun-node:test npm --version
 # Test Git installation (all images)
 docker run --rm devcontainers/bun:test git --version
 
-# Test Python and jq installation (ubuntu-tools image)
-docker run --rm devcontainers/ubuntu-tools:test python3 --version
-docker run --rm devcontainers/ubuntu-tools:test jq --version
+# Test Python and jq installation (ubuntu image)
+docker run --rm devcontainers/ubuntu:test python3 --version
+docker run --rm devcontainers/ubuntu:test jq --version
 ```
 
 ### Interactive Testing
@@ -123,7 +123,7 @@ docker run -it --rm devcontainers/bun:test zsh
 docker run -it --rm devcontainers/bun-node:test zsh
 docker run -it --rm devcontainers/ubuntu-bun:test zsh
 docker run -it --rm devcontainers/ubuntu-bun-node:test zsh
-docker run -it --rm devcontainers/ubuntu-tools:test zsh
+docker run -it --rm devcontainers/ubuntu:test zsh
 ```
 
 ## 📊 Image Inspection

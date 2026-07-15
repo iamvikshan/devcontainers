@@ -5,7 +5,7 @@ images.
 
 ## 📊 Images Comparison
 
-| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | agents            | ubuntu-tools          |
+| Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | agents            | ubuntu          |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest     | ubuntu:latest         |
 | **Size**        | ~57 MB | ~82 MB | ~117 MB | ~173 MB | ~2283 MB | ~82 MB |
@@ -22,7 +22,7 @@ images.
 - **Pure Bun Development** → `bun` or `ubuntu-bun`
 - **Full-Stack Projects** → `bun-node` or `ubuntu-bun-node`
 - **Need Ubuntu Packages** → `ubuntu-bun` or `ubuntu-bun-node`
-- **Need Ubuntu Tools Without JS Runtimes** → `ubuntu-tools`
+- **Need Ubuntu Tools Without JS Runtimes** → `ubuntu`
 - **Smallest Size** → `ubuntu-bun` (117 MB)
 - **Most Features** → `bun-node` (82 MB)
 
@@ -257,9 +257,9 @@ JavaScript runtimes.
 }
 ```
 
-### 6. ubuntu-tools (~82 MB)
+### 6. ubuntu (~82 MB)
 
-**Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubuntu-tools:latest`
+**Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubuntu:latest`
 
 **Description:** Ubuntu-based tools-only environment for automation, scripting,
 and utility-heavy workflows that do not require Bun or Node.js runtimes.
@@ -290,7 +290,7 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
 ```json
 {
   "name": "Tools Workspace",
-  "image": "ghcr.io/iamvikshan/devcontainer/ubuntu-tools:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/ubuntu:latest",
   "customizations": {
     "vscode": {
       "extensions": ["oxc.oxc-vscode"]
@@ -305,7 +305,7 @@ and utility-heavy workflows that do not require Bun or Node.js runtimes.
 
 ```
 Do you need Bun runtime?
-├─ No → ubuntu-tools
+├─ No → ubuntu
 └─ Yes → Do you need Node.js compatibility?
   ├─ No → Do you prefer Ubuntu?
   │  ├─ Yes → ubuntu-bun
@@ -319,7 +319,7 @@ Do you need Bun runtime?
 
 **Smallest to Largest:**
 
-1. **ubuntu-tools** (~82 MB) - Tools-focused baseline
+1. **ubuntu** (~82 MB) - Tools-focused baseline
 2. **ubuntu-bun** (~117 MB) - Most efficient Ubuntu Bun option
 3. **bun** (~57 MB) - Most efficient Bun runtime option
 4. **ubuntu-bun-node** (~173 MB) - Balanced Ubuntu full-stack option
@@ -327,7 +327,7 @@ Do you need Bun runtime?
 
 ### Compatibility Matrix
 
-| Feature             | bun        | bun-node | ubuntu-bun | ubuntu-bun-node | ubuntu-tools |
+| Feature             | bun        | bun-node | ubuntu-bun | ubuntu-bun-node | ubuntu |
 | ------------------- | ---------- | -------- | ---------- | --------------- | ------------ |
 | **Bun APIs**        | ✅ Full    | ✅ Full  | ✅ Full    | ✅ Full         | ❌           |
 | **Node.js APIs**    | ⚠️ Limited | ✅ Full  | ⚠️ Limited | ✅ Full         | ❌           |

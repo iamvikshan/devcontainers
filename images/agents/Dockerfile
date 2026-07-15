@@ -15,20 +15,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cron \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Install native binaries via pipe-to-sh (CodeRabbit, Antigravity, OpenCode, Hermes, Claude Code)
+# 2. Install native binaries via pipe-to-sh (CodeRabbit, Antigravity, Claude Code)
+# Pruned OpenCode and Hermes: OmniRoute natively routes to their free upstream models without needing local CLI wrappers.
 RUN curl -fsSL https://cli.coderabbit.ai/install.sh | bash \
     && mv /root/.local/bin/coderabbit /usr/local/bin/coderabbit \
     && curl -fsSL https://antigravity.google/cli/install.sh | sh \
     && mv /root/.local/bin/agy /usr/local/bin/agy \
-    && curl -fsSL https://opencode.ai/install | bash \
-    && curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash \
     && curl -fsSL https://claude.ai/install.sh | bash \
     && rm -rf /root/.local /root/.cache /tmp/*
 
-# 3. Install npm global tools with native SQLite fallback (OpenWiki and omniroute)
+# 3. Install npm global tools requiring native C++ SQLite bindings (OpenWiki and omniroute)
 RUN npm install -g openwiki omniroute \
     && npm cache clean --force \
-    && rm -rf /root/.npm
+    && rm -rf /root/.npm /tmp/*
 
 # Drop privileges back to the standard non-root user
 USER ${USERNAME}
@@ -38,8 +37,6 @@ LABEL org.opencontainers.image.title="ai-agents" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}" \
       devcontainer.tool.coderabbit="latest" \
       devcontainer.tool.agy="latest" \
-      devcontainer.tool.opencode="latest" \
-      devcontainer.tool.hermes="latest" \
       devcontainer.tool.claudecode="latest" \
       devcontainer.tool.omniroute="latest" \
       devcontainer.tool.openwiki="latest"

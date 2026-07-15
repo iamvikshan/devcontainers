@@ -44,7 +44,7 @@ RUN HOME_DIR=$(if [ "${USERNAME}" = "root" ]; then echo "/root"; else echo "/hom
 USER ${USERNAME}
 
 # 5. Inject Metadata for Skopeo Extraction
-LABEL org.opencontainers.image.title="ubuntu-tools" \
+LABEL org.opencontainers.image.title="ubuntu" \
       org.opencontainers.image.base.name="ubuntu:${UBUNTU_VERSION}" \
       devcontainer.tool.ubuntu="${UBUNTU_VERSION}"
 
