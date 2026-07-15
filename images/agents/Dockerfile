@@ -22,9 +22,8 @@ RUN curl -fsSL https://cli.coderabbit.ai/install.sh | bash \
     && rm -rf /root/.local /root/.cache /tmp/*
 
 RUN npm install -g openwiki omniroute \
-    && apk del .build-deps \
     && npm cache clean --force \
-    && rm -rf /root/.npm /tmp/* /var/cache/apk/*
+    && rm -rf /root/.npm /tmp/*
 
 RUN bun install -g opencode-ai \
     && rm -rf /root/.bun/install/cache /tmp/*
