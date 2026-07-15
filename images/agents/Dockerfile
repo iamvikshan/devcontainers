@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1
 
-# renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node
 ARG BASE_TAG="latest"
 FROM ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}
 
