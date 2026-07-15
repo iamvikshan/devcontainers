@@ -11,7 +11,7 @@ ARG USERNAME=root
 USER root
 
 # 1. Install system cron
-RUN apt-get update && apt-get install -y cron && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends cron && rm -rf /var/lib/apt/lists/*
 
 # 2. Install CodeRabbit CLI
 RUN curl -fsSL https://cli.coderabbit.ai/install.sh | bash \
