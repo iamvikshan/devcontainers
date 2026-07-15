@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 2. Install native binaries via pipe-to-sh (CodeRabbit)
 RUN curl -fsSL https://cli.coderabbit.ai/install.sh | bash \
-    && mv /root/.local/bin/coderabbit /usr/local/bin/coderabbit
+    && mv /root/.local/bin/coderabbit /usr/local/bin/coderabbit \
+    && rm -rf /root/.local /root/.cache /tmp/*
 
 # 3. Install npm global tools requiring native C++ SQLite bindings (OpenWiki and omniroute)
 RUN npm install -g openwiki omniroute @anthropic-ai/claude-code \
