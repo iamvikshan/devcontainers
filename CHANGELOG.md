@@ -1,3 +1,27 @@
+## [v0.2.2] - 2026-07-15
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| agents | v0.2.2 | 2026-07-15 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/agents:v0.2.2) · [Docker Hub](https://hub.docker.com/r/vikshan/agents:v0.2.2) |
+
+### Environment Tool Versions
+
+#### `agents` Environment
+```properties
+agy=latest
+bun=1.3.14
+coderabbit=latest
+node=24.18.0
+omniroute=latest
+opencode=latest
+openwiki=latest
+ubuntu=26.04
+```
+
 ## [v0.2.1] - 2026-07-15
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.

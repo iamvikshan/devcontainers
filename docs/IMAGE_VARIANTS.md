@@ -8,7 +8,7 @@ images.
 | Feature         | bun               | bun-node               | ubuntu-bun       | ubuntu-bun-node   | agents            | ubuntu          |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest     | ubuntu:latest         |
-| **Size**        | ~57 MB | ~82 MB | ~117 MB | ~173 MB | ~1170 MB | ~82 MB |
+| **Size**        | ~57 MB | ~82 MB | ~117 MB | ~173 MB | ~1363 MB | ~82 MB |
 | **Bun Version** | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | ❌ |
 | **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v24.18.0 | ✅ v24.18.0 | ❌ |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                | ❌                    |
@@ -214,7 +214,7 @@ JavaScript runtimes.
 }
 ```
 
-### 5. agents (~1170 MB)
+### 5. agents (~1363 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/agents:latest`
 
