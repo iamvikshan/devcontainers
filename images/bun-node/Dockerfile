@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 
 # 1. Base Image Tracking
-# renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainers/bun
+# renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainer/bun
 ARG BASE_TAG="latest"
 
-FROM ghcr.io/iamvikshan/devcontainers/bun:${BASE_TAG}
+FROM ghcr.io/iamvikshan/devcontainer/bun:${BASE_TAG}
 
 ARG BASE_TAG
 
@@ -23,7 +23,7 @@ USER ${USERNAME}
 
 # 5. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="bun-node" \
-      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainers/bun:${BASE_TAG}" \
+      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/bun:${BASE_TAG}" \
       devcontainer.tool.bun="${BUN_VERSION}"
 
 CMD ["sleep", "infinity"]

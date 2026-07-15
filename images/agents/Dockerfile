@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
-# renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainers/bun-node-node
+# renovate: datasource=docker depName=ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node
 ARG BASE_TAG="latest"
-FROM ghcr.io/iamvikshan/devcontainers/bun-node-node:${BASE_TAG}
+FROM ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}
 
 ARG BASE_TAG
 ARG USERNAME=root
@@ -35,7 +35,7 @@ USER ${USERNAME}
 
 # Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="ai-harness" \
-      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:${BASE_TAG}" \
+      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}" \
       devcontainer.tool.coderabbit="latest" \
       devcontainer.tool.agy="latest" \
       devcontainer.tool.opencode="latest" \

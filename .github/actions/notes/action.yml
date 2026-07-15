@@ -43,7 +43,7 @@ runs:
             SIZE_VAL=$(cat "$size_file")
             
             # Add row to release notes with versioned tag links
-            echo "| $IMG_NAME | $NEW_TAG | $(date +'%Y-%m-%d') | [GHCR](https://ghcr.io/$REPO/$IMG_NAME:$NEW_TAG) · [Docker Hub](https://hub.docker.com/r/vikshan/$IMG_NAME:$NEW_TAG) |" >> release_notes.md
+            echo "| $IMG_NAME | $NEW_TAG | $(date +'%Y-%m-%d') | [GHCR](https://ghcr.io/$OWNER/devcontainer/$IMG_NAME:$NEW_TAG) · [Docker Hub](https://hub.docker.com/r/vikshan/$IMG_NAME:$NEW_TAG) |" >> release_notes.md
             
             # Smart replace the size in the README table inline
             sed -i -E "s/\|[[:space:]]*\*\*$IMG_NAME\*\*[[:space:]]*\|[[:space:]]*[^|]+[[:space:]]*\|/\| **$IMG_NAME** \| $SIZE_VAL \|/" README.md
