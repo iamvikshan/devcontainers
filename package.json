@@ -7,6 +7,6 @@
     "upd": "sudo apt update && sudo apt upgrade -y && bun upgrade && bun update --latest && bun i && bun f"
   },
   "devDependencies": {
-    "oxfmt": "^0.57.0"
+    "oxfmt": "^0.59.0"
   }
 }
