@@ -21,7 +21,7 @@ interactive shell experience.
 | **bun-node**        | 82 MB  | Alpine | ✅  | ✅             | Full-stack development    |
 | **ubuntu-bun**      | 160 MB | Ubuntu | ✅  | ❌             | Ubuntu-based Bun projects |
 | **ubuntu-bun-node** | 217 MB | Ubuntu | ✅  | ✅             | Ubuntu full-stack         |
-| **ubuntu-bun-ai**   | 160 MB | Ubuntu | ✅  | ❌ (Bun proxy) | Personal AI workspace     |
+| **ai**              | 160 MB | Ubuntu | ✅  | ❌ (Bun proxy) | Personal AI workspace     |
 | **ubuntu-tools**    | 127 MB | Ubuntu | ❌  | ❌             | Tools-only automation     |
 
 ### 🎯 Choose Your Image
@@ -45,7 +45,7 @@ docker pull ghcr.io/iamvikshan/devcontainers/bun:latest
 docker pull ghcr.io/iamvikshan/devcontainers/bun-node:latest
 docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun:latest
 docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:latest
-docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-bun-ai:latest
+docker pull ghcr.io/iamvikshan/devcontainers/ai:latest
 docker pull ghcr.io/iamvikshan/devcontainers/ubuntu-tools:latest
 ```
 

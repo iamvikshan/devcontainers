@@ -1,5 +1,28 @@
 {
-  "extends": [
-    "github>iamvikshan/.github//renovate/base"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Zero-maintenance Renovate config for automated GitHub Codespaces image builds.",
+  "extends": ["github>iamvikshan/.github//renovate/base"],
+  "automerge": true,
+  "minimumReleaseAge": "0 days",
+
+  "customManagers": [
+    {
+      "description": "Update tool versions defined as ARGs or ENVs in Dockerfiles",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)Dockerfile$/"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>[a-zA-Z0-9.-]+)\\s*depName=(?<depName>[^\\s]+)(?:\\s+versioning=(?<versioning>[a-zA-Z0-9.-]+))?\\n(?:ENV|ARG)\\s+[A-Z0-9_]+_VERSION=\"(?<currentValue>[^\"]+)\""
+      ]
+    }
+  ],
+
+  "packageRules": [
+    {
+      "description": "Group and automerge all Docker base images and custom tool updates immediately",
+      "matchFileNames": ["**/Dockerfile", "images/**/Dockerfile"],
+      "matchManagers": ["dockerfile", "custom.regex"],
+      "groupName": "docker-environments",
+      "labels": ["docker", "environments", "automerge"]
+    }
   ]
 }

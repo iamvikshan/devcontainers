@@ -1,3 +1,32 @@
+## [v0.1.1] - 2026-07-12
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| bun-node | v0.1.1 | 2026-07-12 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun-node:v0.1.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bun-node:v0.1.1) |
+| bun | v0.1.1 | 2026-07-12 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/bun:v0.1.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bun:v0.1.1) |
+| ubuntu-bun-ai | v0.1.1 | 2026-07-12 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-ai:v0.1.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-ai:v0.1.1) |
+| ubuntu-bun-node | v0.1.1 | 2026-07-12 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun-node:v0.1.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun-node:v0.1.1) |
+| ubuntu-bun | v0.1.1 | 2026-07-12 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-bun:v0.1.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-bun:v0.1.1) |
+| ubuntu-tools | v0.1.1 | 2026-07-12 | [GHCR](https://ghcr.io/iamvikshan/devcontainers/ubuntu-tools:v0.1.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu-tools:v0.1.1) |
+
+### Environment Tool Versions
+
+#### Ubuntu-Based Environments
+```properties
+bun=1.3.14
+node=24.18.0
+ubuntu=26.04
+```
+
+#### Alpine-Based Environments
+```properties
+bun=1.3.14
+```
+
 ## [v0.0.5] - 2026-07-05
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.
