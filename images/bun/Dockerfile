@@ -44,7 +44,7 @@ USER ${USERNAME}
 # 4. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="bun" \
       org.opencontainers.image.base.name="oven/bun:${BUN_VERSION}-alpine" \
-      org.opencontainers.image.source https://github.com/iamvikshan/devcontainers \
+      org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       devcontainer.tool.bun="${BUN_VERSION}"
 
 CMD ["sleep", "infinity"]

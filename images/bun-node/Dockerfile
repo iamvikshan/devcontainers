@@ -17,7 +17,7 @@ USER ${USERNAME}
 # 5. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="bun-node" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/bun:latest" \
-      org.opencontainers.image.source https://github.com/iamvikshan/devcontainers \
+      org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       devcontainer.tool.bun="${BUN_VERSION}"
 
 CMD ["sleep", "infinity"]

@@ -39,7 +39,7 @@ USER ${USERNAME}
 
 # 6. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="ubuntu-bun-node" \
-      org.opencontainers.image.source https://github.com/iamvikshan/devcontainers \
+      org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu:latest" \
       devcontainer.tool.bun="${BUN_VERSION}" \
       devcontainer.tool.node="${NODE_VERSION}"

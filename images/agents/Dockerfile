@@ -32,7 +32,7 @@ USER ${USERNAME}
 
 # Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="ai-agents" \
-      org.opencontainers.image.source https://github.com/iamvikshan/devcontainers \
+      org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest" \
       devcontainer.tool.coderabbit="latest" \
       devcontainer.tool.opencode="latest" \
