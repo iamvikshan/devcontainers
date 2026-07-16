@@ -197,8 +197,11 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:buildcache
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:latest
+          cache-to: |
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
           provenance: mode=min
 
       - name: Extract Size & Tool Versions via Skopeo
@@ -301,8 +304,11 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:buildcache
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:latest
+          cache-to: |
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
           provenance: mode=min
 
       - name: Extract Size & Tool Versions via Skopeo
@@ -396,8 +402,11 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:buildcache
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:latest
+          cache-to: |
+            type=registry,ref=${{ env.GHCR_BASE }}/${{ matrix.image }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
           provenance: mode=min
 
       - name: Extract Size & Tool Versions via Skopeo

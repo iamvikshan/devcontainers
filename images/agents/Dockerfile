@@ -41,4 +41,4 @@ LABEL org.opencontainers.image.title="ai-agents" \
       devcontainer.tool.omniroute="latest" \
       devcontainer.tool.openwiki="latest"
 
-CMD ["sh", "-c", "sudo service cron start && sleep infinity"]
+CMD ["zsh", "-c", "sudo service cron start && nohup omniroute serve > /tmp/omniroute.log 2>&1 & sleep infinity"]
