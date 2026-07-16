@@ -45,6 +45,7 @@ USER ${USERNAME}
 
 # 5. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="ubuntu" \
+      org.opencontainers.image.source https://github.com/iamvikshan/devcontainers \
       org.opencontainers.image.base.name="ubuntu:${UBUNTU_VERSION}" \
       devcontainer.tool.ubuntu="${UBUNTU_VERSION}"
 

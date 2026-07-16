@@ -1,9 +1,7 @@
 # syntax=docker/dockerfile:1
 
-ARG BASE_TAG="latest"
-FROM ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}
+FROM ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest
 
-ARG BASE_TAG
 ARG USERNAME=root
 
 # Elevate to root to install system utilities and global binaries
@@ -34,7 +32,8 @@ USER ${USERNAME}
 
 # Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="ai-agents" \
-      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:${BASE_TAG}" \
+      org.opencontainers.image.source https://github.com/iamvikshan/devcontainers \
+      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest" \
       devcontainer.tool.coderabbit="latest" \
       devcontainer.tool.opencode="latest" \
       devcontainer.tool.agy="latest" \
