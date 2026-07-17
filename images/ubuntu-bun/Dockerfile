@@ -20,6 +20,9 @@ USER root
 COPY --from=bun_source /usr/local/bin/bun /usr/local/bin/bun
 RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
+RUN bun install -g @syncron/r2git \
+&& rm -rf /root/.bun/install/cache /tmp/*
+
 # 5. Drop privileges
 USER ${USERNAME}
 

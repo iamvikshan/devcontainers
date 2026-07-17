@@ -34,6 +34,9 @@ RUN ARCH="$(case "$TARGETARCH" in amd64) echo x64 ;; arm64) echo arm64 ;; *) ech
     && tar -xJf "${NODE_TARBALL}" -C /usr/local --strip-components=1 \
     && rm -f "${NODE_TARBALL}" SHASUMS256.txt node_checksum.txt
 
+RUN bun install -g @syncron/r2git \
+&& rm -rf /root/.bun/install/cache /tmp/*
+
 # 5. Drop privileges
 USER ${USERNAME}
 

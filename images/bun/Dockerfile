@@ -39,6 +39,9 @@ RUN if [ "${USERNAME}" != "root" ]; then \
         chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; \
     fi
 
+RUN bun install -g @syncron/r2git \
+&& rm -rf /root/.bun/install/cache /tmp/*
+
 USER ${USERNAME}
 
 # 4. Inject Metadata for Skopeo Extraction
