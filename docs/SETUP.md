@@ -14,7 +14,7 @@ setup, so the examples below use `zsh`.
 | **bun-node**        | oven/bun | Bun, Node.js, npm, Git    | ~82 MB | Full-stack with Bun + Node.js |
 | **ubuntu-bun**      | Ubuntu   | Bun, Git                  | ~117 MB | Ubuntu-based Bun development  |
 | **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git    | ~173 MB | Ubuntu-based full-stack       |
-| **agents**          | Ubuntu   | Bun, agy, CodeRabbit, Git | ~1369 MB | Personal AI workspace         |
+| **agents**          | Ubuntu   | Bun, agy, CodeRabbit, Git | ~1374 MB | Personal AI workspace         |
 | **ubuntu**    | Ubuntu   | Python, jq, Git, curl     | ~82 MB | Tools-only automation         |
 
 ### 2. Registry Options
