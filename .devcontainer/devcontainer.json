@@ -1,6 +1,6 @@
 {
   "name": "uBUNtu",
-  "image": "ghcr.io/iamvikshan/devcontainer/agents:latest",
+  "image": "ghcr.io/iamvikshan/devcontainer/bun:latest",
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1.10.0": {
       "moby": false,
@@ -9,14 +9,6 @@
   },
   "mounts": ["source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"],
   "runArgs": ["--network=host"],
-  "forwardPorts": [20128],
-  "portsAttributes": {
-    "20128": {
-      "label": "omniroute",
-      "onAutoForward": "notify",
-      "visibility": "private"
-    }
-  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -30,6 +22,5 @@
     }
   },
   "remoteUser": "root",
-  "postCreateCommand": "bun bs --default",
-  "postStartCommand": "bun omni"
+  "postCreateCommand": "bun bs --default"
 }

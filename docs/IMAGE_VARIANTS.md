@@ -7,12 +7,12 @@ images.
 
 | Feature         | bun               | bunode                 | ubun-tu          | ubun-tu-node      | agents            | ubuntu                |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
-| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | ubuntu:latest     | ubuntu:latest         |
+| **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | oven/bun (Alpine) | ubuntu:latest         |
 | **Size**        | ~57 MB            | ~82 MB                 | ~117 MB          | ~173 MB           | ~1374 MB          | ~82 MB                |
 | **Bun Version** | 1.3.14            | 1.3.14                 | 1.3.14           | 1.3.14            | 1.3.14            | ❌                    |
 | **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.18.0       | ✅ v24.18.0       | ❌                    |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                | ❌                    |
-| **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Ubuntu (apt)      | Ubuntu (apt)          |
+| **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Alpine (apk)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | AI & custom tools | Tools-only automation |
 
 ## 🎯 Image Selection Guide
@@ -218,30 +218,28 @@ JavaScript runtimes.
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/agents:latest`
 
-**Description:** Ubuntu-based Bun environment configured for personal AI development, complete with coderabbit CLI and antigravity CLI (agy). It also routes Node.js command execution to Bun.
+**Description:** Alpine-based Bun environment configured for personal AI development, complete with coderabbit CLI and antigravity CLI (agy). It also routes Node.js command execution to Bun.
 
 **Key Features:**
 
 - 🤖 **AI-augmented** - Built-in coderabbit CLI and antigravity CLI
 - ⚡ **Node Checkmate** - Seamlessly redirects node commands to bun
-- 📦 **Ubuntu packages** - Full access to apt repositories
-- 🔐 **sudo access** - Administrative privileges
+- 📦 **Alpine packages** - Full access to apk repositories
 
 **Included Tools:**
 
-- Bun (glibc build)
+- Bun
 - CodeRabbit CLI
 - Antigravity CLI (agy)
 - Node.js command compatibility redirection
 - Git, SSH client, curl, unzip
-- btop (system resource monitor)
-- sudo (administrative access)
+- Alpine package manager (apk)
 
 **Perfect For:**
 
 - Personal AI assistant coding workflows
 - Projects using CodeRabbit & Antigravity tools
-- General Ubuntu-based Bun development
+- General Alpine-based Bun development
 
 **Example Configuration:**
 

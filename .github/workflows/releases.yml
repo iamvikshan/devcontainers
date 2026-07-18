@@ -111,7 +111,7 @@ jobs:
               DERIVATIVES+=("ubun-tu-node")
             fi
             
-            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
+            if [ "${{ steps.filter.outputs.bun }}" == "true" ] || [ "${{ steps.filter.outputs.bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
               AI_CHANGED="true"
             else
               AI_CHANGED="false"

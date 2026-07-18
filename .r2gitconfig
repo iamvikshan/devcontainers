@@ -1,5 +1,5 @@
 {
-  "project": "iamvikshan/r2it",
+  "project": "iamvikshan/r2git",
   "backup": {
     "retention": 5,
     "paths": [
