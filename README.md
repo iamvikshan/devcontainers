@@ -15,14 +15,14 @@ interactive shell experience.
 
 ## Available Images
 
-| Image               | Size   | Base   | Bun | Node.js        | Best For                  |
-| ------------------- | ------ | ------ | --- | -------------- | ------------------------- |
-| **bun** | 57 MB | Alpine | ✅  | ❌             | Pure Bun projects         |
-| **bun-node** | 82 MB | Alpine | ✅  | ✅             | Full-stack development    |
-| **ubuntu-bun** | 117 MB | Ubuntu | ✅  | ❌             | Ubuntu-based Bun projects |
-| **ubuntu-bun-node** | 173 MB | Ubuntu | ✅  | ✅             | Ubuntu full-stack         |
-| **agents** | 1374 MB | Ubuntu | ✅  | ✅             | Personal AI workspace     |
-| **ubuntu** | 82 MB | Ubuntu | ❌  | ❌             | Tools-only automation     |
+| Image            | Size    | Base   | Bun | Node.js | Best For                  |
+| ---------------- | ------- | ------ | --- | ------- | ------------------------- |
+| **bun**          | 57 MB   | Alpine | ✅  | ❌      | Pure Bun projects         |
+| **bunode**       | 82 MB   | Alpine | ✅  | ✅      | Full-stack development    |
+| **ubun-tu**      | 117 MB  | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
+| **ubun-tu-node** | 173 MB  | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
+| **agents**       | 1374 MB | Ubuntu | ✅  | ✅      | Personal AI workspace     |
+| **ubuntu**       | 82 MB   | Ubuntu | ❌  | ❌      | Tools-only automation     |
 
 ### 🎯 Choose Your Image
 
@@ -30,10 +30,10 @@ interactive shell experience.
 Need Bun runtime?
 ├─ Yes → Need Node.js?
 │  ├─ Yes → Need Ubuntu base?
-│  │  ├─ Yes → ubuntu-bun-node
-│  │  └─ No  → bun-node
+│  │  ├─ Yes → ubun-tu-node
+│  │  └─ No  → bunode
 │  └─ No  → Need Ubuntu base?
-│     ├─ Yes → ubuntu-bun
+│     ├─ Yes → ubun-tu
 │     └─ No  → bun
 └─ No  → ubuntu
 ```
@@ -42,9 +42,9 @@ Need Bun runtime?
 
 ```bash
 docker pull ghcr.io/iamvikshan/devcontainer/bun:latest
-docker pull ghcr.io/iamvikshan/devcontainer/bun-node:latest
-docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-bun:latest
-docker pull ghcr.io/iamvikshan/devcontainer/ubuntu-bun-node:latest
+docker pull ghcr.io/iamvikshan/devcontainer/bunode:latest
+docker pull ghcr.io/iamvikshan/devcontainer/ubun-tu:latest
+docker pull ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest
 docker pull ghcr.io/iamvikshan/devcontainer/agents:latest
 docker pull ghcr.io/iamvikshan/devcontainer/ubuntu:latest
 ```
@@ -130,17 +130,17 @@ All images include:
 - **btop** - System resource monitor
 - **Basic development utilities**
 
-#### Alpine-based Images (`bun`, `bun-node`)
+#### Alpine-based Images (`bun`, `bunode`)
 
 - **Bun** - Fast TypeScript and JavaScript runtime
-- **Node.js** _(bun-node only)_
-- **npm** _(bun-node only)_
+- **Node.js** _(bunode only)_
+- **npm** _(bunode only)_
 
-#### Ubuntu-based Images (`ubuntu-bun`, `ubuntu-bun-node`)
+#### Ubuntu-based Images (`ubun-tu`, `ubun-tu-node`)
 
 - **Bun** - Installed via script
-- **Node.js** _(ubuntu-bun-node only)_
-- **npm** _(ubuntu-bun-node only)_
+- **Node.js** _(ubun-tu-node only)_
+- **npm** _(ubun-tu-node only)_
 - **sudo** - Administrative access
 - **Ubuntu package manager** (apt)
 

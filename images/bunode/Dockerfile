@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
 USER ${USERNAME}
 
 # 5. Inject Metadata for Skopeo Extraction
-LABEL org.opencontainers.image.title="bun-node" \
+LABEL org.opencontainers.image.title="bunode" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/bun:latest" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       devcontainer.tool.bun="${BUN_VERSION}"

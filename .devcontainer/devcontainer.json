@@ -1,17 +1,22 @@
 {
-  "name": "Ubuntu + Bun + Docker",
+  "name": "uBUNtu",
   "image": "ghcr.io/iamvikshan/devcontainer/agents:latest",
-
   "features": {
-    "ghcr.io/devcontainers/features/sshd:1": {
-      "version": "latest"
-    },
-
-    "ghcr.io/devcontainers/features/docker-in-docker:4": {
-      "moby": "false"
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1.10.0": {
+      "moby": false,
+      "installDockerBuildx": true
     }
   },
+  "mounts": ["source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"],
   "runArgs": ["--network=host"],
+  "forwardPorts": [20128],
+  "portsAttributes": {
+    "20128": {
+      "label": "omniroute",
+      "onAutoForward": "notify",
+      "visibility": "private"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -19,11 +24,12 @@
         "oven.bun-vscode",
         "ms-azuretools.vscode-docker",
         "coderabbit.coderabbit-vscode",
-        "WakaTime.vscode-wakatime"
+        "WakaTime.vscode-wakatime",
+        "docker.docker"
       ]
     }
   },
-
   "remoteUser": "root",
-  "postCreateCommand": "bun upd && bun bs --default"
+  "postCreateCommand": "bun bs --default",
+  "postStartCommand": "bun omni"
 }

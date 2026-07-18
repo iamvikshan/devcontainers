@@ -1,0 +1,9 @@
+{
+  "project": "iamvikshan/r2it",
+  "backup": {
+    "retention": 5,
+    "paths": [
+      "{cwd}/.env"
+    ]
+  }
+}

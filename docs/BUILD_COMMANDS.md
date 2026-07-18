@@ -20,7 +20,7 @@ docker version
 # Build every image from the repository root
 set -e
 
-for image in bun bun-node ubuntu-bun ubuntu-bun-node ubuntu; do
+for image in bun bunode ubun-tu ubun-tu-node ubuntu; do
   docker build -t "devcontainers/${image}:test" "images/${image}"
 done
 ```
@@ -31,14 +31,14 @@ done
 # Build bun image
 docker build -t devcontainers/bun:test images/bun
 
-# Build bun-node image
-docker build -t devcontainers/bun-node:test images/bun-node
+# Build bunode image
+docker build -t devcontainers/bunode:test images/bunode
 
-# Build ubuntu-bun image
-docker build -t devcontainers/ubuntu-bun:test images/ubuntu-bun
+# Build ubun-tu image
+docker build -t devcontainers/ubun-tu:test images/ubun-tu
 
-# Build ubuntu-bun-node image
-docker build -t devcontainers/ubuntu-bun-node:test images/ubuntu-bun-node
+# Build ubun-tu-node image
+docker build -t devcontainers/ubun-tu-node:test images/ubun-tu-node
 
 # Build ubuntu image
 docker build -t devcontainers/ubuntu:test images/ubuntu
@@ -55,19 +55,19 @@ docker build -t devcontainers/bun:test images/bun
 ### Bun-Node Image
 
 ```bash
-docker build -t devcontainers/bun-node:test images/bun-node
+docker build -t devcontainers/bunode:test images/bunode
 ```
 
 ### Ubuntu-Bun Image
 
 ```bash
-docker build -t devcontainers/ubuntu-bun:test images/ubuntu-bun
+docker build -t devcontainers/ubun-tu:test images/ubun-tu
 ```
 
 ### Ubuntu-Bun-Node Image
 
 ```bash
-docker build -t devcontainers/ubuntu-bun-node:test images/ubuntu-bun-node
+docker build -t devcontainers/ubun-tu-node:test images/ubun-tu-node
 ```
 
 ### Ubuntu-Tools Image
@@ -84,14 +84,14 @@ docker build -t devcontainers/ubuntu:test images/ubuntu
 # Test bun image
 docker run --rm devcontainers/bun:test echo "Hello from Bun!"
 
-# Test bun-node image
-docker run --rm devcontainers/bun-node:test echo "Hello from Bun+Node!"
+# Test bunode image
+docker run --rm devcontainers/bunode:test echo "Hello from Bun+Node!"
 
-# Test ubuntu-bun image
-docker run --rm devcontainers/ubuntu-bun:test echo "Hello from Ubuntu+Bun!"
+# Test ubun-tu image
+docker run --rm devcontainers/ubun-tu:test echo "Hello from Ubuntu+Bun!"
 
-# Test ubuntu-bun-node image
-docker run --rm devcontainers/ubuntu-bun-node:test echo "Hello from Ubuntu+Bun+Node!"
+# Test ubun-tu-node image
+docker run --rm devcontainers/ubun-tu-node:test echo "Hello from Ubuntu+Bun+Node!"
 
 # Test ubuntu image
 docker run --rm devcontainers/ubuntu:test echo "Hello from Ubuntu tools!"
@@ -104,8 +104,8 @@ docker run --rm devcontainers/ubuntu:test echo "Hello from Ubuntu tools!"
 docker run --rm devcontainers/bun:test bun --version
 
 # Test Node.js installation (in node images)
-docker run --rm devcontainers/bun-node:test node --version
-docker run --rm devcontainers/bun-node:test npm --version
+docker run --rm devcontainers/bunode:test node --version
+docker run --rm devcontainers/bunode:test npm --version
 
 # Test Git installation (all images)
 docker run --rm devcontainers/bun:test git --version
@@ -120,9 +120,9 @@ docker run --rm devcontainers/ubuntu:test jq --version
 ```bash
 # Start interactive shell in any image
 docker run -it --rm devcontainers/bun:test zsh
-docker run -it --rm devcontainers/bun-node:test zsh
-docker run -it --rm devcontainers/ubuntu-bun:test zsh
-docker run -it --rm devcontainers/ubuntu-bun-node:test zsh
+docker run -it --rm devcontainers/bunode:test zsh
+docker run -it --rm devcontainers/ubun-tu:test zsh
+docker run -it --rm devcontainers/ubun-tu-node:test zsh
 docker run -it --rm devcontainers/ubuntu:test zsh
 ```
 
