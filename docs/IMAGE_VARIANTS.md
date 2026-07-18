@@ -10,8 +10,8 @@ images.
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | oven/bun (Alpine) | ubuntu:latest         |
 | **Size**        | ~57 MB            | ~82 MB                 | ~117 MB          | ~173 MB           | ~1374 MB          | ~82 MB                |
 | **Bun Version** | 1.3.14            | 1.3.14                 | 1.3.14           | 1.3.14            | 1.3.14            | ❌                    |
-| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.18.0       | ✅ v24.18.0       | ❌                    |
-| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ❌                | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.18.0       | ✅ v22.11.0       | ❌                    |
+| **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ✅ 10.9.0         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Alpine (apk)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | AI & custom tools | Tools-only automation |
 
@@ -229,8 +229,11 @@ JavaScript runtimes.
 **Included Tools:**
 
 - Bun
+- Node.js
+- npm
 - CodeRabbit CLI
 - Antigravity CLI (agy)
+- omniroute, openwiki, opencode-ai
 - Node.js command compatibility redirection
 - Git, SSH client, curl, unzip
 - Alpine package manager (apk)
