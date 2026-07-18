@@ -15,7 +15,7 @@ ARG USERNAME=root
 # We completely removed the tool-versions.txt generation block
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --no-cache \
-    zsh git sudo curl jq btop tree
+    zsh git sudo curl jq btop tree bash
 
 # 3. Consolidated User, Remote ZSH configuration, and Tmux setup
 RUN if [ "${USERNAME}" != "root" ]; then \

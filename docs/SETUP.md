@@ -8,14 +8,14 @@ setup, so the examples below use `zsh`.
 
 ### 1. Choose Your Image
 
-| Image               | Base     | Tools                     | Size    | Use Case                      |
-| ------------------- | -------- | ------------------------- | ------- | ----------------------------- |
-| **bun**             | oven/bun | Bun, Git                  | ~57 MB | Bun-only projects             |
-| **bun-node**        | oven/bun | Bun, Node.js, npm, Git    | ~82 MB | Full-stack with Bun + Node.js |
-| **ubuntu-bun**      | Ubuntu   | Bun, Git                  | ~117 MB | Ubuntu-based Bun development  |
-| **ubuntu-bun-node** | Ubuntu   | Bun, Node.js, npm, Git    | ~173 MB | Ubuntu-based full-stack       |
-| **agents**          | Ubuntu   | Bun, agy, CodeRabbit, Git | ~1374 MB | Personal AI workspace         |
-| **ubuntu**    | Ubuntu   | Python, jq, Git, curl     | ~82 MB | Tools-only automation         |
+| Image            | Base     | Tools                              | Size     | Use Case                      |
+| ---------------- | -------- | ---------------------------------- | -------- | ----------------------------- |
+| **bun**          | oven/bun | Bun, Git                           | ~57 MB   | Bun-only projects             |
+| **bunode**       | oven/bun | Bun, Node.js, npm, Git             | ~82 MB   | Full-stack with Bun + Node.js |
+| **ubun-tu**      | Ubuntu   | Bun, Git                           | ~117 MB  | Ubuntu-based Bun development  |
+| **ubun-tu-node** | Ubuntu   | Bun, Node.js, npm, Git             | ~173 MB  | Ubuntu-based full-stack       |
+| **agents**       | oven/bun | Bun, Node.js, npm, agy, CodeRabbit | ~1374 MB | Personal AI workspace         |
+| **ubuntu**       | Ubuntu   | Python, jq, Git, curl              | ~82 MB   | Tools-only automation         |
 
 ### 2. Registry Options
 
@@ -130,7 +130,7 @@ Recommended extensions for each image type:
 - `oven.bun-vscode` - Bun support
 - `dbaeumer.vscode-eslint` - JavaScript linting
 
-#### Node Images (bun-node, ubuntu-bun-node)
+#### Node Images (bunode, ubun-tu-node)
 
 - `ms-vscode.vscode-typescript-next` - TypeScript support
 - `bradlc.vscode-tailwindcss` - Tailwind CSS support

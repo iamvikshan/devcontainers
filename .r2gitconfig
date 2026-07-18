@@ -1,0 +1,9 @@
+{
+  "project": "iamvikshan/r2git",
+  "backup": {
+    "retention": 5,
+    "paths": [
+      "{cwd}/.env"
+    ]
+  }
+}

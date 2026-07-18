@@ -76,9 +76,9 @@ jobs:
           filters: |
             bun: "images/bun/**"
             ubuntu: "images/ubuntu/**" # <-- RENAMED FROM ubuntu_tools
-            bun_node: "images/bun-node/**"
-            ubuntu_bun: "images/ubuntu-bun/**"
-            ubuntu_bun_node: "images/ubuntu-bun-node/**"
+            bun_node: "images/bunode/**"
+            ubuntu_bun: "images/ubun-tu/**"
+            ubuntu_bun_node: "images/ubun-tu-node/**"
             agents: "images/agents/**"
 
       - name: Construct DAG Matrices
@@ -90,7 +90,7 @@ jobs:
           # Force build ALL if scheduled or manually dispatched
           if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             BASES=("bun" "ubuntu")
-            DERIVATIVES=("bun-node" "ubuntu-bun" "ubuntu-bun-node")
+            DERIVATIVES=("bunode" "ubun-tu" "ubun-tu-node")
             AI_CHANGED="true"
           else
             if [ "${{ steps.filter.outputs.bun }}" == "true" ]; then
@@ -102,16 +102,16 @@ jobs:
 
             # Enqueue derivatives if their bases or they themselves changed
             if [ "${{ steps.filter.outputs.bun }}" == "true" ] || [ "${{ steps.filter.outputs.bun_node }}" == "true" ]; then
-              DERIVATIVES+=("bun-node")
+              DERIVATIVES+=("bunode")
             fi
             if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ]; then
-              DERIVATIVES+=("ubuntu-bun")
+              DERIVATIVES+=("ubun-tu")
             fi
             if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ]; then
-              DERIVATIVES+=("ubuntu-bun-node")
+              DERIVATIVES+=("ubun-tu-node")
             fi
             
-            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
+            if [ "${{ steps.filter.outputs.bun }}" == "true" ] || [ "${{ steps.filter.outputs.bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
               AI_CHANGED="true"
             else
               AI_CHANGED="false"
@@ -442,7 +442,7 @@ jobs:
           path: metadata/
           retention-days: 1
 
-# ============================================
+  # ============================================
   # Job 4: Finalize Changelog & Documentation
   # ============================================
   finalize:
@@ -462,12 +462,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.0
         with:
-          ref: ${{ github.ref_name }} 
-          fetch-depth: 0              
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - name: Setup bun
-        uses: iamvikshan/.github/.github/actions/bun@main   
-    
+        uses: iamvikshan/.github/.github/actions/bun@main
+
       - name: Execute Notes Action
         uses: ./.github/actions/notes
         with:
@@ -525,4 +525,3 @@ jobs:
           container: devcontainer/${{ matrix.image }}
           keep-younger-than: 7
           prune-untagged: true
-          

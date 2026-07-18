@@ -4,10 +4,10 @@
     "f": "oxfmt --write .",
     "f:check": "oxfmt --check .",
     "bs": "mkdir -p scripts && curl -sL https://raw.githubusercontent.com/iamvikshan/.github/main/scripts/bootstrap.sh > scripts/bootstrap.sh && chmod +x scripts/bootstrap.sh && scripts/bootstrap.sh",
-    "upd": "sudo apt update && sudo apt upgrade -y && bun upgrade && bun update --latest && bun i && bun f"
+    "upd": "sudo apk upgrade --no-cache && bun upgrade && bun update --latest && bun f"
   },
   "devDependencies": {
     "oxfmt": "^0.59.0",
-    "lint-staged": "^17.0.8"
+    "lint-staged": "^17.1.0"
   }
 }
