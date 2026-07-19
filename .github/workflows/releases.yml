@@ -10,6 +10,19 @@ on:
         required: false
         default: ''
         type: string
+      target_image:
+        description: 'Target image to rebuild (cascades to children automatically)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - bun
+          - ubuntu
+          - bunode
+          - ubun-tu
+          - ubun-tu-node
+          - agents
   push:
     branches: [main]
     paths:
@@ -87,38 +100,56 @@ jobs:
           BASES=()
           DERIVATIVES=()
 
-          # Force build ALL if scheduled or manually dispatched
-          if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            BASES=("bun" "ubuntu")
-            DERIVATIVES=("bunode" "ubun-tu" "ubun-tu-node")
-            AI_CHANGED="true"
-          else
-            if [ "${{ steps.filter.outputs.bun }}" == "true" ]; then
-              BASES+=("bun")
-            fi
-            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ]; then
-              BASES+=("ubuntu")
-            fi
+          # Setup initial trigger flags based on file changes (Push events)
+          T_BUN="${{ steps.filter.outputs.bun }}"
+          T_UBUNTU="${{ steps.filter.outputs.ubuntu }}"
+          T_BUNODE="${{ steps.filter.outputs.bun_node }}"
+          T_UBUN_TU="${{ steps.filter.outputs.ubuntu_bun }}"
+          T_UBUN_TU_NODE="${{ steps.filter.outputs.ubuntu_bun_node }}"
+          T_AGENTS="${{ steps.filter.outputs.agents }}"
 
-            # Enqueue derivatives if their bases or they themselves changed
-            if [ "${{ steps.filter.outputs.bun }}" == "true" ] || [ "${{ steps.filter.outputs.bun_node }}" == "true" ]; then
-              DERIVATIVES+=("bunode")
-            fi
-            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun }}" == "true" ]; then
-              DERIVATIVES+=("ubun-tu")
-            fi
-            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ]; then
-              DERIVATIVES+=("ubun-tu-node")
-            fi
-            
-            # Migrated dependency tracking for the agents image to use the Ubuntu stack
-            if [ "${{ steps.filter.outputs.ubuntu }}" == "true" ] || [ "${{ steps.filter.outputs.ubuntu_bun_node }}" == "true" ] || [ "${{ steps.filter.outputs.agents }}" == "true" ]; then
-              AI_CHANGED="true"
-            else
-              AI_CHANGED="false"
-            fi
+          # Handle Schedule or Manual Dispatch Target Overrides
+          TARGET="${{ github.event.inputs.target_image || 'all' }}"
+          
+          if [ "${{ github.event_name }}" == "schedule" ] || [ "$TARGET" == "all" ]; then
+            # Force all branches of the DAG if scheduled or "all" is selected
+            T_BUN="true"; T_UBUNTU="true"; T_BUNODE="true"; T_UBUN_TU="true"; T_UBUN_TU_NODE="true"; T_AGENTS="true"
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Reset flags to false, then apply the specific manual target
+            T_BUN="false"; T_UBUNTU="false"; T_BUNODE="false"; T_UBUN_TU="false"; T_UBUN_TU_NODE="false"; T_AGENTS="false"
+            case "$TARGET" in
+              "bun") T_BUN="true" ;;
+              "ubuntu") T_UBUNTU="true" ;;
+              "bunode") T_BUNODE="true" ;;
+              "ubun-tu") T_UBUN_TU="true" ;;
+              "ubun-tu-node") T_UBUN_TU_NODE="true" ;;
+              "agents") T_AGENTS="true" ;;
+            esac
           fi
 
+          # Evaluate Bases
+          if [ "$T_BUN" == "true" ]; then BASES+=("bun"); fi
+          if [ "$T_UBUNTU" == "true" ]; then BASES+=("ubuntu"); fi
+
+          # Evaluate Derivatives (Cascade dependencies logically fall through)
+          if [ "$T_BUN" == "true" ] || [ "$T_BUNODE" == "true" ]; then
+            DERIVATIVES+=("bunode")
+          fi
+          if [ "$T_UBUNTU" == "true" ] || [ "$T_UBUN_TU" == "true" ]; then
+            DERIVATIVES+=("ubun-tu")
+          fi
+          if [ "$T_UBUNTU" == "true" ] || [ "$T_UBUN_TU_NODE" == "true" ]; then
+            DERIVATIVES+=("ubun-tu-node")
+          fi
+          
+          # Evaluate AI (Cascade from Ubuntu track)
+          if [ "$T_UBUNTU" == "true" ] || [ "$T_UBUN_TU_NODE" == "true" ] || [ "$T_AGENTS" == "true" ]; then
+            AI_CHANGED="true"
+          else
+            AI_CHANGED="false"
+          fi
+
+          # Array to JSON String Conversions
           BASES_JSON=$(printf '%s\n' "${BASES[@]}" | jq -R . | jq -cs .)
           [ "${#BASES[@]}" -eq 0 ] && BASES_JSON="[]"
 
@@ -257,7 +288,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.0
 
-      # Micro-check validation mapping to isolate specific pipeline failures
       - name: Check Upstream Base Image Status
         id: check_base
         run: |
@@ -581,3 +611,4 @@ jobs:
           container: devcontainer/${{ matrix.image }}
           keep-younger-than: 7
           prune-untagged: true
+          
