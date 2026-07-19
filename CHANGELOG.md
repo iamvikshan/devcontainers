@@ -1,3 +1,47 @@
+## [v0.3.1] - 2026-07-19
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| bun | v0.3.1 | 2026-07-19 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bun:v0.3.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bun:v0.3.1) |
+| bunode | v0.3.1 | 2026-07-19 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bunode:v0.3.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bunode:v0.3.1) |
+| ubun-tu-node | v0.3.1 | 2026-07-19 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu-node:v0.3.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu-node:v0.3.1) |
+| ubun-tu | v0.3.1 | 2026-07-19 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu:v0.3.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu:v0.3.1) |
+| ubuntu | v0.3.1 | 2026-07-19 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubuntu:v0.3.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu:v0.3.1) |
+
+### Environment Tool Versions
+
+#### `bun` Environment
+```properties
+bun=1.3.14
+```
+
+#### `bunode` Environment
+```properties
+bun=1.3.14
+```
+
+#### `ubun-tu-node` Environment
+```properties
+bun=1.3.14
+node=24.18.0
+ubuntu=26.04
+```
+
+#### `ubun-tu` Environment
+```properties
+bun=1.3.14
+ubuntu=26.04
+```
+
+#### `ubuntu` Environment
+```properties
+ubuntu=26.04
+```
+
 ## [v0.3.0] - 2026-07-19
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.
