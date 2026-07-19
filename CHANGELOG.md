@@ -1,3 +1,14 @@
+## [v0.3.0] - 2026-07-19
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+
+### Environment Tool Versions
+
 ## [v0.2.6] - 2026-07-17
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.
