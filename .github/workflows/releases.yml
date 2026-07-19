@@ -145,7 +145,7 @@ jobs:
     name: Base -> ${{ matrix.image }}
     needs: prepare
     if: ${{ needs.prepare.outputs.bases != '[]' && needs.prepare.outputs.bases != '' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
       packages: write
@@ -249,7 +249,7 @@ jobs:
       needs.prepare.outputs.derivatives != '[]' &&
       needs.prepare.outputs.derivatives != '' &&
       (needs.build-bases.result == 'success' || needs.build-bases.result == 'skipped')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
       packages: write

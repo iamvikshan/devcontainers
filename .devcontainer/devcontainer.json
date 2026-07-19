@@ -17,7 +17,8 @@
         "ms-azuretools.vscode-docker",
         "coderabbit.coderabbit-vscode",
         "WakaTime.vscode-wakatime",
-        "docker.docker"
+        "docker.docker",
+        "github.vscode-github-actions"
       ]
     }
   },
