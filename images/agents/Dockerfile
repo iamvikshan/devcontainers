@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ghcr.io/iamvikshan/devcontainer/bunode:latest
+FROM ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest
 
 USER root
 
@@ -23,7 +23,7 @@ RUN echo "Installing coderabbit..." \
 
 LABEL org.opencontainers.image.title="agents" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
-      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/bunode:latest" \
+      org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest" \
       devcontainer.tool.omniroute="latest" \
       devcontainer.tool.openwiki="latest" \
       devcontainer.tool.opencode="latest" \
