@@ -12,10 +12,12 @@ ARG BUN_VERSION
 ARG USERNAME=root
 
 # 2. Install unpinned OS packages & pinned global tools (using Bun)
-# We completely removed the tool-versions.txt generation block
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --no-cache \
     zsh git sudo curl jq btop tree bash
+
+# Install mise globally
+RUN curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
 
 # 3. Consolidated User, Remote ZSH configuration, and Tmux setup
 RUN if [ "${USERNAME}" != "root" ]; then \
@@ -35,6 +37,7 @@ RUN if [ "${USERNAME}" != "root" ]; then \
     git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" && \
     git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" && \
     curl -fsSL https://raw.githubusercontent.com/iamvikshan/.github/refs/heads/main/scripts/universal.zshrc -o "${HOME_DIR}/.zshrc" && \
+    echo 'eval "$(mise activate zsh)"' >> "${HOME_DIR}/.zshrc" && \
     if [ "${USERNAME}" != "root" ]; then \
         chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; \
     fi
@@ -48,6 +51,7 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="bun" \
       org.opencontainers.image.base.name="oven/bun:${BUN_VERSION}-alpine" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
-      devcontainer.tool.bun="${BUN_VERSION}"
+      devcontainer.tool.bun="${BUN_VERSION}" \
+      devcontainer.tool.mise="latest"
 
 CMD ["sleep", "infinity"]

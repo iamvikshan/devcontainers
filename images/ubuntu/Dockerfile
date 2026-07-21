@@ -19,15 +19,16 @@ RUN if [ "${USERNAME}" != "root" ]; then \
         && usermod -aG sudo ${USERNAME}; \
     fi
 
-# 3. OS Packages & Antigravity CLI (BuildKit Cached)
+# 3. OS Packages & Mise Tooling (BuildKit Cached)
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates zsh git sudo curl unzip xz-utils jq btop tree \
+    && curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh \
     && if [ "${USERNAME}" != "root" ]; then \
         mkdir -p /etc/sudoers.d \
         && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" \
-        && chmod 0440 "/etc/sudoers.d/${USERNAME}" \
+        chmod 0440 "/etc/sudoers.d/${USERNAME}" \
         && visudo -cf "/etc/sudoers.d/${USERNAME}"; \
     fi \
     && rm -rf /var/lib/apt/lists/*
@@ -39,6 +40,7 @@ RUN HOME_DIR=$(if [ "${USERNAME}" = "root" ]; then echo "/root"; else echo "/hom
     && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" \
     && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" \
     && curl -fsSL https://raw.githubusercontent.com/iamvikshan/.github/refs/heads/main/scripts/universal.zshrc -o "${HOME_DIR}/.zshrc" \
+    && echo 'eval "$(mise activate zsh)"' >> "${HOME_DIR}/.zshrc" \
     && if [ "${USERNAME}" != "root" ]; then chown -R "${USERNAME}:${USERNAME}" "${HOME_DIR}"; fi
 
 USER ${USERNAME}
@@ -47,6 +49,7 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="ubuntu" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       org.opencontainers.image.base.name="ubuntu:${UBUNTU_VERSION}" \
-      devcontainer.tool.ubuntu="${UBUNTU_VERSION}"
+      devcontainer.tool.ubuntu="${UBUNTU_VERSION}" \
+      devcontainer.tool.mise="latest"
 
 CMD ["sleep", "infinity"]
