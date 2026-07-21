@@ -1,3 +1,60 @@
+## [v0.4.1] - 2026-07-21
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| agents | v0.4.1 | 2026-07-21 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/agents:v0.4.1) · [Docker Hub](https://hub.docker.com/r/vikshan/agents:v0.4.1) |
+| bun | v0.4.1 | 2026-07-21 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bun:v0.4.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bun:v0.4.1) |
+| bunode | v0.4.1 | 2026-07-21 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bunode:v0.4.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bunode:v0.4.1) |
+| ubun-tu-node | v0.4.1 | 2026-07-21 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu-node:v0.4.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu-node:v0.4.1) |
+| ubun-tu | v0.4.1 | 2026-07-21 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu:v0.4.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu:v0.4.1) |
+| ubuntu | v0.4.1 | 2026-07-21 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubuntu:v0.4.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu:v0.4.1) |
+
+### Environment Tool Versions
+
+#### `agents` Environment
+```properties
+agy=latest
+bun=1.3.14
+coderabbit=latest
+node=24.18.0
+omniroute=latest
+opencode=latest
+openwiki=latest
+ubuntu=26.04
+```
+
+#### `bun` Environment
+```properties
+bun=1.3.14
+```
+
+#### `bunode` Environment
+```properties
+bun=1.3.14
+```
+
+#### `ubun-tu-node` Environment
+```properties
+bun=1.3.14
+node=24.18.0
+ubuntu=26.04
+```
+
+#### `ubun-tu` Environment
+```properties
+bun=1.3.14
+ubuntu=26.04
+```
+
+#### `ubuntu` Environment
+```properties
+ubuntu=26.04
+```
+
 ## [v0.4.0] - 2026-07-19
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.
