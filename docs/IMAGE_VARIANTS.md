@@ -8,7 +8,7 @@ images.
 | Feature         | bun               | bunode                 | ubun-tu          | ubun-tu-node      | agents            | ubuntu                |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | oven/bun (Alpine) | ubuntu:latest         |
-| **Size**        | ~58 MB | ~83 MB | ~116 MB | ~173 MB | ~1372 MB | ~81 MB |
+| **Size**        | ~92 MB | ~116 MB | ~150 MB | ~206 MB | ~784 MB | ~114 MB |
 | **Bun Version** | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | ❌ |
 | **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v24.18.0 | ✅ v24.18.0 | ❌ |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ✅ 10.9.0         | ❌                    |
@@ -23,12 +23,12 @@ images.
 - **Full-Stack Projects** → `bunode` or `ubun-tu-node`
 - **Need Ubuntu Packages** → `ubun-tu` or `ubun-tu-node`
 - **Need Ubuntu Tools Without JS Runtimes** → `ubuntu`
-- **Smallest Size** → `ubun-tu` (116 MB)
-- **Most Features** → `bunode` (83 MB)
+- **Smallest Size** → `ubun-tu` (150 MB)
+- **Most Features** → `bunode` (116 MB)
 
 ## 🐳 Image Details
 
-### 1. bun (~58 MB)
+### 1. bun (~92 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/bun:latest`
 
@@ -74,7 +74,7 @@ compatibility.
 }
 ```
 
-### 2. bunode (~83 MB)
+### 2. bunode (~116 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/bunode:latest`
 
@@ -120,7 +120,7 @@ compatibility.
 }
 ```
 
-### 3. ubun-tu (~116 MB)
+### 3. ubun-tu (~150 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubun-tu:latest`
 
@@ -166,7 +166,7 @@ package ecosystem and tooling. The smallest image in our collection!
 }
 ```
 
-### 4. ubun-tu-node (~173 MB)
+### 4. ubun-tu-node (~206 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest`
 
@@ -214,7 +214,7 @@ JavaScript runtimes.
 }
 ```
 
-### 5. agents (~1372 MB)
+### 5. agents (~784 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/agents:latest`
 
@@ -258,7 +258,7 @@ JavaScript runtimes.
 }
 ```
 
-### 6. ubuntu (~81 MB)
+### 6. ubuntu (~114 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubuntu:latest`
 
@@ -320,11 +320,11 @@ Do you need Bun runtime?
 
 **Smallest to Largest:**
 
-1. **ubuntu** (~81 MB) - Tools-focused baseline
-2. **ubun-tu** (~116 MB) - Most efficient Ubuntu Bun option
-3. **bun** (~58 MB) - Most efficient Bun runtime option
-4. **ubun-tu-node** (~173 MB) - Balanced Ubuntu full-stack option
-5. **bunode** (~83 MB) - Full-featured but larger
+1. **ubuntu** (~114 MB) - Tools-focused baseline
+2. **ubun-tu** (~150 MB) - Most efficient Ubuntu Bun option
+3. **bun** (~92 MB) - Most efficient Bun runtime option
+4. **ubun-tu-node** (~206 MB) - Balanced Ubuntu full-stack option
+5. **bunode** (~116 MB) - Full-featured but larger
 
 ### Compatibility Matrix
 
