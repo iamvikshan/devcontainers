@@ -193,17 +193,17 @@ jobs:
       - uses: docker/setup-buildx-action@v4.2.0
 
       - name: Log in to Registries
-        uses: docker/login-action@v4.4.0
+        uses: docker/login-action@v4.5.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
-      - uses: docker/login-action@v4.4.0
+      - uses: docker/login-action@v4.5.0
         with:
           registry: registry.gitlab.com
           username: oauth2
           password: ${{ secrets.GITLAB_TOKEN }}
-      - uses: docker/login-action@v4.4.0
+      - uses: docker/login-action@v4.5.0
         with:
           username: ${{ env.GL_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -313,18 +313,18 @@ jobs:
 
       - name: Log in to Registries
         if: steps.check_base.outputs.skip != 'true'
-        uses: docker/login-action@v4.4.0
+        uses: docker/login-action@v4.5.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
-      - uses: docker/login-action@v4.4.0
+      - uses: docker/login-action@v4.5.0
         if: steps.check_base.outputs.skip != 'true'
         with:
           registry: registry.gitlab.com
           username: oauth2
           password: ${{ secrets.GITLAB_TOKEN }}
-      - uses: docker/login-action@v4.4.0
+      - uses: docker/login-action@v4.5.0
         if: steps.check_base.outputs.skip != 'true'
         with:
           username: ${{ env.GL_USERNAME }}
@@ -425,18 +425,18 @@ jobs:
 
       - name: Log in to Registries
         if: steps.check_base.outputs.skip != 'true'
-        uses: docker/login-action@v4.4.0
+        uses: docker/login-action@v4.5.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
-      - uses: docker/login-action@v4.4.0
+      - uses: docker/login-action@v4.5.0
         if: steps.check_base.outputs.skip != 'true'
         with:
           registry: registry.gitlab.com
           username: oauth2
           password: ${{ secrets.GITLAB_TOKEN }}
-      - uses: docker/login-action@v4.4.0
+      - uses: docker/login-action@v4.5.0
         if: steps.check_base.outputs.skip != 'true'
         with:
           username: ${{ env.GL_USERNAME }}
