@@ -1,3 +1,67 @@
+## [v0.5.1] - 2026-07-24
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| agents | v0.5.1 | 2026-07-24 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/agents:v0.5.1) · [Docker Hub](https://hub.docker.com/r/vikshan/agents:v0.5.1) |
+| bun | v0.5.1 | 2026-07-24 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bun:v0.5.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bun:v0.5.1) |
+| bunode | v0.5.1 | 2026-07-24 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bunode:v0.5.1) · [Docker Hub](https://hub.docker.com/r/vikshan/bunode:v0.5.1) |
+| ubun-tu-node | v0.5.1 | 2026-07-24 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu-node:v0.5.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu-node:v0.5.1) |
+| ubun-tu | v0.5.1 | 2026-07-24 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu:v0.5.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu:v0.5.1) |
+| ubuntu | v0.5.1 | 2026-07-24 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubuntu:v0.5.1) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu:v0.5.1) |
+
+### Environment Tool Versions
+
+#### `agents` Environment
+```properties
+agy=latest
+aube=latest
+bun=1.3.14
+coderabbit=latest
+mise=latest
+node=24.18.0
+omniroute=latest
+opencode=latest
+openwiki=latest
+ubuntu=26.04
+```
+
+#### `bun` Environment
+```properties
+bun=1.3.14
+mise=latest
+```
+
+#### `bunode` Environment
+```properties
+bun=1.3.14
+mise=latest
+```
+
+#### `ubun-tu-node` Environment
+```properties
+bun=1.3.14
+mise=latest
+node=24.18.0
+ubuntu=26.04
+```
+
+#### `ubun-tu` Environment
+```properties
+bun=1.3.14
+mise=latest
+ubuntu=26.04
+```
+
+#### `ubuntu` Environment
+```properties
+mise=latest
+ubuntu=26.04
+```
+
 ## [v0.5.0] - 2026-07-21
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.
