@@ -32,6 +32,7 @@ LABEL org.opencontainers.image.title="ubun-tu" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu:latest" \
       devcontainer.tool.bun="${BUN_VERSION}" \
+      devcontainer.tool.mise="latest" \
       devcontainer.tool.r2git="latest"
 
 CMD ["sleep", "infinity"]

@@ -7,14 +7,20 @@ ARG BUN_VERSION="1.3.14"
 # renovate: datasource=node-version depName=node
 ARG NODE_VERSION="22.23.1"
 
+# renovate: datasource=github-releases depName=jdx/aube
+ARG AUBE_VERSION="1.34.0"
+
 USER root
 
-# 1. Install tools via Aube, resolve bundled native modules, then purge temporary compilers
+# 1. Permanently expose Aube's global pnpm bin directory to all runtime sessions
+ENV PATH="/root/.local/share/pnpm:$PATH"
+
+# 2. Install tools via Aube, resolve bundled native modules, then purge temporary compilers
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     python3 build-essential \
-    && mise use -g aube \
+    && mise use -g aube@${AUBE_VERSION} \
     && ln -sf /root/.local/share/mise/shims/aube /usr/local/bin/aube \
     # EXPORT PATH & TRUST POLICY so all child scripts and subsequent aube commands inherit them
     && export PATH="/root/.local/share/pnpm:$PATH" \
@@ -30,13 +36,17 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
        done \
     # Remove temporary global helper tools via Aube
     && aube remove -g @mapbox/node-pre-gyp prebuild-install \
-    # Symlink installed binaries globally from the pnpm store so scripts can execute them natively
-    && ln -sf /root/.local/share/pnpm/* /usr/local/bin/ \
+    # Resolve absolute targets so symlinking into /usr/local/bin never creates broken relative links
+    && for bin in /root/.local/share/pnpm/*; do \
+         if [ -e "$bin" ]; then \
+           ln -sf "$(realpath "$bin")" "/usr/local/bin/$(basename "$bin")"; \
+         fi; \
+       done \
     # Purge compilers and Python so zero build bloat remains in the final image
     && apt-get purge -y --auto-remove python3 build-essential \
     && rm -rf /var/lib/apt/lists/* /root/.npm /root/.cache/aube /tmp/*
 
-# 2. Install Binary Tooling (Coderabbit & Agy)
+# 3. Install Binary Tooling (Coderabbit & Agy)
 RUN echo "Installing coderabbit..." \
     && curl -fsSL https://cli.coderabbit.ai/install.sh | bash \
     && mv /root/.local/bin/coderabbit /usr/local/bin/coderabbit \
@@ -50,8 +60,8 @@ LABEL org.opencontainers.image.title="agents" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest" \
       devcontainer.tool.bun="${BUN_VERSION}" \
       devcontainer.tool.node="${NODE_VERSION}" \
+      devcontainer.tool.aube="${AUBE_VERSION}" \
       devcontainer.tool.mise="latest" \
-      devcontainer.tool.aube="latest" \
       devcontainer.tool.omniroute="latest" \
       devcontainer.tool.openwiki="latest" \
       devcontainer.tool.opencode="latest" \
