@@ -1,3 +1,74 @@
+## [v0.5.6] - 2026-07-29
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| agents | v0.5.6 | 2026-07-29 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/agents:v0.5.6) · [Docker Hub](https://hub.docker.com/r/vikshan/agents:v0.5.6) |
+| bun | v0.5.6 | 2026-07-29 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bun:v0.5.6) · [Docker Hub](https://hub.docker.com/r/vikshan/bun:v0.5.6) |
+| bunode | v0.5.6 | 2026-07-29 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bunode:v0.5.6) · [Docker Hub](https://hub.docker.com/r/vikshan/bunode:v0.5.6) |
+| ubun-tu-node | v0.5.6 | 2026-07-29 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu-node:v0.5.6) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu-node:v0.5.6) |
+| ubun-tu | v0.5.6 | 2026-07-29 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu:v0.5.6) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu:v0.5.6) |
+| ubuntu | v0.5.6 | 2026-07-29 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubuntu:v0.5.6) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu:v0.5.6) |
+
+### Environment Tool Versions
+
+#### `agents` Environment
+```properties
+agy=latest
+aube=1.34.0
+bun=1.3.14
+coderabbit=latest
+mise=latest
+node=22.23.1
+omniroute=latest
+opencode=latest
+openwiki=latest
+r2git=latest
+ubuntu=26.04
+```
+
+#### `bun` Environment
+```properties
+bun=1.3.14
+mise=latest
+r2git=latest
+```
+
+#### `bunode` Environment
+```properties
+bun=1.3.14
+mise=latest
+node=latest
+r2git=latest
+```
+
+#### `ubun-tu-node` Environment
+```properties
+aube=1.34.0
+bun=1.3.14
+mise=latest
+node=22.23.1
+r2git=latest
+ubuntu=26.04
+```
+
+#### `ubun-tu` Environment
+```properties
+bun=1.3.14
+mise=latest
+r2git=latest
+ubuntu=26.04
+```
+
+#### `ubuntu` Environment
+```properties
+mise=latest
+ubuntu=26.04
+```
+
 ## [v0.5.5] - 2026-07-29
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.
