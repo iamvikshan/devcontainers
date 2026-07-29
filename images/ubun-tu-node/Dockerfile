@@ -13,7 +13,7 @@ FROM ghcr.io/iamvikshan/devcontainer/ubuntu:latest
 ARG BUN_VERSION
 
 # renovate: datasource=node-version depName=node
-ARG NODE_VERSION="22.23.1"
+ARG NODE_VERSION="22.23.2"
 
 # renovate: datasource=github-releases depName=jdx/aube
 ARG AUBE_VERSION="1.34.0"
