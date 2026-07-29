@@ -11,7 +11,6 @@ FROM ghcr.io/iamvikshan/devcontainer/ubuntu:latest
 
 # 3. Re-declare ARGs for Renovate tracking and Label injection
 ARG BUN_VERSION
-
 ARG USERNAME=root
 
 # 4. Elevate to root to copy binaries and install global tools
@@ -20,8 +19,10 @@ USER root
 COPY --from=bun_source /usr/local/bin/bun /usr/local/bin/bun
 RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
+# Install r2git natively via Bun and symlink it globally for non-root execution
 RUN bun install -g @syncron/r2git \
-&& rm -rf /root/.bun/install/cache /tmp/*
+    && ln -sf /root/.bun/bin/* /usr/local/bin/ \
+    && rm -rf /root/.bun/install/cache /tmp/*
 
 # 5. Drop privileges
 USER ${USERNAME}
@@ -30,6 +31,7 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="ubun-tu" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu:latest" \
-      devcontainer.tool.bun="${BUN_VERSION}"
+      devcontainer.tool.bun="${BUN_VERSION}" \
+      devcontainer.tool.r2git="latest"
 
 CMD ["sleep", "infinity"]

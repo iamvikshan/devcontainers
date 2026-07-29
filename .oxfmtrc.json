@@ -14,7 +14,7 @@
   "trailingComma": "none",
   "useTabs": false,
   "sortPackageJson": false,
-  "ignorePatterns": ["node_modules/", "*ignore*", "*lock*", "metadata/"],
+  "ignorePatterns": ["node_modules/", "*ignore*", "*lock*", "CHANGELOG.md", "metadata/"],
   "overrides": [
     {
       "files": ["*.md"],

@@ -14,7 +14,7 @@ ARG USERNAME=root
 # 2. Install unpinned OS packages & pinned global tools (using Bun)
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --no-cache \
-    zsh git sudo curl jq btop tree bash
+    zsh git sudo curl jq btop tree bash openssh-client ripgrep
 
 # Install mise globally
 RUN curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
@@ -47,11 +47,12 @@ RUN bun install -g @syncron/r2git \
 
 USER ${USERNAME}
 
-# 4. Inject Metadata for Skopeo Extraction
+# 5. Inject Metadata for Skopeo Extraction
 LABEL org.opencontainers.image.title="bun" \
       org.opencontainers.image.base.name="oven/bun:${BUN_VERSION}-alpine" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       devcontainer.tool.bun="${BUN_VERSION}" \
-      devcontainer.tool.mise="latest"
+      devcontainer.tool.mise="latest" \
+      devcontainer.tool.r2git="latest"
 
 CMD ["sleep", "infinity"]

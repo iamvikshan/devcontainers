@@ -8,9 +8,9 @@ images.
 | Feature         | bun               | bunode                 | ubun-tu          | ubun-tu-node      | agents            | ubuntu                |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | oven/bun (Alpine) | ubuntu:latest         |
-| **Size**        | ~92 MB | ~116 MB | ~150 MB | ~206 MB | ~784 MB | ~114 MB |
-| **Bun Version** | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | 1.3.14 | ❌ |
-| **Node.js**     | ❌ | ✅ v22.11.0 | ❌ | ✅ v24.18.0 | ✅ v24.18.0 | ❌ |
+| **Size**        | ~92 MB            | ~116 MB                | ~150 MB          | ~206 MB           | ~784 MB           | ~114 MB               |
+| **Bun Version** | 1.3.14            | 1.3.14                 | 1.3.14           | 1.3.14            | 1.3.14            | ❌                    |
+| **Node.js**     | ❌                | ✅ v22.11.0            | ❌               | ✅ v24.18.0       | ✅ v24.18.0       | ❌                    |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ✅ 10.9.0         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Alpine (apk)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | AI & custom tools | Tools-only automation |

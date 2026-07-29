@@ -1,6 +1,6 @@
 {
   "name": "uBUNtu",
-  "image": "ghcr.io/iamvikshan/devcontainer/bun:latest",
+  "image": "vikshan/ubun-tu:latest",
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1.10.0": {
       "moby": false,

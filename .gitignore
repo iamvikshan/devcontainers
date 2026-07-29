@@ -4,3 +4,4 @@ node_modules
 plans/
 scripts/hooks/
 scripts/bootstrap.sh
+build_log.txt

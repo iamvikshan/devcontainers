@@ -8,9 +8,9 @@ setup, so the examples below use `zsh`.
 
 ### 1. Choose Your Image
 
-| Image            | Base     | Tools                              | Size     | Use Case                      |
-| ---------------- | -------- | ---------------------------------- | -------- | ----------------------------- |
-| **bun**          | oven/bun | Bun, Git                           | ~92 MB | Bun-only projects             |
+| Image            | Base     | Tools                              | Size    | Use Case                      |
+| ---------------- | -------- | ---------------------------------- | ------- | ----------------------------- |
+| **bun**          | oven/bun | Bun, Git                           | ~92 MB  | Bun-only projects             |
 | **bunode**       | oven/bun | Bun, Node.js, npm, Git             | ~116 MB | Full-stack with Bun + Node.js |
 | **ubun-tu**      | Ubuntu   | Bun, Git                           | ~150 MB | Ubuntu-based Bun development  |
 | **ubun-tu-node** | Ubuntu   | Bun, Node.js, npm, Git             | ~206 MB | Ubuntu-based full-stack       |

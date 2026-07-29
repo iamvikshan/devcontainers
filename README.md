@@ -15,14 +15,14 @@ interactive shell experience.
 
 ## Available Images
 
-| Image            | Size    | Base   | Bun | Node.js | Best For                  |
-| ---------------- | ------- | ------ | --- | ------- | ------------------------- |
-| **bun** | 92 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
-| **bunode** | 116 MB | Alpine | ✅  | ✅      | Full-stack development    |
-| **ubun-tu** | 150 MB | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
+| Image            | Size   | Base   | Bun | Node.js | Best For                  |
+| ---------------- | ------ | ------ | --- | ------- | ------------------------- |
+| **bun**          | 92 MB  | Alpine | ✅  | ❌      | Pure Bun projects         |
+| **bunode**       | 116 MB | Alpine | ✅  | ✅      | Full-stack development    |
+| **ubun-tu**      | 150 MB | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
 | **ubun-tu-node** | 206 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
-| **agents** | 784 MB | Alpine | ✅  | ✅      | Personal AI workspace     |
-| **ubuntu** | 114 MB | Ubuntu | ❌  | ❌      | Tools-only automation     |
+| **agents**       | 784 MB | Alpine | ✅  | ✅      | Personal AI workspace     |
+| **ubuntu**       | 114 MB | Ubuntu | ❌  | ❌      | Tools-only automation     |
 
 ### 🎯 Choose Your Image
 

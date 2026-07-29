@@ -13,30 +13,27 @@ FROM ghcr.io/iamvikshan/devcontainer/ubuntu:latest
 ARG BUN_VERSION
 
 # renovate: datasource=node-version depName=node
-ARG NODE_VERSION="24.18.0"
+ARG NODE_VERSION="22.23.1"
 ARG USERNAME=root
 
-# 4. Elevate to root to copy binaries and install Node + global tools
+# 4. Elevate to root to copy binaries and install dependencies
 USER root
 
-# Copy Bun binary and symlink bunx
+# Copy official Bun binary and symlink bunx
 COPY --from=bun_source /usr/local/bin/bun /usr/local/bin/bun
 RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
-# Install Node.js deterministically for the correct architecture, then install formatters
-ARG TARGETARCH
-RUN ARCH="$(case "$TARGETARCH" in amd64) echo x64 ;; arm64) echo arm64 ;; *) echo "Unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; esac)" \
-    && NODE_TARBALL="node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
-    && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_TARBALL}" \
-    && curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt" \
-    && grep " ${NODE_TARBALL}$" SHASUMS256.txt > node_checksum.txt \
-    && sha256sum -c node_checksum.txt \
-    && tar -xJf "${NODE_TARBALL}" -C /usr/local --strip-components=1 \
-    && rm -f "${NODE_TARBALL}" SHASUMS256.txt node_checksum.txt
-
-RUN bun install -g @syncron/r2git \
-&& rm -rf /root/.bun/install/cache /tmp/*
-
+# Install libatomic1 via apt-get, versioned Node and Aube via mise, then add global tools
+RUN mise use -g node@${NODE_VERSION} aube \
+    && AUBE_LOW_DOWNLOAD_THRESHOLD=0 aube add -g @syncron/r2git \
+    # Symlink core shims and global tools into /usr/local/bin for bulletproof system-wide access
+    && ln -sf /root/.local/share/mise/shims/node /usr/local/bin/node \
+    && ln -sf /root/.local/share/mise/shims/npm /usr/local/bin/npm \
+    && ln -sf /root/.local/share/mise/shims/npx /usr/local/bin/npx \
+    && ln -sf /root/.local/share/mise/shims/aube /usr/local/bin/aube \
+    && ln -sf /root/.local/share/pnpm/* /usr/local/bin/ \
+    && rm -rf /root/.npm /root/.cache/mise /root/.cache/aube /tmp/* /var/lib/apt/lists/*
+    
 # 5. Drop privileges
 USER ${USERNAME}
 
@@ -45,6 +42,9 @@ LABEL org.opencontainers.image.title="ubun-tu-node" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/ubuntu:latest" \
       devcontainer.tool.bun="${BUN_VERSION}" \
-      devcontainer.tool.node="${NODE_VERSION}"
+      devcontainer.tool.node="${NODE_VERSION}" \
+      devcontainer.tool.mise="latest" \
+      devcontainer.tool.aube="latest" \
+      devcontainer.tool.r2git="latest"
 
 CMD ["sleep", "infinity"]

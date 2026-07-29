@@ -18,6 +18,7 @@ USER ${USERNAME}
 LABEL org.opencontainers.image.title="bunode" \
       org.opencontainers.image.base.name="ghcr.io/iamvikshan/devcontainer/bun:latest" \
       org.opencontainers.image.source="https://github.com/iamvikshan/devcontainers" \
-      devcontainer.tool.bun="${BUN_VERSION}"
+      devcontainer.tool.bun="${BUN_VERSION}" \
+      devcontainer.tool.node="latest"
 
 CMD ["sleep", "infinity"]

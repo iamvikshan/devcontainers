@@ -110,7 +110,7 @@ jobs:
 
           # Handle Schedule or Manual Dispatch Target Overrides
           TARGET="${{ github.event.inputs.target_image || 'all' }}"
-          
+
           if [ "${{ github.event_name }}" == "schedule" ] || [ "$TARGET" == "all" ]; then
             # Force all branches of the DAG if scheduled or "all" is selected
             T_BUN="true"; T_UBUNTU="true"; T_BUNODE="true"; T_UBUN_TU="true"; T_UBUN_TU_NODE="true"; T_AGENTS="true"
@@ -141,7 +141,7 @@ jobs:
           if [ "$T_UBUNTU" == "true" ] || [ "$T_UBUN_TU_NODE" == "true" ]; then
             DERIVATIVES+=("ubun-tu-node")
           fi
-          
+
           # Evaluate AI (Cascade from Ubuntu track)
           if [ "$T_UBUNTU" == "true" ] || [ "$T_UBUN_TU_NODE" == "true" ] || [ "$T_AGENTS" == "true" ]; then
             AI_CHANGED="true"
@@ -611,4 +611,3 @@ jobs:
           container: devcontainer/${{ matrix.image }}
           keep-younger-than: 7
           prune-untagged: true
-          
