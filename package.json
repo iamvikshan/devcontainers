@@ -7,7 +7,7 @@
     "upd": "sudo apt update -y && sudo apt upgrade -y && bun upgrade && bun update && bun f"
   },
   "devDependencies": {
-    "oxfmt": "^0.61.0",
+    "oxfmt": "^0.62.0",
     "lint-staged": "^17.3.0"
   }
 }
