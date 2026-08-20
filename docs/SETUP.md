@@ -13,7 +13,7 @@ setup, so the examples below use `zsh`.
 | **bun**          | oven/bun | Bun, Git                           | ~101 MB | Bun-only projects             |
 | **bunode**       | oven/bun | Bun, Node.js, npm, Git             | ~126 MB | Full-stack with Bun + Node.js |
 | **ubun-tu**      | Ubuntu   | Bun, Git                           | ~156 MB | Ubuntu-based Bun development  |
-| **ubun-tu-node** | Ubuntu   | Bun, Node.js, npm, Git             | ~243 MB | Ubuntu-based full-stack       |
+| **ubun-tu-node** | Ubuntu   | Bun, Node.js, npm, Git             | ~241 MB | Ubuntu-based full-stack       |
 | **agents**       | oven/bun | Bun, Node.js, npm, agy, CodeRabbit | ~1231 MB | Personal AI workspace         |
 | **ubuntu**       | Ubuntu   | Python, jq, Git, curl              | ~122 MB | Tools-only automation         |
 
