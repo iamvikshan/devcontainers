@@ -3,7 +3,7 @@
 FROM ghcr.io/iamvikshan/devcontainer/bun:latest
 
 # renovate: datasource=docker depName=oven/bun
-ARG BUN_VERSION="1.3.14"
+ARG BUN_VERSION="1.4.0"
 
 ARG USERNAME=root
 

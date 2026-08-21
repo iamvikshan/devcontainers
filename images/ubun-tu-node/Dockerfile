@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=oven/bun
-ARG BUN_VERSION="1.3.14"
+ARG BUN_VERSION="1.4.0"
 
 # 1. Define Bun Source for Multi-Stage Copy (using glibc-compatible slim image)
 FROM oven/bun:${BUN_VERSION}-slim AS bun_source

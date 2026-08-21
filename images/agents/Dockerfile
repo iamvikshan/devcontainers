@@ -2,7 +2,7 @@
 FROM ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest
 
 # renovate: datasource=docker depName=oven/bun
-ARG BUN_VERSION="1.3.14"
+ARG BUN_VERSION="1.4.0"
 
 # renovate: datasource=node-version depName=node
 ARG NODE_VERSION="22.23.2"
