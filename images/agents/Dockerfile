@@ -5,7 +5,7 @@ FROM ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest
 ARG BUN_VERSION="1.4.0"
 
 # renovate: datasource=node-version depName=node
-ARG NODE_VERSION="24.19.0"
+ARG NODE_VERSION="24.20.0"
 
 # renovate: datasource=github-releases depName=jdx/aube
 ARG AUBE_VERSION="2.2.0"
