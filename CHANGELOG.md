@@ -1,3 +1,47 @@
+## [v0.5.30] - 2026-08-31
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| bun | v0.5.30 | 2026-08-31 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bun:v0.5.30) · [Docker Hub](https://hub.docker.com/r/vikshan/bun:v0.5.30) |
+| bunode | v0.5.30 | 2026-08-31 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bunode:v0.5.30) · [Docker Hub](https://hub.docker.com/r/vikshan/bunode:v0.5.30) |
+| ubun-tu | v0.5.30 | 2026-08-31 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu:v0.5.30) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu:v0.5.30) |
+| ubuntu | v0.5.30 | 2026-08-31 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubuntu:v0.5.30) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu:v0.5.30) |
+
+### Environment Tool Versions
+
+#### `bun` Environment
+```properties
+bun=1.4.0
+mise=latest
+r2git=latest
+```
+
+#### `bunode` Environment
+```properties
+bun=1.4.0
+mise=latest
+node=latest
+r2git=latest
+```
+
+#### `ubun-tu` Environment
+```properties
+bun=1.4.0
+mise=latest
+r2git=latest
+ubuntu=26.04
+```
+
+#### `ubuntu` Environment
+```properties
+mise=latest
+ubuntu=26.04
+```
+
 ## [v0.5.29] - 2026-08-30
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.
