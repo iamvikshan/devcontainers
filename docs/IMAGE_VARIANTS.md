@@ -10,7 +10,7 @@ images.
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | oven/bun (Alpine) | ubuntu:latest         |
 | **Size**        | ~97 MB | ~122 MB | ~157 MB | ~243 MB | ~1231 MB | ~120 MB |
 | **Bun Version** | 1.4.0 | 1.4.0 | 1.4.0 | 1.4.0 | 1.3.14 | ❌ |
-| **Node.js**     | ❌ | ✅ vlatest | ❌ | ✅ v24.19.0 | ✅ v22.23.2 | ❌ |
+| **Node.js**     | ❌ | ✅ vlatest | ❌ | ✅ v24.20.0 | ✅ v22.23.2 | ❌ |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ✅ 10.9.0         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Alpine (apk)      | Ubuntu (apt)          |
 | **Best For**    | Pure Bun projects | Full-stack development | Ubuntu workflows | Ubuntu full-stack | AI & custom tools | Tools-only automation |
