@@ -2,13 +2,13 @@
 FROM ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest
 
 # renovate: datasource=docker depName=oven/bun
-ARG BUN_VERSION="1.4.0"
+ARG BUN_VERSION="1.4.2"
 
 # renovate: datasource=node-version depName=node
 ARG NODE_VERSION="24.20.0"
 
 # renovate: datasource=github-releases depName=jdx/aube
-ARG AUBE_VERSION="2.2.4"
+ARG AUBE_VERSION="2.2.12"
 
 USER root
 
