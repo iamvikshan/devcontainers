@@ -10,8 +10,8 @@ setup, so the examples below use `zsh`.
 
 | Image            | Base     | Tools                              | Size     | Use Case                      |
 | ---------------- | -------- | ---------------------------------- | -------- | ----------------------------- |
-| **bun**          | oven/bun | Bun, Git                           | ~97 MB | Bun-only projects             |
-| **bunode**       | oven/bun | Bun, Node.js, npm, Git             | ~122 MB | Full-stack with Bun + Node.js |
+| **bun**          | oven/bun | Bun, Git                           | ~100 MB | Bun-only projects             |
+| **bunode**       | oven/bun | Bun, Node.js, npm, Git             | ~125 MB | Full-stack with Bun + Node.js |
 | **ubun-tu**      | Ubuntu   | Bun, Git                           | ~157 MB | Ubuntu-based Bun development  |
 | **ubun-tu-node** | Ubuntu   | Bun, Node.js, npm, Git             | ~243 MB | Ubuntu-based full-stack       |
 | **agents**       | oven/bun | Bun, Node.js, npm, agy, CodeRabbit | ~1231 MB | Personal AI workspace         |

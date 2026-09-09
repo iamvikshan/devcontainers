@@ -8,8 +8,8 @@ images.
 | Feature         | bun               | bunode                 | ubun-tu          | ubun-tu-node      | agents            | ubuntu                |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | oven/bun (Alpine) | ubuntu:latest         |
-| **Size**        | ~97 MB | ~122 MB | ~157 MB | ~243 MB | ~1231 MB | ~120 MB |
-| **Bun Version** | 1.4.0 | 1.4.0 | 1.4.0 | 1.4.0 | 1.3.14 | ❌ |
+| **Size**        | ~100 MB | ~125 MB | ~157 MB | ~243 MB | ~1231 MB | ~120 MB |
+| **Bun Version** | 1.4.2 | 1.4.2 | 1.4.0 | 1.4.0 | 1.3.14 | ❌ |
 | **Node.js**     | ❌ | ✅ vlatest | ❌ | ✅ v24.20.0 | ✅ v22.23.2 | ❌ |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ✅ 10.9.0         | ❌                    |
 | **Package Mgr** | Alpine (apk)      | Alpine (apk)           | Ubuntu (apt)     | Ubuntu (apt)      | Alpine (apk)      | Ubuntu (apt)          |
@@ -24,11 +24,11 @@ images.
 - **Need Ubuntu Packages** → `ubun-tu` or `ubun-tu-node`
 - **Need Ubuntu Tools Without JS Runtimes** → `ubuntu`
 - **Smallest Size** → `ubun-tu` (157 MB)
-- **Most Features** → `bunode` (122 MB)
+- **Most Features** → `bunode` (125 MB)
 
 ## 🐳 Image Details
 
-### 1. bun (~97 MB)
+### 1. bun (~100 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/bun:latest`
 
@@ -74,7 +74,7 @@ compatibility.
 }
 ```
 
-### 2. bunode (~122 MB)
+### 2. bunode (~125 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/bunode:latest`
 
@@ -322,9 +322,9 @@ Do you need Bun runtime?
 
 1. **ubuntu** (~120 MB) - Tools-focused baseline
 2. **ubun-tu** (~157 MB) - Most efficient Ubuntu Bun option
-3. **bun** (~97 MB) - Most efficient Bun runtime option
+3. **bun** (~100 MB) - Most efficient Bun runtime option
 4. **ubun-tu-node** (~243 MB) - Balanced Ubuntu full-stack option
-5. **bunode** (~122 MB) - Full-featured but larger
+5. **bunode** (~125 MB) - Full-featured but larger
 
 ### Compatibility Matrix
 
