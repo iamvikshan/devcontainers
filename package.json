@@ -8,6 +8,6 @@
   },
   "devDependencies": {
     "oxfmt": "^0.70.0",
-    "lint-staged": "^17.5.1"
+    "lint-staged": "^17.6.0"
   }
 }
