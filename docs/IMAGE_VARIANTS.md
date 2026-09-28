@@ -8,7 +8,7 @@ images.
 | Feature         | bun               | bunode                 | ubun-tu          | ubun-tu-node      | agents            | ubuntu                |
 | --------------- | ----------------- | ---------------------- | ---------------- | ----------------- | ----------------- | --------------------- |
 | **Base Image**  | oven/bun (Alpine) | oven/bun (Alpine)      | ubuntu:latest    | ubuntu:latest     | oven/bun (Alpine) | ubuntu:latest         |
-| **Size**        | ~100 MB | ~125 MB | ~163 MB | ~251 MB | ~1231 MB | ~126 MB |
+| **Size**        | ~100 MB | ~125 MB | ~163 MB | ~250 MB | ~1231 MB | ~126 MB |
 | **Bun Version** | 1.4.2 | 1.4.2 | 1.4.2 | 1.4.2 | 1.3.14 | ❌ |
 | **Node.js**     | ❌ | ✅ vlatest | ❌ | ✅ v24.21.0 | ✅ v22.23.2 | ❌ |
 | **npm**         | ❌                | ✅ 10.9.0              | ❌               | ✅ 10.9.0         | ✅ 10.9.0         | ❌                    |
@@ -166,7 +166,7 @@ package ecosystem and tooling. The smallest image in our collection!
 }
 ```
 
-### 4. ubun-tu-node (~251 MB)
+### 4. ubun-tu-node (~250 MB)
 
 **Primary Image:** `ghcr.io/iamvikshan/devcontainer/ubun-tu-node:latest`
 
@@ -323,7 +323,7 @@ Do you need Bun runtime?
 1. **ubuntu** (~126 MB) - Tools-focused baseline
 2. **ubun-tu** (~163 MB) - Most efficient Ubuntu Bun option
 3. **bun** (~100 MB) - Most efficient Bun runtime option
-4. **ubun-tu-node** (~251 MB) - Balanced Ubuntu full-stack option
+4. **ubun-tu-node** (~250 MB) - Balanced Ubuntu full-stack option
 5. **bunode** (~125 MB) - Full-featured but larger
 
 ### Compatibility Matrix
