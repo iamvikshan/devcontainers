@@ -1,3 +1,40 @@
+## [v0.5.44] - 2026-10-05
+
+All notable changes to this project are documented below. This release contains updates for the specific environments listed.
+
+### Released Environments
+
+| Container | Version | Date | Registry Links |
+|---|---|---|---|
+| bun | v0.5.44 | 2026-10-05 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/bun:v0.5.44) · [Docker Hub](https://hub.docker.com/r/vikshan/bun:v0.5.44) |
+| ubun-tu-node | v0.5.44 | 2026-10-05 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubun-tu-node:v0.5.44) · [Docker Hub](https://hub.docker.com/r/vikshan/ubun-tu-node:v0.5.44) |
+| ubuntu | v0.5.44 | 2026-10-05 | [GHCR](https://ghcr.io/iamvikshan/devcontainer/ubuntu:v0.5.44) · [Docker Hub](https://hub.docker.com/r/vikshan/ubuntu:v0.5.44) |
+
+### Environment Tool Versions
+
+#### `bun` Environment
+```properties
+bun=1.4.2
+mise=latest
+r2git=latest
+```
+
+#### `ubun-tu-node` Environment
+```properties
+aube=2.6.1
+bun=1.4.2
+mise=latest
+node=24.21.0
+r2git=latest
+ubuntu=26.04
+```
+
+#### `ubuntu` Environment
+```properties
+mise=latest
+ubuntu=26.04
+```
+
 ## [] - 2026-10-04
 
 All notable changes to this project are documented below. This release contains updates for the specific environments listed.

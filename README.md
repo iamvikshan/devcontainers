@@ -20,9 +20,9 @@ interactive shell experience.
 | **bun** | 100 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
 | **bunode** | 125 MB | Alpine | ✅  | ✅      | Full-stack development    |
 | **ubun-tu** | 163 MB | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
-| **ubun-tu-node** | 250 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
+| **ubun-tu-node** | 263 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
 | **agents** | 1231 MB | Alpine | ✅  | ✅      | Personal AI workspace     |
-| **ubuntu** | 126 MB | Ubuntu | ❌  | ❌      | Tools-only automation     |
+| **ubuntu** | 140 MB | Ubuntu | ❌  | ❌      | Tools-only automation     |
 
 ### 🎯 Choose Your Image
 
