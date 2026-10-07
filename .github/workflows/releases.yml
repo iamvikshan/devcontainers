@@ -258,7 +258,7 @@ jobs:
           jq -r '.Labels | to_entries[] | select(.key | startswith("devcontainer.tool.")) | "\(.key | sub("devcontainer\\.tool\\."; ""))=\(.value)"' > metadata/${{ matrix.image }}.versions
 
       - name: Upload Metadata
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: metadata-${{ matrix.image }}
           path: metadata/
@@ -384,7 +384,7 @@ jobs:
 
       - name: Upload Metadata
         if: steps.check_base.outputs.skip != 'true'
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: metadata-${{ matrix.image }}
           path: metadata/
@@ -496,7 +496,7 @@ jobs:
 
       - name: Upload Metadata
         if: steps.check_base.outputs.skip != 'true'
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: metadata-agents
           path: metadata/
@@ -559,7 +559,7 @@ jobs:
 
       - name: Download updated README
         if: steps.check_built.outputs.skip != 'true'
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: updated-readme
           path: .
