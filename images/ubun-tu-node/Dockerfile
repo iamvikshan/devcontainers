@@ -16,7 +16,7 @@ ARG BUN_VERSION
 ARG NODE_VERSION="24.22.0"
 
 # renovate: datasource=github-releases depName=jdx/aube
-ARG AUBE_VERSION="2.7.2"
+ARG AUBE_VERSION="2.8.1"
 
 ARG USERNAME=root
 
