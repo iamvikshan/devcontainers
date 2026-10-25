@@ -18,7 +18,7 @@ interactive shell experience.
 | Image            | Size    | Base   | Bun | Node.js | Best For                  |
 | ---------------- | ------- | ------ | --- | ------- | ------------------------- |
 | **bun** | 134 MB | Alpine | ✅  | ❌      | Pure Bun projects         |
-| **bunode** | 159 MB | Alpine | ✅  | ✅      | Full-stack development    |
+| **bunode** | 158 MB | Alpine | ✅  | ✅      | Full-stack development    |
 | **ubun-tu** | 193 MB | Ubuntu | ✅  | ❌      | Ubuntu-based Bun projects |
 | **ubun-tu-node** | 280 MB | Ubuntu | ✅  | ✅      | Ubuntu full-stack         |
 | **agents** | 1231 MB | Alpine | ✅  | ✅      | Personal AI workspace     |
