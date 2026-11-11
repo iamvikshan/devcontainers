@@ -23,23 +23,23 @@ ARG USERNAME=root
 # 4. Permanently expose Aube's global pnpm bin directory to all runtime sessions
 ENV PATH="/root/.local/share/pnpm:$PATH"
 
-# 5. Elevate to root to copy binaries and install dependencies
+# 5. elevate to root to copy binaries and install dependencies
 USER root
 
-# Copy official Bun binary and symlink bunx
+# copy official bun binary and symlink bunx
 COPY --from=bun_source /usr/local/bin/bun /usr/local/bin/bun
 RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
-# Install versioned Node and pinned Aube via mise, then add global tools
-RUN mise use -g node@${NODE_VERSION} aube@${AUBE_VERSION} \
+# install required dynamic libraries, setup node/aube, and add global tools
+RUN apt-get update && apt-get install -y --no-install-recommends libatomic1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && mise use -g node@${NODE_VERSION} aube@${AUBE_VERSION} \
     && export PATH="/root/.local/share/pnpm:$PATH" \
     && AUBE_LOW_DOWNLOAD_THRESHOLD=0 aube add -g @syncron/r2git \
-    # Symlink core shims into /usr/local/bin for bulletproof system-wide access
     && ln -sf /root/.local/share/mise/shims/node /usr/local/bin/node \
     && ln -sf /root/.local/share/mise/shims/npm /usr/local/bin/npm \
     && ln -sf /root/.local/share/mise/shims/npx /usr/local/bin/npx \
     && ln -sf /root/.local/share/mise/shims/aube /usr/local/bin/aube \
-    # Resolve absolute targets so symlinking into /usr/local/bin never creates broken relative links
     && for bin in /root/.local/share/pnpm/*; do \
          if [ -e "$bin" ]; then \
            ln -sf "$(realpath "$bin")" "/usr/local/bin/$(basename "$bin")"; \
